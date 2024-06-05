@@ -22,12 +22,8 @@
 # include <curses.h>
 # include <term.h>
 
-//
 # include "libft/libft.h"
 # include "ft_err.h"
-
-//기타함수
-
 
 typedef enum e_boolean
 {

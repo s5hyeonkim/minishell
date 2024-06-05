@@ -1,5 +1,5 @@
 #ifndef FT_ERR_H
-#define FT_ERR_H
+# define FT_ERR_H
 
 typedef enum e_err
 {
@@ -7,6 +7,6 @@ typedef enum e_err
 	FILE_NOT_EXIST,
 	EXTRA_ERROR,
 	CMD_NOT_FOUND = 127,
-}
+}	t_err;
 
 #endif
