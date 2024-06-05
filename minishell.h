@@ -24,20 +24,20 @@ typedef struct s_token
 {
 	t_type	type;
 	char	*cmd; // or filename
-	int  resp; // 실행의 책임이 있는 인덱스 번호
-}	t_token;
+	int		resp; // 실행의 책임이 있는 인덱스 번호
+}			t_token;
 
 typedef struct s_process
 {
-  int pipe_fd[2];
-  pid_t pid;
-}   t_process;
+	int		pipe_fd[2];
+	pid_t	pid;
+}			t_process;
 
 typedef struct s_exec
 {
-	t_token	*t;
-	t_process *p;
-	size_t size; //token, process size
-}	t_exec;
+	t_token		*t;
+	t_process	*p;
+	size_t		size; //token, process size
+}			t_exec;
 
 #endif
