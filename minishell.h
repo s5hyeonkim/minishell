@@ -2,9 +2,9 @@
 # define MINISHELL_H
 
 //허용함수 헤더
+# include <stdio.h>
 # include <readline/readline.h>
 # include <readline/history.h>
-# include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
 # include <fcntl.h>
