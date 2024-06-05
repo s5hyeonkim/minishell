@@ -2,20 +2,18 @@
 # define MINISHELL_H
 
 //허용함수 헤더
-# include <readline/readline.h> 
+# include <readline/readline.h>
+# include <readline/history.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
 # include <fcntl.h>
 # include <sys/wait.h>
 # include <signal.h>
-# include <unistd.h>
-# include <stdlib.h>
 # include <sys/types.h>
 # include <sys/stat.h>
 # include <dirent.h>
 # include <string.h>
-# include <stdio.h>
 # include <errno.h>
 # include <sys/ioctl.h>
 # include <termios.h>
@@ -24,12 +22,6 @@
 
 # include "libft/libft.h"
 # include "ft_err.h"
-
-typedef enum e_boolean
-{
-	FALSE,
-	TRUE
-}	t_boolean;
 
 typedef enum e_type
 {
