@@ -11,11 +11,11 @@ void exit_process(t_exec *e, char *str, t_err err_code)
 	}
 	else if (err_code == FILE_NOT_EXIST)
 	{
-		ft_putstr_fd(perror(""), STDERR_FILENO);
+		perror("zsh: ");
 		ft_putstr_fd(str, STDERR_FILENO);
 	}
 	else
-		ft_putstr_fd(perror(""), STDERR_FILENO);
+		perror("zsh: ");
 	if (err_code && err_code != 127)
 		err_code = 1;
 	//free
