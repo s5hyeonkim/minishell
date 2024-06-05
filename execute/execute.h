@@ -23,5 +23,9 @@
 typedef struct s_process
 {
     pid_t   pid;
+    char    *path;
+    char    **args;
+    int     flag;
 }   t_process;
+
 #endif
