@@ -22,6 +22,7 @@
 
 # include "libft/libft.h"
 # include "ft_err.h"
+# include "./execute/execute.h"
 
 typedef enum e_type
 {
@@ -42,11 +43,6 @@ typedef struct s_token
 	int		resp; // 실행의 책임이 있는 인덱스 번호
 }			t_token;
 
-typedef struct s_process
-{
-	int		pipe_fd[2];
-	pid_t	pid;
-}			t_process;
 
 typedef struct s_exec
 {
