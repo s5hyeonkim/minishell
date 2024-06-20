@@ -17,8 +17,8 @@
 # include <termios.h>
 # include <curses.h>
 # include <term.h>
-# include "libft/libft.h"
-# include "ft_err.h"
+# include "../libft/libft.h"
+# include "../ft_err.h"
 
 typedef struct s_process
 {

@@ -24,6 +24,9 @@
 # include "ft_err.h"
 # include "./execute/execute.h"
 
+// builtin folder 경로
+# define builtin "./execute/"
+
 typedef enum e_type
 {
 	CMD,
@@ -38,18 +41,26 @@ typedef enum e_type
 
 typedef struct s_token
 {
-	t_type	type;
-	char	*cmd; // or filename
-	int		resp; // 실행의 책임이 있는 인덱스 번호
-}			t_token;
+	t_type			type;
+	char			*cmd; // or filename
+	struct s_token	*left;
+	struct s_token	*right;
+}	t_token;
 
+typedef struct s_env
+{
+	char	**paths;
+	char	**envp;
+	int		status;
+}	t_env;
 
 typedef struct s_exec
 {
-	t_token		*t;
-	t_process	*p;
-	size_t		size; //token, process size
-}			t_exec;
+	t_token			*t;
+	HIST_ENTRY		history;
+	t_process		*p;
+	t_env			env;
+}	t_exec;
 
 //libft
 char	*get_next_line(int fd);
