@@ -53,33 +53,50 @@ void	check_validation(t_exec *info, int argc)
 		exit_process(info, INVALID_ARGV);
 }
 
-char	**get_env_paths(char *envp[])
+char	**get_env_paths(void)
 {
-	int		size;
 	char	**ret;
+	char	*paths;
+	int		size;
 
 	size = 0;
-	ret = NULL;
-	while (envp[size])
-	{
-		if (!ft_memcmp(envp[size], "PATH=", 5))
-		{
-			ret = ft_split(envp[size] + 5, ':');
-			break ;
-		}
-		size++;
-	}
-	if (!envp[size])
+	paths = getenv("PATH");
+	if (paths)
+		ret = ft_split(paths, ':');
+	else
 		ret = ft_calloc(1, sizeof(char *));
 	return (ret);
+}
+
+char	**ft_strsdup(char **envp)
+{
+	size_t	len;
+	char	**new;
+
+	len = 0;
+	while (envp[len])
+		len++;
+	new = ft_calloc(len + 10, sizeof(char *));
+	len = 0;
+	if (new)
+	{
+		while (envp[len])
+		{
+			new[len] = ft_strdup(envp[len]);
+			len++;
+		}
+
+	}
+	return (new);
 }
 
 void	set_info(t_exec *info, char *envp[])
 {
 	ft_memset(info, 0, sizeof(t_exec));
-	info->env.envp = envp;
-	info->env.paths = get_env_paths(envp);
-	if (!info->env.paths)
+	info->data.envp = envp;
+	if (info->data.envp)
+		info->data.paths = get_env_paths();
+	if (!info->data.paths || !info->data.envp)
 		exit_process(info, MALLOC_FAILED);
 }
 
@@ -175,35 +192,61 @@ void	set_tokens(t_exec *info, char *buffer)
 // 	exec_token(info->t, info->env);
 // }
 
-char	*get_cmdpath(char **paths, char *cmd)
+char	*check_builtin(char *cmd, int *err)
+{
+	char	*ret;
+
+	*err = EXIT_SUCCESS;
+	ret = ft_strjoin(builtin, cmd);
+	if (ret == NULL)
+	{
+		*err = MALLOC_FAILED;
+		return (NULL);
+	}
+	if (!access(ret, X_OK))
+		return (ret);
+	free(ret);
+	*err = EXIT_FAILURE;
+	return (NULL);
+}
+
+char	*check_pathenv(char **paths, char *cmd)
 {
 	int		index;
 	char	*ret;
 	char	*temp;
 
 	index = 0;
-	temp = ft_strjoin(builtin, cmd);
-	if (*paths == NULL || !temp)
-		return (temp);
-	if (!access(temp, X_OK))
-		return (temp);
-	free(temp);
 	temp = ft_strjoin("/", cmd);
 	if (!temp)
-		return (temp);
+		return (NULL);
 	while (paths[index])
 	{
 		ret = ft_strjoin(paths[index++], temp);
 		if (!ret)
-			break ;
+		{
+			free(temp);
+			return (NULL);
+		}
 		if (!access(ret, X_OK))
 			break ;
 		free(ret);
 		ret = NULL;
 	}
-	free(temp);
 	if (!ret)
-		ret = ft_strjoin(builtin, cmd);
+		ret = ft_strdup(cmd);
+	return (ret);
+}
+
+char	*get_cmdpath(char **paths, char *cmd)
+{
+	int		err;
+	char	*ret;
+
+	ret = check_builtin(cmd, &err);
+	if (ret || err == MALLOC_FAILED)
+		return (ret);
+	ret = check_pathenv(paths, cmd);
 	return (ret);
 }
 
@@ -304,10 +347,11 @@ void	set_process(t_exec *info)
 	{
 		info->p->args = get_cmdargs(info->t->cmd);
 		if (info->p->args)
-			info->p->path = get_cmdpath(info->env.paths, info->t->cmd);
+			info->p->path = get_cmdpath(info->data.paths, info->t->cmd);
 		if (!info->p->args || !info->p->path)
 			exit_process(info, MALLOC_FAILED);
-		if (execve(info->p->path, info->p->args, info->env.envp) == -1)
+		printf("%s\n", info->p->path);
+		if (execve(info->p->path, info->p->args, info->data.envp) == -1)
 			exit_process(info, CMD_NOT_FOUND);
 	}
 	else
@@ -335,7 +379,7 @@ void	parent(t_exec *info, pid_t pid)
 	waitpid(pid, &status, 0);
 	if (WIFEXITED(status))
 	{
-		info->env.status = WEXITSTATUS(status);
+		info->data.status = WEXITSTATUS(status);
 		if (WEXITSTATUS(status) == 128 + SIGTERM)
 			exit_process(info, 128 + SIGTERM);
 		if (WEXITSTATUS(status) == 128 + SIGINT)

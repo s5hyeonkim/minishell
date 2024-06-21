@@ -47,19 +47,19 @@ typedef struct s_token
 	struct s_token	*right;
 }	t_token;
 
-typedef struct s_env
+typedef struct s_data
 {
 	char	**paths;
 	char	**envp;
+	char	*data;
 	int		status;
-}	t_env;
+}	t_data;
 
 typedef struct s_exec
 {
 	t_token			*t;
-	HIST_ENTRY		history;
 	t_process		*p;
-	t_env			env;
+	t_data			data;
 }	t_exec;
 
 //libft
