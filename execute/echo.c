@@ -20,8 +20,8 @@ char	*get_value(char *strs[], char *key)
 		return (NULL);
 	while (strs[index])
 	{
-		size = ft_strlen(strs[index]);
-		if (!ft_memcmp(strs[index], key, size) && strs[index][size] == '=')
+		size = ft_strchr(strs[index], '=') - strs[index];
+		if (!ft_memcmp(strs[index], key, size) && ft_strlen(key) == size)
 		{
 		    ret = strs[index] + size + 1;
 			break ;
@@ -48,5 +48,7 @@ int	ft_echo(t_exec *info, t_process p)
 	}
 	if (!is_no_nl(p.args[1]))
 		ft_putchar_fd('\n', 1);
+	else
+		replace_lines();
 	return (EXIT_SUCCESS);
 }

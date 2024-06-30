@@ -122,13 +122,11 @@ void	check_valid(t_exec *info, int argc)
 /* signal*/
 void	replace_lines(void)
 {
-	if (status >= 130)
-	{
-		ft_putchar_fd('\n', STDERR_FILENO);
-		rl_on_new_line();
-		rl_replace_line("", 0);
-		rl_redisplay();
-	}
+	ft_putchar_fd('\n', STDERR_FILENO);
+	rl_on_new_line();
+	rl_replace_line("", 0);
+	rl_redisplay();
+
 }
 
 void    child_handler(int signo)
@@ -170,6 +168,7 @@ char	*check_pathenv(char **paths, char *cmd)
 	temp = ft_strjoin("/", cmd);
 	if (!temp)
 		return (NULL);
+	ret = NULL;
 	while (paths[index])
 	{
 		ret = ft_strjoin(paths[index++], temp);
@@ -181,8 +180,10 @@ char	*check_pathenv(char **paths, char *cmd)
 		if (!access(ret, X_OK))
 			break ;
 		free(ret);
+		ret = NULL;
 	}
-	if (!paths[index])
+	free(temp);
+	if (!ret)
 		ret = ft_strdup(cmd);
 	return (ret);
 }
@@ -241,7 +242,7 @@ char	*get_cmdpath(char **paths, char *cmd)
 	ret = check_custom(cmd, &err);
 	if (err == EXIT_FAILURE)
 	{
-		printf("no custom\n");
+		// printf("no custom\n");
 		ret = check_pathenv(paths, cmd);
 	}
 	return (ret);
@@ -341,6 +342,7 @@ int	exec_builtin(t_exec *info, t_process p)
 	int			index;
 
 	index = 0;
+	// printf("builtin?\n");
 	while (index < 7)
 	{
 		if (!ft_memcmp(cmds[index], p.path, ft_strlen(cmds[index]) + 1))
@@ -354,6 +356,7 @@ void	exec_program(t_exec *info, t_process p)
 {
 	char	**envp;
 
+	// printf("external_program\n");
 	envp = deqtoenvp(info->data.envps);
 	if (!envp)
 		exit_process(info, NULL, MALLOC_FAILED);
@@ -460,13 +463,13 @@ void	set_cmd(t_exec *info)
 
 	index = 0;
 	find_cmd(info, info->t, &index);
-	printf("number of command: %d\n", index);
+	// printf("number of command: %d\n", index);
 	while (index--)
 	{
 		set_args(info, &info->p[index]);
 		//printf("first commad: %s\n", info->p[index].args[0]);
 		set_path(info, &info->p[index]);
-		printf("path/command: %s\n", info->p[index].path);
+		// printf("path/command: %s\n", info->p[index].path);
 	}
 }
 
@@ -499,9 +502,12 @@ void	close_pipe(t_exec *info, int index)
 
 void	child(t_exec *info, int index)
 {
+	// printf("child process start\n");
 	set_signal(info, child_handler);
-	exec_builtin(info, info->p[index]);
-	exec_program(info, info->p[index]);
+	if (is_builtin(info->p[index].path))
+		exec_builtin(info, info->p[index]);
+	else
+		exec_program(info, info->p[index]);
 }
 
 void	parent(t_exec *info, int index)
@@ -526,7 +532,7 @@ void	subprocess(t_exec *info)
 	int			index;
 
 	index = 0;
-	printf("execute in child process\n");
+	// printf("execute in child process\n");
 	while (info->p[index].path)
 	{
 		open_pipe(info, index);
@@ -538,9 +544,9 @@ void	subprocess(t_exec *info)
 
 void	inprocess(t_exec *info)
 {
-	printf("execute in current process\n");
+	// printf("execute in current process\n");
 	exec_builtin(info, info->p[0]);
-	printf("%s\n", info->p[0].path);	
+	//printf("%s\n", info->p[0].path);	
 }
 
 void	wait_process(t_exec *info)

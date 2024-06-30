@@ -82,6 +82,7 @@ void	*ft_memset(void *ptr, int c, size_t len);
 
 //minishell
 void	exit_process(t_exec *info, char *obj, int errcode);
+void	replace_lines(void);
 void	free_info(t_exec info);
 
 //execute
