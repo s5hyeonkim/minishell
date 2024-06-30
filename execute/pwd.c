@@ -1,56 +1,37 @@
-#include "../libft/libft.h"
-#include <stdio.h>
+#include "../minishell.h"
 
-void	check_others(char *name, char *opt)
-{
-	ft_putstr_fd(name, 2);
-	if (opt[0] == '-')
-	{
-		ft_putstr_fd(": illegal option -- ", 2);
-		ft_putchar_fd(opt[1], 2);
-		ft_putchar_fd('\n', 2);
-	}
-	else
-		ft_putstr_fd("usage: pwd with no option\n", 2);
-	exit(1);
-}
-
-void 	check_pwd(char *opt)
-{
-	char	err[3];
-
-	if (opt[0] != '-' || !opt[1] || (opt[1] == '-' && !opt[2]))
-		return ;
-	err[0] = 0;
-	ft_strlcat(err, opt, 3);
-	ft_putstr_fd("minishell: pwd: ", 2);
-	ft_putstr_fd(err, 2);
-	ft_putstr_fd(": invalid option\n", 2);
-	ft_putstr_fd("pwd: usage: pwd with no option\n", 2);
-	exit(1);
-}
-
-void	check_option(char *name, char *opt)
+int	is_valid_option(char *opt)
 {
 	if (!opt)
-		return ;
-	if (ft_strncmp("pwd", name, 4))
-		check_others(name, opt);
-	else
-		check_pwd(opt);
+		return (TRUE);
+	if (!ft_memcmp(opt, "--", 3) || !ft_memcmp(opt, "-", 2) || opt[0] != '-')
+		return (TRUE);
+	return (FALSE);
 }
 
-int	main(int argc, char *argv[])
+char	*get_pwd(t_exec *info)
 {
 	char	cwd[4096];
+	char	*pwd;
 
-	check_option(argv[0], argv[1]);
-	if (getcwd(cwd, sizeof(cwd)) != NULL)
-		printf("%s\n", cwd);
-	else
-	{
-		perror("minishell: ");
-		return (1);
-	}
+	ft_memset(cwd, 0, 4096);
+	if (!getcwd(cwd, sizeof(cwd)))
+		exit_process(info, NULL, EXTRA_ERROR);
+	pwd = ft_strdup(cwd);
+	if (!pwd)
+		exit_process(info, NULL, MALLOC_FAILED);
+	return (pwd);
+}
+
+int	ft_pwd(t_exec *info, t_process p)
+{
+	char	*cwd;
+
+	(void) info;
+	if (!is_valid_option(p.args[1]))
+		return (INVALID_ARGV);
+	cwd = get_pwd(info);
+	printf("%s\n", cwd);
+	free(cwd);
 	return (EXIT_SUCCESS);
 }

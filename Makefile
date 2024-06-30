@@ -1,9 +1,19 @@
 CC = cc
 CFLAGS = -Wall -Wextra -Werror 
-CPPFLAGS = -I${HOME}/.brew/opt/readline/include -Iminishell.h -MMD -MP
-LDFLAGS = -L${HOME}/.brew/opt/readline/lib -Llibft
-LDLIBS = -lreadline -lft
+CPPFLAGS = -I${HOME}/.brew/opt/readline/include -Iminishell.h -Ift_err.h -MMD -MP
+LDFLAGS = -L${HOME}/.brew/opt/readline/lib -Llibft -Lexecute/deque
+LDLIBS = -lreadline -lft -lftdeque
+EXEC = ./execute/
 SRCS = ./main.c \
+	   ./print.c \
+	   $(EXEC)cd.c \
+	   $(EXEC)echo.c \
+	   $(EXEC)env.c \
+	   $(EXEC)execute.c \
+	   $(EXEC)exit.c \
+	   $(EXEC)export.c \
+	   $(EXEC)pwd.c \
+	   $(EXEC)unset.c \
 
 OBJS = $(SRCS:.c=.o)
 DEPS = $(SRCS:.c=.d)
@@ -16,7 +26,7 @@ all : $(NAME)
 
 $(NAME) : $(OBJS)
 	make -C libft
-	make -C execute
+	make -C execute/deque
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) $^ -o $@
 
 
@@ -25,13 +35,11 @@ $(NAME) : $(OBJS)
 
 clean :
 	make clean -C libft
-	make clean -C execute
 	rm -f $(DEPS)
 	rm -f $(OBJS)
 
 fclean :
 	make fclean -C libft
-	make fclean -C execute
 	rm -f $(OBJS)
 	rm -f $(DEPS)
 	rm -f $(NAME)

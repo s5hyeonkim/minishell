@@ -1,66 +1,79 @@
 #include "minishell.h"
 
-void	print_error(int code)
+volatile int	status;
+
+void	init(t_exec *info, int argc, char *envp[]);
+void	set_info(t_exec *info, char **envp);
+void	check_valid(t_exec *info, int argc);
+void	exec_external(t_exec *info, t_process p);
+
+/* exit */
+
+void	free_token(t_token *t)
 {
-	if (code == CMD_NOT_FOUND)
+	if (t)
 	{
-		ft_putstr_fd("minishell: command not found\n", 2);
-		printf("%d\n", errno);
-		perror("why?: ");
+		free_token(t->left);
+		free_token(t->right);
+		//free(t->cmd);
+		free(t);
 	}
-	else if (code == INVALID_ARGV)
-		ft_putstr_fd("minishell: invalid arguments\n", 2);
-	else
-		perror("minishell: ");
 }
 
-void	exit_process(t_exec *info, int errcode)
+void	free_data(t_data d)
 {
-	if (errcode && errcode <= 127)
+	free_strs(d.paths);
+	free_deques(&d.envps);
+	// add more?
+}
+
+void	free_tprocess(t_process *p)
+{
+	int	index;
+
+	index = 0;
+	if (!p)
+		return ;
+	while (p[index].args)
 	{
-		print_error(errcode);
+		free_strs(p[index].args);
+		free(p[index].path);
+		index++;
+	}
+}
+
+void	free_info(t_exec info)
+{
+	free_token(info.t);
+	free_data(info.data);
+	free_tprocess(info.p);
+}
+
+void	exit_process(t_exec *info, char *obj, int errcode)
+{
+	if (errcode && errcode < 127)
+	{
+		print_msg(obj, errcode);
 		errcode = 1;
 	}
-	free(info->t);
+	if (errcode == 128 + SIGTERM)
+	{
+		ft_putstr_fd("exit\n", 2);
+		errcode = 0;
+	}
+	free_info(*info);
 	exit(errcode);
 }
 
-void	set_signal(t_exec *info, void(*func)(int))
-{
-	if (signal(SIGINT, func) == SIG_ERR)
-		exit_process(info, SIG_ERROR);
-	if (signal(SIGTERM, func) == SIG_ERR)
-		exit_process(info, SIG_ERROR);
-	if (signal(SIGQUIT, func) == SIG_ERR)
-		exit_process(info, SIG_ERROR);
-}
-
-void	child_handler(int signo)
-{
-	//if (signo == SIGINT)
-		//exit(128 + signo);
-	exit(128 + signo);
-}
-
-void    handler(int signo)
-{
-	(void) signo;
-}
-
-void	check_validation(t_exec *info, int argc)
-{
-	if (argc != 1)
-		exit_process(info, INVALID_ARGV);
-}
-
-char	**get_env_paths(void)
+/* set */
+char	**get_env_paths(char *envp[])
 {
 	char	**ret;
 	char	*paths;
 	int		size;
 
 	size = 0;
-	paths = getenv("PATH");
+	paths = get_value(envp, "PATH");
 	if (paths)
 		ret = ft_split(paths, ':');
 	else
@@ -93,123 +106,60 @@ char	**ft_strsdup(char **envp)
 void	set_info(t_exec *info, char *envp[])
 {
 	ft_memset(info, 0, sizeof(t_exec));
-	info->data.envp = envp;
-	if (info->data.envp)
-		info->data.paths = get_env_paths();
-	if (!info->data.paths || !info->data.envp)
-		exit_process(info, MALLOC_FAILED);
+	info->data.envps = strstodeq(envp);
+	if (info->data.envps)
+		info->data.paths = get_env_paths(envp);
+	if (!info->data.paths || !info->data.envps)
+		exit_process(info, NULL, MALLOC_FAILED);
 }
 
-void	set_terminal(void)
+void	check_valid(t_exec *info, int argc)
 {
-	struct termios	term;
-
-	tcgetattr(STDIN_FILENO, &term);
-	term.c_lflag &= ~(ICANON | ECHO);
-	term.c_cc[VMIN] = 1;
-	term.c_cc[VTIME] = 0;
-	tcsetattr(STDIN_FILENO, TCSANOW, &term);
+	if (argc != 1)
+		exit_process(info, NULL, INVALID_ARGV);
 }
 
-void	set_terminal_print(void)
+/* signal*/
+void	replace_lines(void)
 {
-	struct termios	term;
-
-	tcgetattr(STDOUT_FILENO, &term);
-	term.c_lflag |= (ECHOCTL);
-	tcsetattr(STDOUT_FILENO, 0, &term);
-}
-
-void	set_terminal_printoff(void)
-{
-	struct termios	term;
-
-	tcgetattr(1, &term);
-	term.c_lflag &= ~(ECHOCTL);
-	tcsetattr(1, 0, &term);
-}
-
-void	init(t_exec *info, int argc, char *envp[])
-{
-	set_info(info, envp);
-	check_validation(info, argc);
-	//set_terminal();
-	set_signal(info, handler);
-}
-
-void	readlines(t_exec *info, char **buffer)
-{
-
-	*buffer = readline("minishell$ ");
-	if (*buffer == 0)
-		exit_process(info, 128 + SIGTERM);
-	if (**buffer)
-		add_history(*buffer);
-}
-
-void	free_array(char **strs)
-{
-	size_t	index;
-
-	index = 0;
-	if (!strs)
-		return ;
-	while (strs[index])
-		free(strs[index++]);
-	free(strs);
-}
-
-int	tokenization(t_token *t, char *buffer)
-{
-	if (*buffer == 0)
-		return (EXIT_SUCCESS);
-	t->cmd = ft_strdup(buffer);
-	if (!t->cmd)
-		return (MALLOC_FAILED);
-	return (tokenization(t->right, buffer + ft_strlen(t->cmd)));
-}
-
-void	set_tokens(t_exec *info, char *buffer)
-{
-	info->t = ft_calloc(1, sizeof(t_token));
-	if (!info->t)
-		exit_process(info, MALLOC_FAILED);
-	if (tokenization(info->t, buffer))
-		exit_process(info, MALLOC_FAILED);
-}
-
-// void	exec_token(t_token *t, t_env env)
-// {
-// 	if (!t)
-// 		return ;
-// 	exec_token(t->left, env);
-// 	exec(t, env);
-// 	exec_token(t->right, env);
-// }
-
-// void	exec_tokens(t_exec *info)
-// {
-// 	exec_token(info->t, info->env);
-// }
-
-char	*check_builtin(char *cmd, int *err)
-{
-	char	*ret;
-
-	*err = EXIT_SUCCESS;
-	ret = ft_strjoin(builtin, cmd);
-	if (ret == NULL)
+	if (status >= 130)
 	{
-		*err = MALLOC_FAILED;
-		return (NULL);
+		ft_putchar_fd('\n', STDERR_FILENO);
+		rl_on_new_line();
+		rl_replace_line("", 0);
+		rl_redisplay();
 	}
-	if (!access(ret, X_OK))
-		return (ret);
-	free(ret);
-	*err = EXIT_FAILURE;
-	return (NULL);
 }
 
+void    child_handler(int signo)
+{
+	(void) signo;
+	status = signo + 128;
+	//printf("signal receive %d\n", status);
+	if (signo == SIGINT)
+		exit(status);
+}
+
+void    handler(int signo)
+{
+	(void) signo;
+	status = signo + 128;
+	//printf("signal receive %d\n", status);
+	if (signo == SIGINT)
+		replace_lines();
+}
+
+void	set_signal(t_exec *info, void(*func)(int))
+{
+	if (signal(SIGINT, func) == SIG_ERR)
+		exit_process(info, NULL, SIG_ERROR);
+	if (signal(SIGTERM, func) == SIG_ERR)
+		exit_process(info, NULL, SIG_ERROR);
+	if (signal(SIGQUIT, func) == SIG_ERR)
+		exit_process(info, NULL, SIG_ERROR);
+}
+
+/* execute parsing*/
 char	*check_pathenv(char **paths, char *cmd)
 {
 	int		index;
@@ -231,11 +181,54 @@ char	*check_pathenv(char **paths, char *cmd)
 		if (!access(ret, X_OK))
 			break ;
 		free(ret);
-		ret = NULL;
 	}
-	if (!ret)
+	if (!paths[index])
 		ret = ft_strdup(cmd);
 	return (ret);
+}
+
+int	is_builtin(char *cmd)
+{
+	const char	*cmds[] = {"echo", "cd", "pwd", "export", "unset", "env", "exit"};
+	size_t		len;
+	int			index;
+
+	index = 0;
+	while (index < 7)
+	{
+		len = ft_strlen(cmds[index]);
+		if (!ft_memcmp(cmds[index], cmd, len) && (!cmd[len] || cmd[len] == ' '))
+			return (TRUE);
+		index++;
+	}
+	return (FALSE);
+}
+
+char	*check_custom(char *cmd, int *err)
+{
+	char	*ret;
+
+	if (is_builtin(cmd))
+	{
+		ret = ft_strdup(cmd);
+		if (!ret)
+			*err = MALLOC_FAILED;
+		return (ret);
+	}
+	else
+	{
+		ret = ft_strjoin(external, cmd);
+		if (ret == NULL)
+		{
+			*err = MALLOC_FAILED;
+			return (NULL);
+		}
+	}
+	if (!access(ret, X_OK))
+		return (ret);
+	free(ret);
+	*err = EXIT_FAILURE;
+	return (NULL);
 }
 
 char	*get_cmdpath(char **paths, char *cmd)
@@ -243,10 +236,14 @@ char	*get_cmdpath(char **paths, char *cmd)
 	int		err;
 	char	*ret;
 
-	ret = check_builtin(cmd, &err);
-	if (ret || err == MALLOC_FAILED)
-		return (ret);
-	ret = check_pathenv(paths, cmd);
+	err = EXIT_SUCCESS;
+	//printf("is custom?\n");
+	ret = check_custom(cmd, &err);
+	if (err == EXIT_FAILURE)
+	{
+		printf("no custom\n");
+		ret = check_pathenv(paths, cmd);
+	}
 	return (ret);
 }
 
@@ -272,6 +269,7 @@ int	is_valid_quotation(size_t *start, int *open1, int open2)
 	return (FALSE);
 }
 
+// redirection 추가 필요
 void	set_parsing_point(size_t *start, size_t *end, char *cmd)
 {
 	int	open[2];
@@ -314,7 +312,7 @@ char	**get_args(char **strs, char *cmd)
 			strs[index] = ft_strdup(&cmd[start]);
 		if (!strs[index++] && cmd[start])
 		{
-			free_array(strs);
+			free_strs(strs);
 			return (0);
 		}
 		start = ++end;
@@ -335,76 +333,254 @@ char	**get_cmdargs(char *cmd)
 	return (ret);
 }
 
-void	set_process(t_exec *info)
+/* program */
+	/* builtin */
+int	exec_builtin(t_exec *info, t_process p)
 {
-	info->p = ft_calloc(1, sizeof(t_process));
-	if (!info->p)
-		exit_process(info, MALLOC_FAILED);
-	info->p->pid = fork();
-	if (info->p->pid == -1)
-		exit_process(info, FORK_FAILED);
-	else if (!info->p->pid)
+	const char	*cmds[] = {"echo", "cd", "pwd", "export", "unset", "env", "exit"};
+	int			index;
+
+	index = 0;
+	while (index < 7)
 	{
-		info->p->args = get_cmdargs(info->t->cmd);
-		if (info->p->args)
-			info->p->path = get_cmdpath(info->data.paths, info->t->cmd);
-		if (!info->p->args || !info->p->path)
-			exit_process(info, MALLOC_FAILED);
-		printf("%s\n", info->p->path);
-		if (execve(info->p->path, info->p->args, info->data.envp) == -1)
-			exit_process(info, CMD_NOT_FOUND);
+		if (!ft_memcmp(cmds[index], p.path, ft_strlen(cmds[index]) + 1))
+			break ;
+		index++;
 	}
-	else
-		waitpid(info->p->pid, 0, WNOHANG);
+	return (select_builtin(index)(info, p));
+}
+	/* external */
+void	exec_program(t_exec *info, t_process p)
+{
+	char	**envp;
+
+	envp = deqtoenvp(info->data.envps);
+	if (!envp)
+		exit_process(info, NULL, MALLOC_FAILED);
+	if (execve(p.path, p.args, envp) == -1)
+		exit_process(info, p.args[0], CMD_NOT_FOUND);
 }
 
-void	child(t_exec *info)
+/* parsing and set tokens 수정 필요 */
+int	tokenization(t_token *t, char *buffer)
 {
-	char	*buffer;
+	if (*buffer == 0)
+		return (EXIT_SUCCESS);
+	t->type = CMD;
+	t->cmd = ft_strdup(buffer);
+	if (!t->cmd)
+		return (MALLOC_FAILED);
+	return (tokenization(t->right, buffer + ft_strlen(t->cmd)));
+}
 
+void	set_tokens(t_exec *info, char *buffer)
+{
+	info->t = ft_calloc(1, sizeof(t_token));
+	if (!info->t)
+		exit_process(info, NULL, MALLOC_FAILED);
+	if (tokenization(info->t, buffer))
+		exit_process(info, NULL, MALLOC_FAILED);
+}
+
+/* main */
+void	set_terminal_printoff(void)
+{
+	struct termios	term;
+
+	tcgetattr(1, &term);
+	term.c_lflag &= ~(ECHOCTL);
+	tcsetattr(1, 0, &term);
+}
+
+void	init(t_exec *info, int argc, char *envp[])
+{
+	set_info(info, envp);
+	check_valid(info, argc);
+	set_signal(info, handler);
 	set_terminal_printoff();
-	set_signal(info, child_handler);
-	readlines(info, &buffer);
-	set_tokens(info, buffer);
-	set_process(info);
-	//printf("reply: %s %d", buffer, *buffer);
-	waitpid(info->p->pid, 0, 0);
-	exit_process(info, 0);
 }
 
-void	parent(t_exec *info, pid_t pid)
+void	readlines(t_exec *info, char **buffer)
 {
+
+	*buffer = readline("minishell$ ");
+	if (*buffer == 0)
+	{
+		exit_process(info, NULL, SIGTERM + 128);
+	}
+	if (**buffer)
+		add_history(*buffer);
+}
+
+int	find_pipe(t_token *t)
+{
+	int	pipe_num;
+
+	if (!t)
+		return (0);
+	pipe_num = 0;
+	if (t->type == PIPE)
+		pipe_num++;
+	pipe_num += find_pipe(t->left);
+	pipe_num += find_pipe(t->right);
+	return (pipe_num);
+}
+
+void	find_cmd(t_exec *info, t_token *t, int *idx)
+{
+	if (!t)
+		return ;
+	find_cmd(info, t->left, idx);
+	if (t->type == CMD)
+	{
+		info->p[*idx].t = *t;
+		*idx += 1;
+	}
+	find_cmd(info, t->right, idx);
+}
+
+void	set_args(t_exec *info, t_process *p)
+{
+	// simple cmd로 수정 필요, 지금 t.cmd type은 redirection 포함한 cmd
+	p->args = get_cmdargs(p->t.cmd);
+	if (!p->args)
+		exit_process(info, NULL, MALLOC_FAILED);
+}
+
+void	set_path(t_exec *info, t_process *p)
+{
+	p->path = get_cmdpath(info->data.paths, p->args[0]);
+	if (!p->path)
+		exit_process(info, NULL, MALLOC_FAILED);
+}
+
+void	set_cmd(t_exec *info)
+{
+	int	index;
+
+	index = 0;
+	find_cmd(info, info->t, &index);
+	printf("number of command: %d\n", index);
+	while (index--)
+	{
+		set_args(info, &info->p[index]);
+		//printf("first commad: %s\n", info->p[index].args[0]);
+		set_path(info, &info->p[index]);
+		printf("path/command: %s\n", info->p[index].path);
+	}
+}
+
+void	set_cmds(t_exec *info)
+{
+	int	pipenum;
+
+	pipenum = 0;
+	pipenum += find_pipe(info->t);
+	info->p = ft_calloc(pipenum + 2, sizeof(t_token));
+	if (!info->p)
+		exit_process(info, NULL, MALLOC_FAILED);
+	set_cmd(info);
+}
+
+void	open_pipe(t_exec *info, int index)
+{
+	if (info->p[index + 1].path)
+	{
+		if (pipe(info->p[index].fd))
+			exit_process(info, NULL, PIPE_FAILED);
+	}
+}
+
+void	close_pipe(t_exec *info, int index)
+{
+	if (info->p[index + 1].path)
+		close(info->p[index].fd[1]);
+}
+
+void	child(t_exec *info, int index)
+{
+	set_signal(info, child_handler);
+	exec_builtin(info, info->p[index]);
+	exec_program(info, info->p[index]);
+}
+
+void	parent(t_exec *info, int index)
+{
+	close_pipe(info, index);
+	waitpid(info->p[index].pid, 0, WNOHANG);
+}
+
+void	get_child(t_exec *info, int index)
+{
+	info->p[index].pid = fork();
+	if (info->p[index].pid == -1)
+		exit_process(info, NULL, FORK_FAILED);
+	else if (!info->p[index].pid)
+		child(info, index);
+	else
+		parent(info, index);
+}
+
+void	subprocess(t_exec *info)
+{
+	int			index;
+
+	index = 0;
+	printf("execute in child process\n");
+	while (info->p[index].path)
+	{
+		open_pipe(info, index);
+		get_child(info, index);
+		close_pipe(info, index);
+		index++;
+	}
+}
+
+void	inprocess(t_exec *info)
+{
+	printf("execute in current process\n");
+	exec_builtin(info, info->p[0]);
+	printf("%s\n", info->p[0].path);	
+}
+
+void	wait_process(t_exec *info)
+{
+	int	index;
 	int	status;
 
-	waitpid(pid, &status, 0);
-	if (WIFEXITED(status))
+	index = 0;
+	while (info->p[index].path)
 	{
-		info->data.status = WEXITSTATUS(status);
-		if (WEXITSTATUS(status) == 128 + SIGTERM)
-			exit_process(info, 128 + SIGTERM);
-		if (WEXITSTATUS(status) == 128 + SIGINT)
-		{
-			ft_putstr_fd("\n", STDERR_FILENO);
-			rl_on_new_line();
-			rl_replace_line("", 0);
-			rl_redisplay();
-		}
+		waitpid(info->p[index].pid, &status, 0);
+		if (WIFEXITED(status))
+			status = WEXITSTATUS(status);
+		index++;
 	}
 }
+
+void	exec_cmds(t_exec *info)
+{
+	if (info->p[1].path || !is_builtin(info->p[0].path))
+	{
+		subprocess(info);
+		wait_process(info);
+	}
+	else
+		inprocess(info);
+}
+
 
 void	loop(t_exec *info)
 {
-	pid_t	pid;
+	char	*buffer;
+
 	rl_clear_history();
-	while (1)
+	while(1)
 	{
-		pid = fork();
-		if (pid == -1)
-			exit_process(info, FORK_FAILED);
-		else if (!pid)
-			child(info);
-		else
-			parent(info, pid);
+		readlines(info, &buffer);
+		set_tokens(info, buffer);
+		set_cmds(info);
+		exec_cmds(info);
 	}
 }
 

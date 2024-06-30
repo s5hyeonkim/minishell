@@ -1,9 +1,8 @@
-#include "../libft/libft.h"
+#include "../minishell.h"
 
-int main(int argc, char *argv[], char *envp[])
+int ft_unset(t_exec *info, t_process p)
 {
-    (void) argc;
-    (void) argv;
-    (void) envp;
+    (void) info;
+    (void) p;
     return (0);
 }

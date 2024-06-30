@@ -9,7 +9,6 @@
 /*   Updated: 2024/06/03 14:44:45 by yubin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 #include "libft.h"
 
 void	free_str(char *str)
@@ -29,9 +28,5 @@ void	free_strs(char **strs)
 		strs[idx] = 0;
 		idx++;
 	}
-	if (strs != NULL)
-	{
-		free(strs);
-		strs = NULL;
-	}
+	free(strs);
 }

@@ -6,7 +6,7 @@
 /*   By: yubin <yubin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/11 11:35:18 by yubshin           #+#    #+#             */
-/*   Updated: 2024/06/03 14:46:52 by yubin            ###   ########.fr       */
+/*   Updated: 2024/06/26 18:51:11 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ char		*ft_strtrim(char const *s1, char const *set);
 
 char		**ft_split(char const *str, char c);
 char		**ft_split_set(char *str, char *charset);
-
+char		**ft_strsdup(char **strs);
 char		*ft_itoa(int n);
 char		*ft_strmapi(char const *str, char (*f)(unsigned int, char));
 void		ft_striteri(char *str, void (*f)(unsigned int, char*));

@@ -1,19 +1,18 @@
-#include "../libft/libft.h"
-#include <stdio.h>
+#include "../minishell.h"
 
-int	main(int argc, char *argv[], char *envp[])
+int	ft_env(t_exec *info, t_process p)
 {
-	int	index;
+	int		index;
+	char	**envs;
 
-    if (argc != 1)
-	{
-		ft_putstr_fd("env: ", 2);
-		ft_putstr_fd(argv[1], 2);
-		ft_putstr_fd(": No such file or directory\n", 2);
-		return (1);
-	}
+	if (p.args[1])
+		return (INVALID_ARGV);
+	envs = deqtoenvp(info->data.envps);
+	if (!envs)
+		exit_process(info, NULL, MALLOC_FAILED);
 	index = 0;
-	while (envp[index])
-		printf("%s\n", envp[index++]);
-    return (0);
+	while (envs[index])
+		printf("%s\n", envs[index++]);
+	free(envs);
+    return (EXIT_SUCCESS);
 }

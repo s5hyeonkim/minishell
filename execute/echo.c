@@ -1,9 +1,52 @@
-#include "../libft/libft.h"
+#include "../minishell.h"
 
-int main(int argc, char *argv[], char *envp[])
+// $? 환경변수 기능 추가 필요
+int	is_no_nl(char *str)
 {
-    (void) argc;
-    (void) argv;
-    (void) envp;
-    return (0);
+	if (str && !ft_memcmp(str, "-n", 3))		
+		return (TRUE);
+	return (FALSE);
+}
+
+char	*get_value(char *strs[], char *key)
+{
+	int     index;
+	size_t	size;
+	char    *ret;	
+
+	index = 0;
+	ret = NULL;
+	if (!strs)
+		return (NULL);
+	while (strs[index])
+	{
+		size = ft_strlen(strs[index]);
+		if (!ft_memcmp(strs[index], key, size) && strs[index][size] == '=')
+		{
+		    ret = strs[index] + size + 1;
+			break ;
+		}
+		index++;
+	}
+	return (ret);
+}
+
+int	ft_echo(t_exec *info, t_process p)
+{
+	int 	index;
+
+	//envs 각자 구하기.
+	(void) info;
+	index = 1;
+	if (is_no_nl(p.args[1]))
+		index++;
+	while (p.args[index])
+	{
+		ft_putstr_fd(p.args[index], 1);
+		if (p.args[++index])
+			ft_putchar_fd(' ', 1);
+	}
+	if (!is_no_nl(p.args[1]))
+		ft_putchar_fd('\n', 1);
+	return (EXIT_SUCCESS);
 }
