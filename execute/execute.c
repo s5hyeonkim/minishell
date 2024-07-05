@@ -12,5 +12,6 @@ built_in	select_builtin(int index)
 	fp[4] = ft_unset;
 	fp[5] = ft_env;
 	fp[6] = ft_exit;
+	// printf("right function %d\n", index);
 	return (fp[index]);
 }

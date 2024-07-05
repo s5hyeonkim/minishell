@@ -78,7 +78,7 @@ int	set_env(t_deque *deq, char *keyval)
 	p = ft_strchr(keyval, '=');
 	if (p)
 	{
-		deq->key = ft_substr(keyval, 0, p - keyval + 1);
+		deq->key = ft_substr(keyval, 0, p - keyval);
 		if (!deq->key)
 			return (MALLOC_FAILED);
 		deq->mid = '=';

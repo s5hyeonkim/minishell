@@ -67,6 +67,7 @@ int ft_cd(t_exec *info, t_process p)
 
 	index = 1;
 	cwd = get_pwd(info);
+	printf("cd start\n");
 	if (!p.args[1])
 	{
 		to_dir = get_val_fromdeq(info, "HOME");
@@ -82,6 +83,7 @@ int ft_cd(t_exec *info, t_process p)
 		return (EXIT_FAILURE);
 	else
 	{
+		printf("pwd set needed\n");
 		set_oldpwd(info, cwd);
 		free(cwd);
 		cwd = get_pwd(info);

@@ -8,7 +8,7 @@ char	**ft_strsdup(char **envp)
 	len = 0;
 	while (envp[len])
 		len++;
-	new = ft_calloc(len + 10, sizeof(char *));
+	new = ft_calloc(len + 1, sizeof(char *));
 	len = 0;
 	if (new)
 	{

@@ -28,12 +28,10 @@
 
 typedef enum e_type
 {
-	CMD,
+	CMD = 1,
 	SIMPLE_CMD,
-	H_RE,
-	I_RE,
-	O_RE,
-	A_RE,
+	REDIRECT,
+	REDIRECTS,
 	PIPE,
 	AND,
 	OR
@@ -68,6 +66,8 @@ typedef struct s_exec
 {
 	t_token			*t;
 	t_process		*p;
+	size_t			size;
+	int				status;
 	t_data			data;
 }	t_exec;
 
@@ -84,8 +84,13 @@ void	*ft_memset(void *ptr, int c, size_t len);
 void	exit_process(t_exec *info, char *obj, int errcode);
 void	replace_lines(void);
 void	free_info(t_exec info);
+void    child_handler(int signo);
+void	set_signal(t_exec *info, void(*func)(int));
 
 //execute
+void		exec_cmds(t_exec *info);
+void		set_cmds(t_exec *info);
+void		set_process(t_exec *info);
 char		*check_pathenv(char **paths, char *cmd);
 built_in	select_builtin(int index);
 char		*get_value(char *strs[], char *key);
@@ -98,4 +103,9 @@ int     	ft_export(t_exec *info, t_process p);
 int     	ft_unset(t_exec *info, t_process p);
 int     	ft_env(t_exec *info, t_process p);
 int     	ft_exit(t_exec *info, t_process p);
+void		free_token(t_token *t);
+void		free_data(t_data d);
+void		free_tprocess(t_process *p);
+void		free_info(t_exec info);
+
 #endif

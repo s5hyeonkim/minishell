@@ -7,7 +7,7 @@ void	print_strs(char *strs[])
 	index = 0;
 	while (strs[index])
 	{
-		printf("%s\n", strs[index]);
+		printf("declare -x: %s\n", strs[index]);
 		index++;
 	}
 }
@@ -25,6 +25,7 @@ int	ft_keycmp(char *a, char *b)
 			return (1);
 		if (a[index] != b[index])
 			break ;
+		index++;
 	}
 	return (a[index] - b[index]);
 }

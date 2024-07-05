@@ -6,6 +6,8 @@ LDLIBS = -lreadline -lft -lftdeque
 EXEC = ./execute/
 SRCS = ./main.c \
 	   ./print.c \
+	   ./execute.c \
+	   ./free.c \
 	   $(EXEC)cd.c \
 	   $(EXEC)echo.c \
 	   $(EXEC)env.c \
@@ -14,7 +16,7 @@ SRCS = ./main.c \
 	   $(EXEC)export.c \
 	   $(EXEC)pwd.c \
 	   $(EXEC)unset.c \
-
+	   
 OBJS = $(SRCS:.c=.o)
 DEPS = $(SRCS:.c=.d)
 
@@ -30,8 +32,11 @@ $(NAME) : $(OBJS)
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) $^ -o $@
 
 
+$(EXEC)%.o : $(EXEC)%.c
+	$(CC) $(CFLAGS) -c -o $@ $<
+
 %.o : %.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean :
 	make clean -C libft
