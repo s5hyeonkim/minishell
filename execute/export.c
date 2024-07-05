@@ -57,31 +57,12 @@ void	ft_sort(char **strs)
 int	change_envs(t_deques *deqs, char *str)
 {
 	t_deque	*node;
-	size_t	size;
+	t_pairs	keyval;
 
-	node = deqs->tail;
-	while (1)
-	{
-		node = node->next;
-		size = ft_strchr(str, '=') - str + 1;
-		if (ft_strlen(node->key) == size)
-		{
-			if (!ft_memcmp(str, node->key, size))
-			{
-				free(node->val);
-				node->val = ft_strdup(ft_strchr(str, '=') + 1);
-				if (!node->val)
-					return (EXIT_FAILURE);
-				break ;
-			}
-		}
-		if (node == deqs->tail)
-		{
-			if (push_back(deqs) || set_env(deqs->tail, str))
-				return (EXIT_FAILURE);
-			break ;
-		}
-	}
+	node = pop(deqs, search_deq(deqs, str));
+	free_deque(node);
+	if (set_keyval(str, &keyval) || push_back(deqs, keyval))
+		return (MALLOC_FAILED);
 	return (EXIT_SUCCESS);
 }
 
@@ -92,7 +73,7 @@ int ft_export(t_exec *info, t_process p)
 	int		status;
 
 	status = EXIT_SUCCESS;
-	envs = deqtoenvp(info->data.envps);
+	envs = deqtoenvp(info->data.envps, ENV);
 	if (!envs)
 		exit_process(info, NULL, MALLOC_FAILED);
 	if (!p.args[1])
@@ -101,14 +82,13 @@ int ft_export(t_exec *info, t_process p)
 		print_strs(envs);
 		return (status);
 	}
-	index = 1;
-	while (p.args[index])
+	index = 0;
+	while (p.args[++index])
 	{
-		if (ft_isdigit(p.args[index][0]) && ft_strchr(p.args[index], '='))
+		if (!ft_isalpha(p.args[index][0]))
 			status = 1;
 		else if (change_envs(info->data.envps, p.args[index]))
 			exit_process(info, NULL, MALLOC_FAILED);
-		index++;
 	}
 	return (0);
 }

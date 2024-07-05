@@ -19,9 +19,10 @@ char	*get_val_fromdeq(t_exec *info, char *key)
 {
 	char	**envp;
 
-	envp = deqtoenvp(info->data.envps);
+	envp = deqtoenvp(info->data.envps, ENV);
 	if (!envp)
 		exit_process(info, NULL, MALLOC_FAILED);
+	// envp free 못합
 	return (get_value(envp, key));
 }
 

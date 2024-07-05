@@ -10,14 +10,28 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "deque.h"
+int	set_deque(t_deque **deq, t_pairs keyval)
+{
 
-int	push_back(t_deques *deques)
+	*deq = create_deque();
+	if (*deq == NULL)
+		return (MALLOC_FAILED);
+	(*deq)->keyval.key = keyval.key;
+	(*deq)->keyval.mid = keyval.mid;
+	(*deq)->keyval.val = keyval.val;
+	return (EXIT_SUCCESS);
+}
+
+int	push_back(t_deques *deques, t_pairs keyval)
 {
 	t_deque	*new_deque;
 
-	new_deque = create_deque();
-	if (new_deque == NULL)
+	if (set_deque(&new_deque, keyval))
+	{
+		free_keyval(keyval);
+		free_deque(new_deque);
 		return (MALLOC_FAILED);
+	}
 	if (deques->head == NULL)
 	{
 		deques->head = new_deque;

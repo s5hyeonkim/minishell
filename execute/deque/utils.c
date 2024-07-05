@@ -11,14 +11,14 @@
 /* ************************************************************************** */
 #include "deque.h"
 
-static int	get_size(t_deque *head, t_status state)
+int	get_size(t_deque *head, t_status state)
 {
 	t_deque	*deq;
 	int		size;
 
 	deq = head;
 	size = 0;
-	while (TRUE)
+	while (deq)
 	{
 		if (deq->state >= state)
 			size++;
@@ -29,28 +29,14 @@ static int	get_size(t_deque *head, t_status state)
 	return (size);
 }
 
-char	*ft_eqjoin(char *a, char *c)
-{
-	char	*temp;
-	char	*ret;
-
-	ret = NULL;
-	temp = ft_strjoin(a, "=");
-	if (!temp)
-		return (NULL);
-	ret = ft_strjoin(temp, c);
-	free(temp);
-	return (ret);
-}
-
-char	**deqtoenvp(t_deques *deqs)
+char	**deqtoenvp(t_deques *deqs, t_status state)
 {
 	char	**ret;
 	int		size;
 	int		index;
 	t_deque	*deq;
 
-	size = get_size(deqs->head, ENV);
+	size = get_size(deqs->head, state);
 	ret = ft_calloc(size + 1, sizeof(char *));
 	if (!ret)
 		return (NULL);
@@ -59,9 +45,9 @@ char	**deqtoenvp(t_deques *deqs)
 	while (index < size)
 	{
 		deq = deq->next;
-		if (deq->state != ENV)
+		if (deq->state != state)
 			continue ;
-		ret[index] = ft_eqjoin(deq->key, deq->val);
+		ret[index] = ft_pairjoin(deq->keyval);
 		if (!ret[index++])
 		{
 			free_strs(ret);
@@ -71,33 +57,10 @@ char	**deqtoenvp(t_deques *deqs)
 	return (ret);
 }
 
-int	set_env(t_deque *deq, char *keyval)
-{
-	char	*p;
-
-	p = ft_strchr(keyval, '=');
-	if (p)
-	{
-		deq->key = ft_substr(keyval, 0, p - keyval);
-		if (!deq->key)
-			return (MALLOC_FAILED);
-		deq->mid = '=';
-		deq->val = ft_strdup(p + 1);
-		if (!deq->val)
-			return (MALLOC_FAILED);
-	}
-	else
-	{
-		deq->key = ft_strdup(keyval);
-		if (!deq->key)
-			return (MALLOC_FAILED);
-	}
-	return (EXIT_SUCCESS);
-}
-
 t_deques	*strstodeq(char **strs)
 {
 	t_deques	*new;
+	t_pairs		keyval;
 	int			index;
 
 	index = 0;
@@ -106,7 +69,8 @@ t_deques	*strstodeq(char **strs)
 		return (NULL);
 	while (strs[index])
 	{
-		if (push_back(new) || set_env(new->tail, strs[index]))
+		if (set_keyval(strs[index], &keyval) \
+		|| push_back(new, keyval))
 		{
 			free_deques(&new);
 			return (NULL);
@@ -114,10 +78,11 @@ t_deques	*strstodeq(char **strs)
 		new->tail->state = ENV;
 		index++;
 	}
-	if (push_back(new) || set_env(new->tail, ""))
+	if (!index && (set_keyval("", &keyval) || push_back(new, keyval)))
 	{
 		free_deques(&new);
-		new = NULL;
+		return (NULL);
 	}
 	return (new);
 }
+

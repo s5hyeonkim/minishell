@@ -19,7 +19,6 @@ SRCS = ./main.c \
 	   
 OBJS = $(SRCS:.c=.o)
 DEPS = $(SRCS:.c=.d)
-
 NAME = minishell
 
 all : $(NAME)

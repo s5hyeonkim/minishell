@@ -7,10 +7,12 @@ CPPFLAGS = -Ideque.h
 LDFLAGS = -L../../libft
 LDLIBS = -lft
 SRCS = utils.c \
-	   lifecycle.c \
+	   creation.c \
+	   free.c \
 	   pop.c \
 	   push.c \
-	   utils.c
+	   utils.c \
+	   pair.c
 
 OBJS = $(SRCS:.c=.o)
 NAME = libftdeque.a

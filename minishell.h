@@ -107,5 +107,6 @@ void		free_token(t_token *t);
 void		free_data(t_data d);
 void		free_tprocess(t_process *p);
 void		free_info(t_exec info);
+int			is_close(t_exec *info, char *str);
 
 #endif

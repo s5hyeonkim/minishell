@@ -114,64 +114,55 @@ int	is_valid_quotation(size_t *start, int *open1, int open2)
 }
 
 // redirection 추가 필요
-void	set_parsing_point(size_t *start, size_t *end, char *cmd)
+void	set_parsing_point(size_t *start, char *cmd)
 {
 	int	open[2];
+	int	end;
 
 	ft_memset(open, 0, sizeof(int) * 2);
 	while (cmd[*start] == ' ')
 		(*start)++;
-	*end = *start;
-	while (cmd[*end])
+	end = *start;
+	while (cmd[end])
 	{
-		if (cmd[*end] == ' ' && !open[0] && !open[1])
-			cmd[*end] = 0;
-		if (cmd[*end] == '\'' && is_valid_quotation(start, &open[0], open[1]))
-			cmd[*end] = 0;
-		if (cmd[*end] == '\"' && is_valid_quotation(start, &open[1], open[0]))
-			cmd[*end] = 0;
-		if (!open[0] && !open[1] && !cmd[*end])
+		if (cmd[end] == ' ' && !open[0] && !open[1])
+			cmd[end] = 0;
+		if (cmd[end] == '\'' && is_valid_quotation(start, &open[0], open[1]))
+			cmd[end] = 0;
+		if (cmd[end] == '\"' && is_valid_quotation(start, &open[1], open[0]))
+			cmd[end] = 0;
+		if (!open[0] && !open[1] && !cmd[end])
 			break ;
-		(*end)++;
+		(end)++;
 	}
 }
 
-char	**get_args(char **strs, char *cmd)
+char	**get_args(char *cmd)
 {
-	int		index;
-	int		size;
-	size_t	start;
-	size_t	end;
-	size_t	len;
+	t_deques	*deq;
+	char		**str;
+	t_pairs		keyval;
+	size_t		start;
+	size_t		len;
 
+	deq = create_deques();
+	if (!deq)
+		return (NULL);
 	start = 0;
-	end = 0;
-	index = 0;
-	size = 10;
 	len = ft_strlen(cmd);
-	while (strs && end < len)
+	while (start < len)
 	{
-		set_parsing_point(&start, &end, cmd);
-		if (cmd[start])
-			strs[index] = ft_strdup(&cmd[start]);
-		if (!strs[index++] && cmd[start])
+		set_parsing_point(&start, cmd);
+		if (cmd[start] && (set_keyval(&cmd[start], &keyval) || push_back(deq, keyval)))
 		{
-			free_strs(strs);
-			return (0);
+			free_deques(&deq);
+			return (NULL);
 		}
-		start = ++end;
-		strs = fit_arrsize(strs, index, &size);
+		start = start + ft_strlen(&cmd[start]);
 	}
-	if (strs && !strs[0])
-	{
-		strs[0] = ft_calloc(1, sizeof(char));
-		if (!strs[0])
-		{
-			free(strs);
-			strs = NULL;
-		}
-	}
-	return (strs);
+	str = deqtoenvp(deq, NO_EXPORT);
+	free_deques(&deq);
+	return (str);
 }
 
 char	**get_cmdargs(char *cmd)
@@ -181,7 +172,7 @@ char	**get_cmdargs(char *cmd)
 	ret = ft_calloc(10, sizeof(char *));
 	if (!ret)
 		return (NULL);
-	ret = get_args(ret, cmd);
+	ret = get_args(cmd);
 	free(cmd);
 	return (ret);
 }
@@ -208,8 +199,8 @@ void	exec_program(t_exec *info, t_process p)
 {
 	char	**envp;
 
-	// printf("external %s %s\n", p.path, p.args[0]);
-	envp = deqtoenvp(info->data.envps);
+	//printf("external %s %s\n", p.path, p.args[0]);
+	envp = deqtoenvp(info->data.envps, ENV);
 	if (!envp)
 		exit_process(info, NULL, MALLOC_FAILED);
 	if (execve(p.path, p.args, envp) == -1)
@@ -265,7 +256,7 @@ void	set_cmds(t_exec *info)
 
 void	set_token_process(t_exec *info, t_token *t, int *index)
 {
-	if (!t || !t->type)
+	if (!t)
 		return ;
 	if (t->type == SIMPLE_CMD || t->type == REDIRECT)
 	{
@@ -275,7 +266,7 @@ void	set_token_process(t_exec *info, t_token *t, int *index)
 	}
 	else
 	{
-		set_token_process(info, info->t->left, index);	
+		set_token_process(info, t->left, index);
 		set_token_process(info, t->right, index);
 	}
 }

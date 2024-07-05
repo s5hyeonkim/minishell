@@ -60,3 +60,45 @@ t_deque	*pop_back(t_deques *deques)
 	}
 	return (node);
 }
+
+t_deque	*search_deq(t_deques *deq, char *key)
+{
+	t_deque	*node;
+
+	node = deq->tail;
+	while (node)
+	{
+		node = node->next;
+		if (ft_strlen(key) == ft_strlen(node->keyval.key) && !ft_memcmp(node->keyval.key, key, ft_strlen(key)))
+			return (node);
+		if (node == deq->tail)
+			break ;
+	}
+	return (NULL);
+}
+
+t_deque	*pop(t_deques *deqs, t_deque *target)
+{
+	t_deque	*node;
+
+	node = deqs->tail;
+	if (deqs->head == target)
+		return (pop_front(deqs));
+	if (deqs->tail == target)
+		return (pop_back(deqs));
+	while (node)
+	{
+		node = node->next;
+		if (node == target)
+		{
+			node->prev->next = node->next;
+			node->next->prev = node->prev;
+			node->prev = NULL;
+			node->next = NULL;
+			return (node);
+		}
+		if (node == deqs->tail)
+			break ;
+	}
+	return (NULL);
+}
