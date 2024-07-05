@@ -40,11 +40,13 @@ $(EXEC)%.o : $(EXEC)%.c
 
 clean :
 	make clean -C libft
+	make fclean -C execute/deque
 	rm -f $(DEPS)
 	rm -f $(OBJS)
 
 fclean :
 	make fclean -C libft
+	make fclean -C execute/deque
 	rm -f $(OBJS)
 	rm -f $(DEPS)
 	rm -f $(NAME)

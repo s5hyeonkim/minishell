@@ -1,24 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_pushswap.h                                      :+:      :+:    :+:   */
+/*   deque.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 10:50:14 by sohykim           #+#    #+#             */
-/*   Updated: 2024/05/08 19:33:26 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/07/05 12:36:38 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #ifndef DEQUE_H
 # define DEQUE_H
-# define INT_MAX 2147483647
-# define INT_MIN -2147483648
 # include "../../libft/libft.h"
 # include "../../ft_err.h"
 
 typedef enum e_status
 {
-	NO_EXPORT = 0,
 	EXPORT = 1,
 	ENV = 2
 }	t_status;
@@ -26,8 +24,9 @@ typedef enum e_status
 typedef struct s_deque
 {
 	char			*key;
-	char			mid;
-	char			*val;
+	char			mid; //=
+	char			*val;	// export a val = "";
+							// export a=, val = "";
 	t_status		state;
 	struct s_deque	*prev;
 	struct s_deque	*next;
@@ -51,5 +50,4 @@ int			push_front(t_deques *deques);
 void		free_deque(t_deque *deque);
 void		free_deques(t_deques **deques);
 void		free_strs(char **strs);
-
 #endif
