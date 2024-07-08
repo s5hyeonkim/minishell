@@ -86,3 +86,19 @@ t_deques	*strstodeq(char **strs)
 	return (new);
 }
 
+void	print_deques(t_deques *deq)
+{
+	t_deque	*node;
+
+	node  = deq->head;
+	while (node)
+	{
+		if (node->keyval.mid)
+			printf("%s=%s\n", node->keyval.key, node->keyval.val);
+		else
+			printf("%s\n", node->keyval.key);
+		node = node->next;
+		if (node == deq->head)
+			break ;
+	}
+}

@@ -17,7 +17,7 @@
 
 typedef enum e_status
 {
-	NO_EXPORT = 0,
+	NO = 0,
 	EXPORT = 1,
 	ENV = 2
 }	t_status;
@@ -58,9 +58,11 @@ void		free_deques(t_deques **deques);
 void		free_strs(char **strs);
 int			set_keyval(char *str, t_pairs *keyval);
 void		free_keyval(t_pairs keyval);
+char    	*get_key_strs(char *str);
 int			set_keyval(char *str, t_pairs *keyval);
 char		*ft_pairjoin(t_pairs keyval);
 t_deque		*search_deq(t_deques *deq, char *key);
 t_deque		*pop(t_deques *deqs, t_deque *target);
+void		print_deques(t_deques *deq);
 
 #endif

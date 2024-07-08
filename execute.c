@@ -114,67 +114,67 @@ int	is_valid_quotation(size_t *start, int *open1, int open2)
 }
 
 // redirection 추가 필요
-void	set_parsing_point(size_t *start, char *cmd)
+int	check_quotation_flag(int *flag, int flag2)
 {
-	int	open[2];
-	int	end;
+	*flag = !(*flag);
+	if (!flag2)
+		return (TRUE);
+	return (FALSE);
+}
 
-	ft_memset(open, 0, sizeof(int) * 2);
-	while (cmd[*start] == ' ')
-		(*start)++;
-	end = *start;
-	while (cmd[end])
+void	parsing_cmd(char *cmd)
+{
+	size_t		size;
+	int			flag;
+	int			flag1;
+
+	size = 0;
+	flag = 0;
+	flag1 = 0;
+	while (cmd[size])
 	{
-		if (cmd[end] == ' ' && !open[0] && !open[1])
-			cmd[end] = 0;
-		if (cmd[end] == '\'' && is_valid_quotation(start, &open[0], open[1]))
-			cmd[end] = 0;
-		if (cmd[end] == '\"' && is_valid_quotation(start, &open[1], open[0]))
-			cmd[end] = 0;
-		if (!open[0] && !open[1] && !cmd[end])
+		if (cmd[size] == ' ' && !flag && !flag1)
+			cmd[size] = 0;
+		if (cmd[size] == '\'' && check_quotation_flag(&flag, flag1))
+			cmd[size] = 0;
+		if (cmd[size] == '\"' && check_quotation_flag(&flag1, flag))
+			cmd[size] = 0;
+		if (!flag1 && !flag && !cmd[size])
 			break ;
-		(end)++;
+		size++;
 	}
 }
 
-char	**get_args(char *cmd)
+char	**get_cmdargs(char *cmd)
 {
 	t_deques	*deq;
 	char		**str;
 	t_pairs		keyval;
 	size_t		start;
 	size_t		len;
+	size_t		end;
 
 	deq = create_deques();
 	if (!deq)
 		return (NULL);
 	start = 0;
+	end = 0;
 	len = ft_strlen(cmd);
 	while (start < len)
 	{
-		set_parsing_point(&start, cmd);
+		// printf("%zu\n", start);
+		parsing_cmd(&cmd[start]);
 		if (cmd[start] && (set_keyval(&cmd[start], &keyval) || push_back(deq, keyval)))
 		{
+			free_keyval(keyval);
 			free_deques(&deq);
 			return (NULL);
 		}
-		start = start + ft_strlen(&cmd[start]);
+		start = start + ft_strlen(&cmd[start]) + 1;
 	}
-	str = deqtoenvp(deq, NO_EXPORT);
+	str = deqtoenvp(deq, NO);
 	free_deques(&deq);
 	return (str);
-}
-
-char	**get_cmdargs(char *cmd)
-{
-	char	**ret;
-
-	ret = ft_calloc(10, sizeof(char *));
-	if (!ret)
-		return (NULL);
-	ret = get_args(cmd);
-	free(cmd);
-	return (ret);
 }
 
 /* program */
@@ -225,7 +225,7 @@ size_t	find_pipe(t_token *t)
 void	set_args(t_exec *info, t_process *p)
 {
 	// simple cmd로 수정 필요, 지금 t.cmd type은 redirection 포함한 cmd
-	// printf("%s\n", p->t.cmd);
+	// printf("enter set args:%s\n", p->t.cmd);
 	p->args = get_cmdargs(p->t.cmd);
 	if (!p->args)
 		exit_process(info, NULL, MALLOC_FAILED);
@@ -243,7 +243,6 @@ void	set_cmds(t_exec *info)
 	size_t	index;
 
 	index = 0;
-	// printf("size: %d\n", size);
 	while (index < info->size)
 	{
 		set_args(info, &info->p[index]);
@@ -260,14 +259,17 @@ void	set_token_process(t_exec *info, t_token *t, int *index)
 		return ;
 	if (t->type == SIMPLE_CMD || t->type == REDIRECT)
 	{
+		// printf("set SIMPLE CMD\n");
 		info->p[*index].t = *t;
 		(*index)++;
 		return ;
 	}
-	else
+	else if (t->type)
 	{
-		set_token_process(info, t->left, index);
-		set_token_process(info, t->right, index);
+		if (t->left && t->left->cmd && t->left->cmd[0])
+			set_token_process(info, t->left, index);
+		if (t->right && t->right->cmd && t->right->cmd[0])
+			set_token_process(info, t->right, index);
 	}
 }
 
@@ -281,7 +283,7 @@ void	set_process(t_exec *info)
 	if (!info->p)
 		exit_process(info, NULL, MALLOC_FAILED);
 	set_token_process(info, info->t, &index);
-	printf("set process\n");
+	// printf("set process\n");
 }
 
 void	open_pipe(t_exec *info, int index)
@@ -336,7 +338,7 @@ void	subprocess(t_exec *info)
 	size_t	index;
 
 	index = 0;
-	// printf("execute in child process\n");
+	printf("execute in child process\n");
 	while (index < info->size)
 	{
 		open_pipe(info, index);
@@ -350,7 +352,7 @@ void	inprocess(t_exec *info)
 {
 	int	ret;
 	printf("execute in current process\n");
-	printf("%s\n", info->p[0].path);	
+	// printf("%s\n", info->p[0].path);	
 	ret = exec_builtin(info, info->p[0]);
 	info->status = ret;
 }
@@ -372,14 +374,16 @@ void	wait_process(t_exec *info)
 
 void	exec_cmds(t_exec *info)
 {
-	printf("exec\n");
-	if (info->p[1].path || !is_builtin(info->p[0].path))
+	if (info->size > 1 || !is_builtin(info->p[0].path))
 	{
 		subprocess(info);
 		wait_process(info);
 	}
 	else
+	{
 		inprocess(info);
+		//print_deques(info->data.envps);
+	}
 }
 
 

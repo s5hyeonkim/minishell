@@ -16,6 +16,8 @@ SRCS = ./main.c \
 	   $(EXEC)export.c \
 	   $(EXEC)pwd.c \
 	   $(EXEC)unset.c \
+
+#./main.c
 	   
 OBJS = $(SRCS:.c=.o)
 DEPS = $(SRCS:.c=.d)

@@ -15,7 +15,9 @@ void	free_strs(char **strs)
 void    free_keyval(t_pairs keyval)
 {
     free(keyval.key);
+	keyval.key = NULL;
     free(keyval.val);
+	keyval.val = NULL;
 }
 
 void	free_deque(t_deque *deque)

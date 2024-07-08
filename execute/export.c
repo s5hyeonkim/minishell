@@ -9,12 +9,13 @@ void	print_strs(char *strs[])
 	while (strs[index])
 	{
 		if (!ft_strchr(strs[index], '='))
-			printf("declare -x: %s\n", strs[index]);
+			printf("declare -x %s\n", strs[index]);
 		else
 		{
 			size = ft_strchr(strs[index], '=') - strs[index];
 			strs[index][size] = 0;
 			printf("declare -x: %s=\"%s\"\n", strs[index] ,strs[index] + size + 1);
+			strs[index][size] = '=';
 		}
 		index++;
 	}
@@ -54,7 +55,7 @@ void	ft_sort(char **strs)
 			{
 				temp = strs[index];
 				strs[index] = strs[index2];
-				strs[index2] = strs[index];
+				strs[index2] = temp;
 			}
 			index2++;
 		}
@@ -66,11 +67,18 @@ int	change_envs(t_deques *deqs, char *str)
 {
 	t_deque	*node;
 	t_pairs	keyval;
+	char	*key;
 
-	node = pop(deqs, search_deq(deqs, str));
+	key = get_key_strs(str);
+	node = pop(deqs, search_deq(deqs, key));
 	free_deque(node);
+	free(key);
 	if (set_keyval(str, &keyval) || push_back(deqs, keyval))
 		return (MALLOC_FAILED);
+	if (keyval.val[0])
+		deqs->tail->state = ENV;
+	else if (keyval.mid)
+		deqs->tail->state = EXPORT;
 	return (EXIT_SUCCESS);
 }
 
@@ -81,13 +89,11 @@ int ft_export(t_exec *info, t_process p)
 	int		status;
 
 	status = EXIT_SUCCESS;
-	printf("here\n");
-	envs = deqtoenvp(info->data.envps, ENV);
-	if (!envs)
-		exit_process(info, NULL, MALLOC_FAILED);
-	printf("export variable: %s", p.args[1]);
 	if (!p.args[1])
 	{
+		envs = deqtoenvp(info->data.envps, ENV);
+		if (!envs)
+			exit_process(info, NULL, MALLOC_FAILED);
 		ft_sort(envs);
 		print_strs(envs);
 		free_strs(envs);
