@@ -281,7 +281,7 @@ void	set_process(t_exec *info)
 	if (!info->p)
 		exit_process(info, NULL, MALLOC_FAILED);
 	set_token_process(info, info->t, &index);
-	// printf("set\n");
+	printf("set process\n");
 }
 
 void	open_pipe(t_exec *info, int index)
@@ -349,10 +349,10 @@ void	subprocess(t_exec *info)
 void	inprocess(t_exec *info)
 {
 	int	ret;
-	// printf("execute in current process\n");
+	printf("execute in current process\n");
+	printf("%s\n", info->p[0].path);	
 	ret = exec_builtin(info, info->p[0]);
 	info->status = ret;
-	//printf("%s\n", info->p[0].path);	
 }
 
 void	wait_process(t_exec *info)
@@ -372,7 +372,7 @@ void	wait_process(t_exec *info)
 
 void	exec_cmds(t_exec *info)
 {
-	// printf("exec\n");
+	printf("exec\n");
 	if (info->p[1].path || !is_builtin(info->p[0].path))
 	{
 		subprocess(info);

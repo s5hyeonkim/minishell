@@ -22,7 +22,7 @@ char    *get_key_strs(char *str)
     char    *key;
 
     if (ft_strchr(str, '='))
-        key = ft_substr(str, 0, ft_strchr(str, '=') - str - 1);
+        key = ft_substr(str, 0, ft_strchr(str, '=') - str);
     else
         key = ft_strdup(str);
     return (key);

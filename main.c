@@ -94,7 +94,7 @@ void	set_signal(t_exec *info, void(*func)(int))
 /* parsing and set tokens 수정 필요 */
 void	tokenization(t_exec *info, t_token *t)
 {
-	// printf("origin cmd: %s\n", t->cmd);
+	printf("origin cmd: %s\n", t->cmd);
 	t->type = SIMPLE_CMD;
 	(void) info;
 	//tokenization(info, t->left);

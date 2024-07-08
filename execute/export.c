@@ -2,12 +2,20 @@
 
 void	print_strs(char *strs[])
 {
-	int	index;
+	int		index;
+	size_t	size;
 
 	index = 0;
 	while (strs[index])
 	{
-		printf("declare -x: %s\n", strs[index]);
+		if (!ft_strchr(strs[index], '='))
+			printf("declare -x: %s\n", strs[index]);
+		else
+		{
+			size = ft_strchr(strs[index], '=') - strs[index];
+			strs[index][size] = 0;
+			printf("declare -x: %s=\"%s\"\n", strs[index] ,strs[index] + size + 1);
+		}
 		index++;
 	}
 }
@@ -73,13 +81,16 @@ int ft_export(t_exec *info, t_process p)
 	int		status;
 
 	status = EXIT_SUCCESS;
+	printf("here\n");
 	envs = deqtoenvp(info->data.envps, ENV);
 	if (!envs)
 		exit_process(info, NULL, MALLOC_FAILED);
+	printf("export variable: %s", p.args[1]);
 	if (!p.args[1])
 	{
 		ft_sort(envs);
 		print_strs(envs);
+		free_strs(envs);
 		return (status);
 	}
 	index = 0;
@@ -90,5 +101,5 @@ int ft_export(t_exec *info, t_process p)
 		else if (change_envs(info->data.envps, p.args[index]))
 			exit_process(info, NULL, MALLOC_FAILED);
 	}
-	return (0);
+	return (status);
 }

@@ -1,34 +1,44 @@
 # include "minishell.h"
-int	is_quote(char c)
+int	is_equalquote(char prev, char next)
 {
-	if (c == '\'' || c == '\"')
-		return (TRUE);
-	return (FALSE);
+	if (prev != next)
+		return (FALSE);
+	if (prev != '\'' && prev != '\"')
+		return (FALSE);
+	return (TRUE);
+}
+
+int	set_quote(t_pairs *keyval, char c)
+{
+	keyval->mid = c;
+	return (TRUE);
 }
 
 int	is_close(t_exec *info, char *str)
 {
 	t_deques	*rec;
-	t_deque		*pop;
 	int			index;
+	t_pairs		keyval;
 	int			ret;
 
 	rec = create_deques();
-	if (!rec || push_back_char(rec, -1))
+	keyval.mid = -1;
+	if (!rec || push_back(rec, keyval))
 		exit_process(info, NULL, MALLOC_FAILED);
-	while(str[index])
+	index = -1;
+	ret = FALSE;
+	while(str[++index])
 	{
-		if (is_quote(str[index]) && rec->tail->mid == str[index])
+		if (is_equalquote(rec->tail->keyval.mid, str[index]))
+			free_deque(pop_back(rec));
+		else if (set_quote(&keyval, str[index]) && push_back(rec, keyval))
 		{
-			pop = pop_back(rec);
-			free_deque(pop);
-		}
-		else if (is_quote(str[index]) && push_back_char(rec, str[index]))
+			free_deques(&rec);
 			exit_process(info, NULL, MALLOC_FAILED);
-		index++;
+		}
 	}
-	if (rec->tail->mid == -1)
+	if (rec->tail->keyval.mid == -1)
 		ret = TRUE;
-	free_deques(&rec);	
-	return (FALSE);
+	free_deques(&rec);
+	return (ret);
 }
