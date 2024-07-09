@@ -1,34 +1,20 @@
 #include "minishell.h"
 
 /* execute parsing*/
-char	*check_pathenv(char **paths, char *cmd)
+char	*get_pathcmd(char **paths, char *cmd)
 {
 	int		index;
 	char	*ret;
-	char	*temp;
 
 	index = 0;
-	temp = ft_strjoin("/", cmd);
-	if (!temp)
-		return (NULL);
-	ret = NULL;
 	while (paths[index])
 	{
-		ret = ft_strjoin(paths[index++], temp);
-		if (!ret)
-		{
-			free(temp);
-			return (NULL);
-		}
-		if (!access(ret, X_OK))
-			break ;
+		ret = ft_pairjoin(paths[index++],'/', cmd);
+		if (!ret || !access(ret, X_OK))
+			return (ret);
 		free(ret);
-		ret = NULL;
 	}
-	free(temp);
-	if (!ret)
-		ret = ft_strdup(cmd);
-	return (ret);
+	return (ft_strdup(cmd));
 }
 
 int	is_builtin(char *cmd)
@@ -48,57 +34,17 @@ int	is_builtin(char *cmd)
 	return (FALSE);
 }
 
-char	*check_custom(char *cmd, int *err)
-{
-	char	*ret;
-
-	if (is_builtin(cmd))
-	{
-		ret = ft_strdup(cmd);
-		if (!ret)
-			*err = MALLOC_FAILED;
-		return (ret);
-	}
-	else
-	{
-		ret = ft_strjoin(external, cmd);
-		if (ret == NULL)
-		{
-			*err = MALLOC_FAILED;
-			return (NULL);
-		}
-	}
-	if (!access(ret, X_OK))
-		return (ret);
-	free(ret);
-	*err = EXIT_FAILURE;
-	return (NULL);
-}
-
 char	*get_cmdpath(char **paths, char *cmd)
 {
 	int		err;
 	char	*ret;
 
 	err = EXIT_SUCCESS;
-	//printf("is custom?\n");
-	ret = check_custom(cmd, &err);
-	if (err == EXIT_FAILURE)
-	{
-		// printf("no custom\n");
-		ret = check_pathenv(paths, cmd);
-	}
+	if (is_builtin(cmd))
+		ret = ft_strdup(cmd);
+	else
+		ret = get_pathcmd(paths, cmd);
 	return (ret);
-}
-
-char	**fit_arrsize(char **str, int index, int *size)
-{
-	if (index == *size - 1)
-	{
-		*size += 10;
-		str = ft_realloc(str, sizeof(char *) * *size);
-	}
-	return (str);
 }
 
 int	is_valid_quotation(size_t *start, int *open1, int open2)
@@ -122,58 +68,70 @@ int	check_quotation_flag(int *flag, int flag2)
 	return (FALSE);
 }
 
-void	parsing_cmd(char *cmd)
+void	parsing_cmd(char *cmd, size_t *start, size_t *end)
 {
 	size_t		size;
 	int			flag;
 	int			flag1;
 
-	size = 0;
+	size = *start;
 	flag = 0;
 	flag1 = 0;
+	while (cmd[size] == ' ')
+		size++;
+	*start = size;
 	while (cmd[size])
 	{
-		if (cmd[size] == ' ' && !flag && !flag1)
-			cmd[size] = 0;
 		if (cmd[size] == '\'' && check_quotation_flag(&flag, flag1))
-			cmd[size] = 0;
+			size++;
 		if (cmd[size] == '\"' && check_quotation_flag(&flag1, flag))
-			cmd[size] = 0;
-		if (!flag1 && !flag && !cmd[size])
+			size++;
+		if (!flag1 && !flag && cmd[size] == ' ')
 			break ;
 		size++;
 	}
+	*end = size;
 }
 
-char	**get_cmdargs(char *cmd)
+int	set_parsing_deques(t_deques **deqs, char *cmd)
 {
-	t_deques	*deq;
-	char		**str;
-	t_pairs		keyval;
 	size_t		start;
-	size_t		len;
 	size_t		end;
+	size_t		len;
+	char		*str;
 
-	deq = create_deques();
-	if (!deq)
-		return (NULL);
 	start = 0;
 	end = 0;
 	len = ft_strlen(cmd);
 	while (start < len)
 	{
-		// printf("%zu\n", start);
-		parsing_cmd(&cmd[start]);
-		if (cmd[start] && (set_keyval(&cmd[start], &keyval) || push_back(deq, keyval)))
+		parsing_cmd(cmd, &start, &end);
+		// printf("%zu %zu\n", start, end);
+		if (start >= len && end == start)
+			break ;
+		str = ft_substr(cmd, start, end - start);
+		if (!str || push_keyval(*deqs, str))
 		{
-			free_keyval(keyval);
-			free_deques(&deq);
-			return (NULL);
+			free(str);
+			free_deques(deqs);
+			return (MALLOC_FAILED);
 		}
-		start = start + ft_strlen(&cmd[start]) + 1;
+		free(str);
+		start = ++end;
 	}
-	str = deqtoenvp(deq, NO);
-	free_deques(&deq);
+	return (EXIT_SUCCESS);
+}
+
+char	**get_cmdargs(char *cmd)
+{
+	t_deques	*deqs;
+	char		**str;
+
+	deqs = create_deques();
+	if (!deqs || set_parsing_deques(&deqs, cmd))
+		return (NULL);
+	str = deqtoenvp(deqs, NO);
+	free_deques(&deqs);
 	return (str);
 }
 
@@ -192,7 +150,7 @@ int	exec_builtin(t_exec *info, t_process p)
 			break ;
 		index++;
 	}
-	return (select_builtin(index)(info, p));
+	return (find_builtin(index)(info, p));
 }
 	/* external */
 void	exec_program(t_exec *info, t_process p)

@@ -61,7 +61,7 @@ t_deque	*pop_back(t_deques *deques)
 	return (node);
 }
 
-t_deque	*search_deq(t_deques *deq, char *key)
+t_deque	*find_deq(t_deques *deq, char *key)
 {
 	t_deque	*node;
 

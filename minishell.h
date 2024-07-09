@@ -92,23 +92,26 @@ void	set_signal(t_exec *info, void(*func)(int));
 void		exec_cmds(t_exec *info);
 void		set_cmds(t_exec *info);
 void		set_process(t_exec *info);
-char		*check_pathenv(char **paths, char *cmd);
-built_in	select_builtin(int index);
+built_in	find_builtin(int index);
 char		*read_val_strs(char *strs[], char *key);
-int			change_envs(t_deques *deqs, char *str);
+
+//builtin
+int			set_pwd(char **cwd);
 int     	ft_echo(t_exec *info, t_process p);
 int     	ft_cd(t_exec *info, t_process p);
-char		*get_pwd(t_exec *info);
 int     	ft_pwd(t_exec *info, t_process p);
 int     	ft_export(t_exec *info, t_process p);
 int     	ft_unset(t_exec *info, t_process p);
 int     	ft_env(t_exec *info, t_process p);
 int     	ft_exit(t_exec *info, t_process p);
+
+// deq
+int			push_keyval(t_deques *deqs, char *str);
+
+// free
 void		free_token(t_token *t);
 void		free_data(t_data d);
 void		free_tprocess(t_process *p, size_t size);
 void		free_info(t_exec info);
-int			is_close(t_exec *info, char *str);
-char		*read_val_deq(t_deques *deq, char *key);
 
 #endif

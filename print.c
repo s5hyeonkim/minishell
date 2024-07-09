@@ -18,15 +18,22 @@ void	print_err(int code)
 		perror("minishell: ");
 }
 
-void	print_msg(char *obj, int code)
+int	handle_error(char *exec, char *obj, int code)
 {
 	int	stdout_fd;
 
 	stdout_fd = dup(STDOUT_FILENO);
 	dup2(STDERR_FILENO, STDOUT_FILENO);
 	if (obj)
-		print_objerr(obj, code);
+		printf("minishell: %s : command not found\n", obj);
+	else if (exec)
+		print_objerr(exec, code);
 	else
 		print_err(code);
 	dup2(stdout_fd, STDOUT_FILENO);
+	if (code == 127)
+		return (code);
+	else if (code)
+		return (EXIT_FAILURE);
+	return (EXIT_SUCCESS);
 }

@@ -7,6 +7,7 @@
 # define TRUE 1
 # endif
 # include <stdio.h>
+# include <stdlib.h>
 # include <string.h>
 # include <unistd.h>
 # include <errno.h>
@@ -26,6 +27,6 @@ typedef enum e_err
 
 void	print_objerr(char *obj, int code);
 void	print_err(int code);
-void	print_msg(char *obj, int code);
+int		handle_error(char *exec, char *obj, int code);
 
 #endif

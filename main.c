@@ -5,19 +5,14 @@ volatile int	status;
 
 void	exit_process(t_exec *info, char *obj, int errcode)
 {
+	free_info(*info);
 	if (errcode && errcode <= 127)
-	{
-		print_msg(obj, errcode);
-		if (errcode != 127)
-			errcode = 1;
-	}
+		exit(handle_error(obj, NULL, errcode));
 	if (errcode == 128 + SIGTERM)
 	{
-		ft_putstr_fd("exit\n", 2);
+		ft_putstr_fd("exit\n", STDERR_FILENO);
 		errcode = 0;
 	}
-	(void) info;
-	//free_info(*info);
 	exit(errcode);
 }
 

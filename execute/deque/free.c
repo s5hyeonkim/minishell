@@ -8,7 +8,10 @@ void	free_strs(char **strs)
 	if (!strs)
 		return ;
 	while (strs[index])
-		free(strs[index++]);
+	{
+		free(strs[index]);
+		strs[index++] = NULL;
+	}
 	free(strs);
 }
 

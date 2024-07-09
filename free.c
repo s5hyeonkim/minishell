@@ -41,8 +41,7 @@ void	free_tprocess(t_process *p, size_t size)
 void	free_info(t_exec info)
 {
 	free_token(info.t);
-	info.t = NULL;
 	free_data(info.data);
 	free_tprocess(info.p, info.size);
-	info.p = NULL;
+	ft_memset(&info, 0, sizeof(t_exec));
 }

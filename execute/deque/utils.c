@@ -35,6 +35,7 @@ char	**deqtoenvp(t_deques *deqs, t_status state)
 	int		size;
 	int		index;
 	t_deque	*deq;
+	t_pairs	keyval;
 
 	size = get_size(deqs->head, state);
 	ret = ft_calloc(size + 1, sizeof(char *));
@@ -47,7 +48,8 @@ char	**deqtoenvp(t_deques *deqs, t_status state)
 		deq = deq->next;
 		if (deq->state != state)
 			continue ;
-		ret[index] = ft_pairjoin(deq->keyval);
+		keyval = deq->keyval;
+		ret[index] = ft_pairjoin(keyval.key, keyval.mid, keyval.val);
 		if (!ret[index++])
 		{
 			free_strs(ret);
@@ -101,4 +103,16 @@ void	print_deques(t_deques *deq)
 		if (node == deq->head)
 			break ;
 	}
+}
+
+char	*read_val_deq(t_deques *deq, char *key)
+{
+	char	*val;
+	t_deque	*node;
+
+	val = NULL;
+	node = find_deq(deq, key);
+	if (node)
+		val = node->keyval.val;
+	return (val);
 }

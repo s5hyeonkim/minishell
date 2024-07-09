@@ -1,18 +1,18 @@
 #include "deque.h"
 
-char	*ft_pairjoin(t_pairs keyval)
+char	*ft_pairjoin(char *key, char mid, char *val)
 {
 	char	*temp;
 	char	*ret;
-    char    mid[2];
+    char    m[2];
 
 	ret = NULL;
-    mid[0] = keyval.mid;
-    mid[1] = 0;
-	temp = ft_strjoin(keyval.key, mid);
+    m[0] = mid;
+    m[1] = 0;
+	temp = ft_strjoin(key, m);
 	if (!temp)
 		return (NULL);
-	ret = ft_strjoin(temp, keyval.val);
+	ret = ft_strjoin(temp, val);
 	free(temp);
 	return (ret);
 }

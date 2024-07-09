@@ -17,7 +17,7 @@
 
 typedef enum e_status
 {
-	NO = 0,
+	NO = 0,	// export와 관련 없는 것.
 	EXPORT = 1,
 	ENV = 2
 }	t_status;
@@ -25,9 +25,8 @@ typedef enum e_status
 typedef struct s_pairs
 {
 	char	*key;
-	char	mid; //=
-	char	*val;	// export a val = "";
-					// export a=, val = "";
+	char	mid; 	// = 또는 0
+	char	*val; 	// val != NULL;
 }	t_pairs;
 
 typedef struct s_deque
@@ -56,13 +55,13 @@ int			push_front(t_deques *deques);
 void		free_deque(t_deque *deque);
 void		free_deques(t_deques **deques);
 void		free_strs(char **strs);
-int			set_keyval(char *str, t_pairs *keyval);
 void		free_keyval(t_pairs keyval);
 char    	*get_key_strs(char *str);
 int			set_keyval(char *str, t_pairs *keyval);
-char		*ft_pairjoin(t_pairs keyval);
-t_deque		*search_deq(t_deques *deq, char *key);
+char		*ft_pairjoin(char *key, char mid, char *val);
+t_deque		*find_deq(t_deques *deq, char *key);
 t_deque		*pop(t_deques *deqs, t_deque *target);
 void		print_deques(t_deques *deq);
+char		*read_val_deq(t_deques *deq, char *key);
 
 #endif
