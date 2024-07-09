@@ -59,6 +59,7 @@ typedef struct s_process
 typedef struct s_data
 {
 	char		**paths;	//path environment variables
+	char		*home;
 	t_deques	*envps;
 }	t_data;
 
@@ -93,7 +94,7 @@ void		set_cmds(t_exec *info);
 void		set_process(t_exec *info);
 char		*check_pathenv(char **paths, char *cmd);
 built_in	select_builtin(int index);
-char		*get_value(char *strs[], char *key);
+char		*read_val_strs(char *strs[], char *key);
 int			change_envs(t_deques *deqs, char *str);
 int     	ft_echo(t_exec *info, t_process p);
 int     	ft_cd(t_exec *info, t_process p);
@@ -108,5 +109,6 @@ void		free_data(t_data d);
 void		free_tprocess(t_process *p, size_t size);
 void		free_info(t_exec info);
 int			is_close(t_exec *info, char *str);
+char		*read_val_deq(t_deques *deq, char *key);
 
 #endif

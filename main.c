@@ -29,7 +29,7 @@ char	**get_env_paths(char *envp[])
 	int		size;
 
 	size = 0;
-	paths = get_value(envp, "PATH");
+	paths = read_val_strs(envp, "PATH");
 	if (paths)
 		ret = ft_split(paths, ':');
 	else
@@ -43,7 +43,9 @@ void	set_info(t_exec *info, char *envp[])
 	info->data.envps = strstodeq(envp);
 	if (info->data.envps)
 		info->data.paths = get_env_paths(envp);
-	if (!info->data.paths || !info->data.envps)
+	if (info->data.envps && info->data.paths)
+		info->data.home = ft_strdup(read_val_deq(info->data.envps, "HOME"));
+	if (!info->data.paths || !info->data.envps || !info->data.home)
 		exit_process(info, NULL, MALLOC_FAILED);
 }
 

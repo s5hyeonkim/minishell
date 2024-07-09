@@ -28,7 +28,7 @@ char    *get_key_strs(char *str)
     return (key);
 }
 
-char    *get_value_strs(char *str)
+char    *get_val_strs(char *str)
 {
     char    *val;
 
@@ -46,7 +46,7 @@ int	set_keyval(char *str, t_pairs *keyval)
     else
         keyval->mid = 0;
     keyval->key = get_key_strs(str);
-    keyval->val = get_value_strs(str);
+    keyval->val = get_val_strs(str);
 	if (!keyval->key || !keyval->val)
 	{
 		free_keyval(*keyval);

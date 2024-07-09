@@ -8,11 +8,11 @@ int	is_no_nl(char *str)
 	return (FALSE);
 }
 
-char	*get_value(char *strs[], char *key)
+char	*read_val_strs(char *strs[], char *key)
 {
+	char    *ret;	
 	int     index;
 	size_t	size;
-	char    *ret;	
 
 	index = 0;
 	ret = NULL;
@@ -48,7 +48,5 @@ int	ft_echo(t_exec *info, t_process p)
 	}
 	if (!is_no_nl(p.args[1]))
 		ft_putchar_fd('\n', 1);
-	else
-		replace_lines();
 	return (EXIT_SUCCESS);
 }
