@@ -32,16 +32,23 @@ char	**get_env_paths(char *envp[])
 	return (ret);
 }
 
+void	set_data(t_exec *info, char *envp[])
+{
+	info->data.envps = strstodeq(envp);
+	info->data.paths = get_env_paths(envp);
+	if (info->data.envps)
+	{
+		info->data.home = ft_strdup(read_val_deq(info->data.envps, "HOME"));
+		info->data.user = ft_strdup(read_val_deq(info->data.envps, "USER"));
+	}
+	if (!info->data.paths || !info->data.envps || !info->data.home || !info->data.user)
+		exit_process(info, NULL, EXTRA_ERROR);
+}
+
 void	set_info(t_exec *info, char *envp[])
 {
 	ft_memset(info, 0, sizeof(t_exec));
-	info->data.envps = strstodeq(envp);
-	if (info->data.envps)
-		info->data.paths = get_env_paths(envp);
-	if (info->data.envps && info->data.paths)
-		info->data.home = ft_strdup(read_val_deq(info->data.envps, "HOME"));
-	if (!info->data.paths || !info->data.envps || !info->data.home)
-		exit_process(info, NULL, EXTRA_ERROR);
+	set_data(info, envp);
 }
 
 void	check_valid(t_exec *info, int argc)
@@ -57,7 +64,6 @@ void	replace_lines(void)
 	rl_on_new_line();
 	rl_replace_line("", 0);
 	rl_redisplay();
-
 }
 
 void    child_handler(int signo)

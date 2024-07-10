@@ -59,6 +59,7 @@ typedef struct s_data
 {
 	char		**paths;	//path environment variables
 	char		*home;
+	char		*user;
 	t_deques	*envps;
 }	t_data;
 
@@ -99,5 +100,4 @@ void		free_token(t_token *t);
 void		free_data(t_data d);
 void		free_tprocess(t_process *p, size_t size);
 void		free_info(t_exec info);
-
 #endif
