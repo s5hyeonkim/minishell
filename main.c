@@ -41,7 +41,7 @@ void	set_info(t_exec *info, char *envp[])
 	if (info->data.envps && info->data.paths)
 		info->data.home = ft_strdup(read_val_deq(info->data.envps, "HOME"));
 	if (!info->data.paths || !info->data.envps || !info->data.home)
-		exit_process(info, NULL, MALLOC_FAILED);
+		exit_process(info, NULL, EXTRA_ERROR);
 }
 
 void	check_valid(t_exec *info, int argc)
@@ -81,11 +81,11 @@ void    handler(int signo)
 void	set_signal(t_exec *info, void(*func)(int))
 {
 	if (signal(SIGINT, func) == SIG_ERR)
-		exit_process(info, NULL, SIG_ERROR);
+		exit_process(info, NULL, EXTRA_ERROR);
 	if (signal(SIGTERM, func) == SIG_ERR)
-		exit_process(info, NULL, SIG_ERROR);
+		exit_process(info, NULL, EXTRA_ERROR);
 	if (signal(SIGQUIT, func) == SIG_ERR)
-		exit_process(info, NULL, SIG_ERROR);
+		exit_process(info, NULL, EXTRA_ERROR);
 }
 
 /* parsing and set tokens 수정 필요 */
@@ -102,14 +102,14 @@ int	set_token(t_token **t)
 {
 	*t = ft_calloc(1, sizeof(t_token));
 	if (*t == NULL)
-		return (MALLOC_FAILED);
+		return (EXTRA_ERROR);
 	return (EXIT_SUCCESS);
 }
 
 void	set_tokens(t_exec *info, char *buffer)
 {
 	if (set_token(&(info->t)))
-		exit_process(info, NULL, MALLOC_FAILED);
+		exit_process(info, NULL, EXTRA_ERROR);
 	info->t->cmd = buffer;
 	// printf("token start %s\n", info->t->cmd);
 	tokenization(info, info->t);

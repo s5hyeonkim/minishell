@@ -63,27 +63,6 @@ void	ft_sort(char **strs)
 	}
 }
 
-int	push_keyval(t_deques *deqs, char *str)
-{
-	t_deque	*node;
-	t_pairs	keyval;
-	char	*key;
-
-	key = get_key_strs(str);
-	node = pop(deqs, find_deq(deqs, key));
-	free_deque(node);
-	free(key);
-	if (set_keyval(str, &keyval) || push_back(deqs, keyval))
-	{
-		free_keyval(keyval);
-		return (MALLOC_FAILED);
-	}
-	if (keyval.val[0])
-		deqs->tail->state = ENV;
-	else if (keyval.mid)
-		deqs->tail->state = EXPORT;
-	return (EXIT_SUCCESS);
-}
 
 int ft_export(t_exec *info, t_process p)
 {
@@ -96,7 +75,7 @@ int ft_export(t_exec *info, t_process p)
 	{
 		envs = deqtoenvp(info->data.envps, ENV);
 		if (!envs)
-			exit_process(info, NULL, MALLOC_FAILED);
+			return (handle_error(p.args[0], NULL, EXTRA_ERROR));
 		ft_sort(envs);
 		print_strs(envs);
 		free_strs(envs);
@@ -106,9 +85,12 @@ int ft_export(t_exec *info, t_process p)
 	while (p.args[++index])
 	{
 		if (!ft_isalpha(p.args[index][0]))
-			status = 1;
+			status = EXIT_FAILURE;
 		else if (push_keyval(info->data.envps, p.args[index]))
-			exit_process(info, NULL, MALLOC_FAILED);
+		{
+			handle_error(p.args[0], NULL, EXTRA_ERROR);
+			return (BUILTIN_ERROR);
+		}
 	}
 	return (status);
 }

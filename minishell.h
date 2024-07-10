@@ -14,7 +14,6 @@
 # include <sys/stat.h>
 # include <dirent.h>
 # include <string.h>
-# include <errno.h>
 # include <sys/ioctl.h>
 # include <termios.h>
 # include <curses.h>
@@ -23,8 +22,8 @@
 # include "libft/libft.h"
 # include "ft_err.h"
 # include "./execute/deque/deque.h"
-// external folder 경로
-# define external "./execute/"
+# define NAME_MAX 256
+# define PATH_MAX 1024
 
 typedef enum e_type
 {
@@ -74,19 +73,11 @@ typedef struct s_exec
 
 typedef int (*built_in)(t_exec *info, t_process p);
 
-//libft
-char	*get_next_line(int fd);
-void	*ft_calloc(size_t count, size_t size);
-size_t	ft_strlcat(char *dst, const char *src, size_t dstsize);
-size_t	ft_strlen(const char *str);
-void	*ft_memset(void *ptr, int c, size_t len);
-
 //minishell
-void	exit_process(t_exec *info, char *obj, int errcode);
-void	replace_lines(void);
-void	free_info(t_exec info);
-void    child_handler(int signo);
-void	set_signal(t_exec *info, void(*func)(int));
+void		exit_process(t_exec *info, char *obj, int errcode);
+void		replace_lines(void);
+void    	child_handler(int signo);
+void		set_signal(t_exec *info, void(*func)(int));
 
 //execute
 void		exec_cmds(t_exec *info);
@@ -94,19 +85,14 @@ void		set_cmds(t_exec *info);
 void		set_process(t_exec *info);
 built_in	find_builtin(int index);
 char		*read_val_strs(char *strs[], char *key);
-
-//builtin
 int			set_pwd(char **cwd);
-int     	ft_echo(t_exec *info, t_process p);
-int     	ft_cd(t_exec *info, t_process p);
-int     	ft_pwd(t_exec *info, t_process p);
-int     	ft_export(t_exec *info, t_process p);
-int     	ft_unset(t_exec *info, t_process p);
-int     	ft_env(t_exec *info, t_process p);
-int     	ft_exit(t_exec *info, t_process p);
-
-// deq
-int			push_keyval(t_deques *deqs, char *str);
+int			ft_pwd(t_exec *info, t_process p);
+int			ft_env(t_exec *info, t_process p);
+int			ft_exit(t_exec *info, t_process p);
+int 		ft_export(t_exec *info, t_process p);
+int 		ft_cd(t_exec *info, t_process p);
+int			ft_echo(t_exec *info, t_process p);
+int			ft_unset(t_exec *info, t_process p);
 
 // free
 void		free_token(t_token *t);

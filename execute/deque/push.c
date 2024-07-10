@@ -15,7 +15,7 @@ int	set_deque(t_deque **deq, t_pairs keyval)
 
 	*deq = create_deque();
 	if (*deq == NULL)
-		return (MALLOC_FAILED);
+		return (EXTRA_ERROR);
 	(*deq)->keyval.key = keyval.key;
 	(*deq)->keyval.mid = keyval.mid;
 	(*deq)->keyval.val = keyval.val;
@@ -30,7 +30,7 @@ int	push_back(t_deques *deques, t_pairs keyval)
 	{
 		free_keyval(keyval);
 		free_deque(new_deque);
-		return (MALLOC_FAILED);
+		return (EXTRA_ERROR);
 	}
 	if (deques->head == NULL)
 	{
@@ -55,7 +55,7 @@ int	push_front(t_deques *deques)
 
 	new_deque = create_deque();
 	if (new_deque == NULL)
-		return (MALLOC_FAILED);
+		return (EXTRA_ERROR);
 	if (deques->head == NULL)
 	{
 		deques->tail = new_deque;
@@ -70,5 +70,27 @@ int	push_front(t_deques *deques)
 		deques->tail->next = new_deque;
 	}
 	deques->head = new_deque;
+	return (EXIT_SUCCESS);
+}
+
+int	push_keyval(t_deques *deqs, char *str)
+{
+	t_deque	*node;
+	t_pairs	keyval;
+	char	*key;
+
+	key = get_key_str(str);
+	node = pop(deqs, find_deq(deqs, key));
+	free_deque(node);
+	free(key);
+	if (set_keyval(str, &keyval) || push_back(deqs, keyval))
+	{
+		free_keyval(keyval);
+		return (EXIT_FAILURE);
+	}
+	if (keyval.val[0])
+		deqs->tail->state = ENV;
+	else if (keyval.mid)
+		deqs->tail->state = EXPORT;
 	return (EXIT_SUCCESS);
 }

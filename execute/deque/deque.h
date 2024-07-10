@@ -56,12 +56,13 @@ void		free_deque(t_deque *deque);
 void		free_deques(t_deques **deques);
 void		free_strs(char **strs);
 void		free_keyval(t_pairs keyval);
-char    	*get_key_strs(char *str);
+char    	*get_key_str(char *str);
 int			set_keyval(char *str, t_pairs *keyval);
 char		*ft_pairjoin(char *key, char mid, char *val);
 t_deque		*find_deq(t_deques *deq, char *key);
 t_deque		*pop(t_deques *deqs, t_deque *target);
 void		print_deques(t_deques *deq);
 char		*read_val_deq(t_deques *deq, char *key);
+int			push_keyval(t_deques *deqs, char *str);
 
 #endif

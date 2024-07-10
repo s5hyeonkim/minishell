@@ -11,22 +11,26 @@
 # include <string.h>
 # include <unistd.h>
 # include <errno.h>
+# include "./libft/libft.h"
+
+# define MSG_ARGV "invalid arguments\n"
+# define MSG_OPT "invalid argument or option\n"
+# define MSG_IDF "not a valid identifier\n"
+# define MSG_SET "not set\n"
+# define MSG_NUM "numeric argument required\n"
+# define MSG_CMD "command not found\n"
 
 typedef enum e_err
 {
-	MALLOC_FAILED = 1,
+	BUILTIN_ERROR = 2,
 	INVALID_ARGV,
-	SIG_ERROR,
-	FORK_FAILED,
-	PIPE_FAILED,
-	FILE_NOT_EXIST,
-	PWD_ERROR,
+	INVALID_OPT,
+	INVALID_IDF,
+	NOT_SET,
+	NOT_NUM,
 	EXTRA_ERROR,
 	CMD_NOT_FOUND = 127,
 }	t_err;
 
-void	print_objerr(char *obj, int code);
-void	print_err(int code);
 int		handle_error(char *exec, char *obj, int code);
-
 #endif

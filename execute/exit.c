@@ -70,7 +70,7 @@ long	ft_atol(const char *str)
 		sign = -1;
 		str++;
 	}
-	while (*str >= '0' && *str <= '9')
+	while (ft_isdigit(*str))
 	{
 		pre = result;
 		result = result * 10 + *str - '0';
@@ -79,27 +79,27 @@ long	ft_atol(const char *str)
 	return (result * sign);
 }
 
-// exit 하기 전에 free 하자
+// --처리 필요
 int ft_exit(t_exec *info, t_process p)
 {
     long    exit_code;
-    int		stdout_fd;
+	int		index;
 
-	exit_code = 255;
+	index = 1;
+	exit_code = info->status;
 	ft_putstr_fd("exit\n", STDERR_FILENO);
-    if (p.args[1])
+	if (p.args[index] && !ft_memcmp(p.args[index], "--", 3))
+		index++;
+    if (p.args[index])
     {
-        exit_code = ft_atol(p.args[1]);
-        if (!is_equal(exit_code, p.args[1]))
+        exit_code = ft_atol(p.args[index]);
+        if (!is_equal(exit_code, p.args[index]))
         {
-			stdout_fd = dup(STDOUT_FILENO);
-			dup2(STDERR_FILENO, STDOUT_FILENO);
-			printf("minishell: exit: %s: numeric argument required\n", p.args[1]);
-			dup2(stdout_fd, STDOUT_FILENO);
+			handle_error(p.args[0], p.args[index], NOT_NUM);
 			exit_code = 255;
         }
-		else if (p.args[2])
-			return (INVALID_ARGV);
+		else if (p.args[index + 1])
+			return (handle_error(p.args[0], NULL, INVALID_ARGV));
     }
 	free_info(*info);
     exit(exit_code);

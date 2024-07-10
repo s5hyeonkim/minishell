@@ -17,7 +17,7 @@ char	*ft_pairjoin(char *key, char mid, char *val)
 	return (ret);
 }
 
-char    *get_key_strs(char *str)
+char    *get_key_str(char *str)
 {
     char    *key;
 
@@ -28,7 +28,7 @@ char    *get_key_strs(char *str)
     return (key);
 }
 
-char    *get_val_strs(char *str)
+char    *get_val_str(char *str)
 {
     char    *val;
 
@@ -45,14 +45,14 @@ int	set_keyval(char *str, t_pairs *keyval)
 		keyval->mid = '=';
     else
         keyval->mid = 0;
-    keyval->key = get_key_strs(str);
-    keyval->val = get_val_strs(str);
+    keyval->key = get_key_str(str);
+    keyval->val = get_val_str(str);
 	if (!keyval->key || !keyval->val)
 	{
 		free_keyval(*keyval);
 		keyval->key = NULL;
 		keyval->val = NULL;
-		return (MALLOC_FAILED);
+		return (EXTRA_ERROR);
 	}
 	return (EXIT_SUCCESS);
 }

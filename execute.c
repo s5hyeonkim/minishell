@@ -114,7 +114,7 @@ int	set_parsing_deques(t_deques **deqs, char *cmd)
 		{
 			free(str);
 			free_deques(deqs);
-			return (MALLOC_FAILED);
+			return (EXTRA_ERROR);
 		}
 		free(str);
 		start = ++end;
@@ -152,6 +152,7 @@ int	exec_builtin(t_exec *info, t_process p)
 	}
 	return (find_builtin(index)(info, p));
 }
+
 	/* external */
 void	exec_program(t_exec *info, t_process p)
 {
@@ -160,7 +161,7 @@ void	exec_program(t_exec *info, t_process p)
 	//printf("external %s %s\n", p.path, p.args[0]);
 	envp = deqtoenvp(info->data.envps, ENV);
 	if (!envp)
-		exit_process(info, NULL, MALLOC_FAILED);
+		exit_process(info, NULL, EXTRA_ERROR);
 	if (execve(p.path, p.args, envp) == -1)
 		exit_process(info, p.args[0], CMD_NOT_FOUND);
 }
@@ -186,14 +187,14 @@ void	set_args(t_exec *info, t_process *p)
 	// printf("enter set args:%s\n", p->t.cmd);
 	p->args = get_cmdargs(p->t.cmd);
 	if (!p->args)
-		exit_process(info, NULL, MALLOC_FAILED);
+		exit_process(info, NULL, EXTRA_ERROR);
 }
 
 void	set_path(t_exec *info, t_process *p)
 {
 	p->path = get_cmdpath(info->data.paths, p->args[0]);
 	if (!p->path)
-		exit_process(info, NULL, MALLOC_FAILED);
+		exit_process(info, NULL, EXTRA_ERROR);
 }
 
 void	set_cmds(t_exec *info)
@@ -239,7 +240,7 @@ void	set_process(t_exec *info)
 	info->size = find_pipe(info->t) + 1;
 	info->p = ft_calloc(info->size, sizeof(t_process));
 	if (!info->p)
-		exit_process(info, NULL, MALLOC_FAILED);
+		exit_process(info, NULL, EXTRA_ERROR);
 	set_token_process(info, info->t, &index);
 	// printf("set process\n");
 }
@@ -249,7 +250,7 @@ void	open_pipe(t_exec *info, int index)
 	if (info->p[index + 1].path)
 	{
 		if (pipe(info->p[index].fd))
-			exit_process(info, NULL, PIPE_FAILED);
+			exit_process(info, NULL, EXTRA_ERROR);
 	}
 }
 
@@ -284,7 +285,7 @@ void	get_child(t_exec *info, int index)
 {
 	info->p[index].pid = fork();
 	if (info->p[index].pid == -1)
-		exit_process(info, NULL, FORK_FAILED);
+		exit_process(info, NULL, EXTRA_ERROR);
 	else if (!info->p[index].pid)
 		child(info, index);
 	else
@@ -308,11 +309,9 @@ void	subprocess(t_exec *info)
 
 void	inprocess(t_exec *info)
 {
-	int	ret;
 	printf("execute in current process\n");
 	// printf("%s\n", info->p[0].path);	
-	ret = exec_builtin(info, info->p[0]);
-	info->status = ret;
+	info->status = exec_builtin(info, info->p[0]);
 }
 
 void	wait_process(t_exec *info)
@@ -328,6 +327,7 @@ void	wait_process(t_exec *info)
 			status = WEXITSTATUS(status);
 		index++;
 	}
+	info->status = status;
 }
 
 void	exec_cmds(t_exec *info)

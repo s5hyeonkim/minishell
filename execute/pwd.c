@@ -6,20 +6,15 @@ int	is_valid_option(char *opt)
 		return (TRUE);
 	if (!ft_memcmp(opt, "--", 3) || !ft_memcmp(opt, "-", 2) || opt[0] != '-')
 		return (TRUE);
-	handle_error("pwd", NULL, INVALID_ARGV);
+	handle_error("pwd", opt, INVALID_OPT);
 	return (FALSE);
 }
 
-int	set_pwd(char **pwd)
+int	set_pwd(char **cwd)
 {
-	char	cwd[4096];
-
-	ft_memset(cwd, 0, 4096);
-	if (!getcwd(cwd, sizeof(cwd)))
-		return (handle_error("pwd", NULL, EXTRA_ERROR));
-	*pwd = ft_strdup(cwd);
-	if (*pwd == NULL)
-		return (handle_error("pwd", NULL, MALLOC_FAILED));
+	*cwd = ft_calloc(PATH_MAX, sizeof(char));
+	if (*cwd == NULL || !getcwd(*cwd, sizeof(char) * PATH_MAX))
+		return (EXIT_FAILURE);
 	return (EXIT_SUCCESS);
 }
 
@@ -28,8 +23,13 @@ int	ft_pwd(t_exec *info, t_process p)
 	char	*cwd;
 
 	(void) info;
-	if (!is_valid_option(p.args[1]) || set_pwd(&cwd))
+	if (!is_valid_option(p.args[1]))
 		return (EXIT_FAILURE);
+	if (set_pwd(&cwd))
+	{
+		handle_error("pwd", NULL, EXTRA_ERROR);
+		return (BUILTIN_ERROR);
+	}
 	printf("%s\n", cwd);
 	free(cwd);
 	return (EXIT_SUCCESS);
