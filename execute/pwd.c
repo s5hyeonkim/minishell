@@ -10,7 +10,7 @@ int	is_valid_option(char *opt)
 	return (FALSE);
 }
 
-int	set_pwd(char **cwd)
+int	set_ㅊwd(char **cwd)
 {
 	*cwd = ft_calloc(PATH_MAX, sizeof(char));
 	if (*cwd == NULL || !getcwd(*cwd, sizeof(char) * PATH_MAX))
@@ -25,7 +25,7 @@ int	ft_pwd(t_exec *info, t_process p)
 	(void) info;
 	if (!is_valid_option(p.args[1]))
 		return (EXIT_FAILURE);
-	if (set_pwd(&cwd))
+	if (set_cwd(&cwd))
 	{
 		handle_error("pwd", NULL, EXTRA_ERROR);
 		return (BUILTIN_ERROR);

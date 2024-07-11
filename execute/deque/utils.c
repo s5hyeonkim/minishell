@@ -11,10 +11,10 @@
 /* ************************************************************************** */
 #include "deque.h"
 
-int	get_size(t_deque *head, t_status state)
+size_t	ft_deqlen(t_deque *head, t_state state)
 {
 	t_deque	*deq;
-	int		size;
+	size_t	size;
 
 	deq = head;
 	size = 0;
@@ -29,15 +29,15 @@ int	get_size(t_deque *head, t_status state)
 	return (size);
 }
 
-char	**deqtoenvp(t_deques *deqs, t_status state)
+char	**deqtoenvp(t_deques *deqs, t_state state)
 {
 	char	**ret;
-	int		size;
-	int		index;
+	size_t	index;
+	size_t	size;
 	t_deque	*deq;
 	t_pairs	keyval;
 
-	size = get_size(deqs->head, state);
+	size = ft_deqlen(deqs->head, state);
 	ret = ft_calloc(size + 1, sizeof(char *));
 	if (!ret)
 		return (NULL);

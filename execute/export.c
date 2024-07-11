@@ -84,12 +84,15 @@ int ft_export(t_exec *info, t_process p)
 	index = 0;
 	while (p.args[++index])
 	{
+		printf("p.args[index]: %s\n", p.args[0]);
+		printf("p.args[index]: %s\n", p.args[1]);
 		if (!ft_isalpha(p.args[index][0]))
 			status = EXIT_FAILURE;
-		else if (push_keyval(info->data.envps, p.args[index]))
+		else if (replace_back(info->data.envps, p.args[index]))
 		{
 			handle_error(p.args[0], NULL, EXTRA_ERROR);
 			return (BUILTIN_ERROR);
+			printf("%s\n", info->data.envps->tail->keyval.key);
 		}
 	}
 	return (status);

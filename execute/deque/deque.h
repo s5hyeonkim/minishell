@@ -15,12 +15,12 @@
 # include "../../libft/libft.h"
 # include "../../ft_err.h"
 
-typedef enum e_status
+typedef enum e_state
 {
 	NO = 0,	// export와 관련 없는 것.
 	EXPORT = 1,
 	ENV = 2
-}	t_status;
+}	t_state;
 
 typedef struct s_pairs
 {
@@ -32,7 +32,7 @@ typedef struct s_pairs
 typedef struct s_deque
 {
 	t_pairs			keyval;
-	t_status		state;
+	t_state			state;
 	struct s_deque	*prev;
 	struct s_deque	*next;
 }	t_deque;
@@ -49,7 +49,7 @@ t_deque		*pop_front(t_deques *deques);
 t_deque		*pop_back(t_deques *deques);
 int			set_env(t_deque *deq, char *keyval);
 t_deques	*strstodeq(char **strs);
-char		**deqtoenvp(t_deques *deqs, t_status state);
+char		**deqtoenvp(t_deques *deqs, t_state state);
 int			push_back(t_deques *deques, t_pairs keyval);
 int			push_front(t_deques *deques);
 void		free_deque(t_deque *deque);
@@ -63,6 +63,7 @@ t_deque		*find_deq(t_deques *deq, char *key);
 t_deque		*pop(t_deques *deqs, t_deque *target);
 void		print_deques(t_deques *deq);
 char		*read_val_deq(t_deques *deq, char *key);
-int			push_keyval(t_deques *deqs, char *str);
+int			replace_back(t_deques *deqs, char *str);
+int			push_keyback(t_deques *deques, char *str);
 
 #endif

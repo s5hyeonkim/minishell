@@ -10,15 +10,22 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "deque.h"
+void	set_state(t_deque *deq)
+{
+	if (deq->keyval.val[0])
+		deq->state = ENV;
+	else if (deq->keyval.mid)
+		deq->state = EXPORT;
+}
+
 int	set_deque(t_deque **deq, t_pairs keyval)
 {
 
 	*deq = create_deque();
 	if (*deq == NULL)
 		return (EXTRA_ERROR);
-	(*deq)->keyval.key = keyval.key;
-	(*deq)->keyval.mid = keyval.mid;
-	(*deq)->keyval.val = keyval.val;
+	ft_memcpy(&((*deq)->keyval), &keyval, sizeof(t_pairs));
+	set_state(*deq);
 	return (EXIT_SUCCESS);
 }
 
@@ -73,13 +80,15 @@ int	push_front(t_deques *deques)
 	return (EXIT_SUCCESS);
 }
 
-int	push_keyval(t_deques *deqs, char *str)
+int	replace_back(t_deques *deqs, char *str)
 {
 	t_deque	*node;
 	t_pairs	keyval;
 	char	*key;
 
 	key = get_key_str(str);
+	if (!key)
+		return (EXIT_FAILURE);
 	node = pop(deqs, find_deq(deqs, key));
 	free_deque(node);
 	free(key);
@@ -88,9 +97,22 @@ int	push_keyval(t_deques *deqs, char *str)
 		free_keyval(keyval);
 		return (EXIT_FAILURE);
 	}
-	if (keyval.val[0])
-		deqs->tail->state = ENV;
-	else if (keyval.mid)
-		deqs->tail->state = EXPORT;
 	return (EXIT_SUCCESS);
+}
+
+int	push_keyback(t_deques *deques, char *str)
+{
+	t_pairs	keyval;
+
+	ft_memset(&keyval, 0, sizeof(t_pairs));
+	keyval.key = ft_strdup(str);
+	if (keyval.key)
+		keyval.val = ft_strdup("");
+	if (!keyval.key || !keyval.val)
+	{
+		free(keyval.key);
+		free(keyval.val);
+		return (EXTRA_ERROR);
+	}
+	return (push_back(deques, keyval));
 }

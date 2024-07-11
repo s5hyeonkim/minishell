@@ -1,4 +1,5 @@
 #include "minishell.h"
+#include "execute/execute.h"
 
 /* execute parsing*/
 char	*get_pathcmd(char **paths, char *cmd)
@@ -27,7 +28,9 @@ int	is_builtin(char *cmd)
 	while (index < 7)
 	{
 		len = ft_strlen(cmds[index]);
-		if (!ft_memcmp(cmds[index], cmd, len) && (!cmd[len] || cmd[len] == ' '))
+		if (!ft_memcmp(cmds[index], cmd, len + 1))
+			return (TRUE);
+		if (!ft_memcmp(cmds[index], cmd, len) && cmd[len] == ' ')
 			return (TRUE);
 		index++;
 	}
@@ -110,7 +113,7 @@ int	set_parsing_deques(t_deques **deqs, char *cmd)
 		if (start >= len && end == start)
 			break ;
 		str = ft_substr(cmd, start, end - start);
-		if (!str || push_keyval(*deqs, str))
+		if (!str || push_keyback(*deqs, str))
 		{
 			free(str);
 			free_deques(deqs);
@@ -184,7 +187,7 @@ size_t	find_pipe(t_token *t)
 void	set_args(t_exec *info, t_process *p)
 {
 	// simple cmd로 수정 필요, 지금 t.cmd type은 redirection 포함한 cmd
-	// printf("enter set args:%s\n", p->t.cmd);
+	// printf("enter set args: %s\n", p->t.cmd);
 	p->args = get_cmdargs(p->t.cmd);
 	if (!p->args)
 		exit_process(info, NULL, EXTRA_ERROR);
