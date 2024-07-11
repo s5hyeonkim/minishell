@@ -1,11 +1,10 @@
 #include "minishell.h"
 
-volatile int	status;
 /* exit */
 
-void	exit_process(t_exec *info, char *obj, int errcode)
+void	exit_process(t_shell *shell, char *obj, int errcode)
 {
-	free_info(*info);
+	free_shell(*shell);
 	if (errcode && errcode <= 127)
 		exit(handle_error(obj, NULL, errcode));
 	if (errcode == 128 + SIGTERM)
@@ -32,76 +31,39 @@ char	**get_env_paths(char *envp[])
 	return (ret);
 }
 
-void	set_data(t_exec *info, char *envp[])
+void	set_data(t_shell *shell, char *envp[])
 {
-	info->data.envps = strstodeq(envp);
-	info->data.paths = get_env_paths(envp);
-	if (info->data.envps)
+	shell->data.envps = strstodeq(envp);
+	shell->data.paths = get_env_paths(envp);
+	if (shell->data.envps)
 	{
-		info->data.home = ft_strdup(read_val_deq(info->data.envps, "HOME"));
-		info->data.user = ft_strdup(read_val_deq(info->data.envps, "USER"));
+		shell->data.home = ft_strdup(read_val_deq(shell->data.envps, "HOME"));
+		shell->data.user = ft_strdup(read_val_deq(shell->data.envps, "USER"));
 	}
-	if (!info->data.paths || !info->data.envps || !info->data.home || !info->data.user)
-		exit_process(info, NULL, EXTRA_ERROR);
+	if (!shell->data.paths || !shell->data.envps || !shell->data.home || !shell->data.user)
+		exit_process(shell, NULL, EXTRA_ERROR);
 }
 
-void	set_info(t_exec *info, char *envp[])
+void	set_shell(t_shell *shell, char *envp[])
 {
-	ft_memset(info, 0, sizeof(t_exec));
-	set_data(info, envp);
+	ft_memset(shell, 0, sizeof(t_shell));
+	set_data(shell, envp);
 }
 
-void	check_valid(t_exec *info, int argc)
+void	check_valid(t_shell *shell, int argc)
 {
 	if (argc != 1)
-		exit_process(info, NULL, INVALID_ARGV);
-}
-
-/* signal*/
-void	replace_lines(void)
-{
-	ft_putchar_fd('\n', STDERR_FILENO);
-	rl_on_new_line();
-	rl_replace_line("", 0);
-	rl_redisplay();
-}
-
-void    child_handler(int signo)
-{
-	(void) signo;
-	status = signo + 128;
-	//printf("signal receive %d\n", status);
-	if (signo == SIGINT)
-		exit(status);
-}
-
-void    handler(int signo)
-{
-	(void) signo;
-	status = signo + 128;
-	//printf("signal receive %d\n", status);
-	if (signo == SIGINT)
-		replace_lines();
-}
-
-void	set_signal(t_exec *info, void(*func)(int))
-{
-	if (signal(SIGINT, func) == SIG_ERR)
-		exit_process(info, NULL, EXTRA_ERROR);
-	if (signal(SIGTERM, func) == SIG_ERR)
-		exit_process(info, NULL, EXTRA_ERROR);
-	if (signal(SIGQUIT, func) == SIG_ERR)
-		exit_process(info, NULL, EXTRA_ERROR);
+		exit_process(shell, NULL, INVALID_ARGV);
 }
 
 /* parsing and set tokens 수정 필요 */
-void	tokenization(t_exec *info, t_token *t)
+void	tokenization(t_shell *shell, t_token *t)
 {
 	printf("origin cmd: %s\n", t->cmd);
 	t->type = SIMPLE_CMD;
-	(void) info;
-	//tokenization(info, t->left);
-	//tokenization(info, t->right);
+	(void) shell;
+	//tokenization(shell, t->left);
+	//tokenization(shell, t->right);
 }
 
 int	set_token(t_token **t)
@@ -112,13 +74,13 @@ int	set_token(t_token **t)
 	return (EXIT_SUCCESS);
 }
 
-void	set_tokens(t_exec *info, char *buffer)
+void	set_tokens(t_shell *shell, char *buffer)
 {
-	if (set_token(&(info->t)))
-		exit_process(info, NULL, EXTRA_ERROR);
-	info->t->cmd = buffer;
-	// printf("token start %s\n", info->t->cmd);
-	tokenization(info, info->t);
+	if (set_token(&(shell->t)))
+		exit_process(shell, NULL, EXTRA_ERROR);
+	shell->t->cmd = buffer;
+	// printf("token start %s\n", shell->t->cmd);
+	tokenization(shell, shell->t);
 	// printf("token end\n");
 }
 
@@ -132,53 +94,53 @@ void	set_terminal_printoff(void)
 	tcsetattr(1, 0, &term);
 }
 
-void	init(t_exec *info, int argc, char *envp[])
+void	init(t_shell *shell, int argc, char *envp[])
 {
-	set_info(info, envp);
-	check_valid(info, argc);
-	set_signal(info, handler);
+	set_shell(shell, envp);
+	check_valid(shell, argc);
+	set_signal(shell, signal_handler);
 	set_terminal_printoff();
 }
 
-void	readlines(t_exec *info, char **buffer)
+void	readlines(t_shell *shell, char **buffer)
 {
 
 	*buffer = readline("minishell$ ");
 	if (*buffer == 0)
-		exit_process(info, NULL, SIGTERM + 128);
+		exit_process(shell, NULL, SIGTERM + 128);
 	if (**buffer)
 		add_history(*buffer);
 }
 
-void	set_status(t_exec *info)
+void	set_status(t_shell *shell)
 {
 	if (status)
-		info->status = status;
+		shell->status = status;
 	status = 0;
 }
 
-void	loop(t_exec *info)
+void	loop(t_shell *shell)
 {
 	char	*buffer;
 
 	rl_clear_history();
 	while(1)
 	{
-		readlines(info, &buffer);
+		readlines(shell, &buffer);
 		// printf("buffer: %s\n", buffer);
-		set_status(info);
-		set_tokens(info, buffer);
-		set_process(info);
-		set_cmds(info);
-		exec_cmds(info);
+		set_status(shell);
+		set_tokens(shell, buffer);
+		set_process(shell);
+		set_cmds(shell);
+		exec_cmds(shell);
 	}
 }
 
 int	main(int argc, char *argv[], char *envp[])
 {
-	t_exec	info;
+	t_shell	shell;
 
 	(void)argv;
-	init(&info, argc, envp);
-	loop(&info);
+	init(&shell, argc, envp);
+	loop(&shell);
 }

@@ -10,6 +10,7 @@
 # include <fcntl.h>
 # include <sys/wait.h>
 # include <signal.h>
+# include <sys/signal.h>
 # include <sys/types.h>
 # include <sys/stat.h>
 # include <dirent.h>
@@ -22,6 +23,8 @@
 # include "libft/libft.h"
 # include "ft_err.h"
 # include "./execute/deque/deque.h"
+# include "./execute/execute.h"
+# include "./src/src.h"
 # define NAME_MAX 256
 # define PATH_MAX 1024
 
@@ -63,41 +66,50 @@ typedef struct s_data
 	t_deques	*envps;
 }	t_data;
 
-typedef struct s_exec
+typedef struct s_shell
 {
 	t_token			*t;
 	t_process		*p;
-	size_t			size;
+	size_t			p_size;
 	int				status;
 	t_data			data;
-}	t_exec;
+}	t_shell;
 
-typedef int (*built_in)(t_exec *info, t_process p);
+volatile int	status;
+typedef int (*built_in)(t_shell *shell, t_process p);
+typedef struct sigaction t_sigaction;
 
 //minishell
-void		exit_process(t_exec *info, char *obj, int errcode);
-void		replace_lines(void);
-void    	child_handler(int signo);
-void		set_signal(t_exec *info, void(*func)(int));
+void		exit_process(t_shell *shell, char *obj, int errcode);
+void		replace_line(void);
+void		child_handler(int signo);
+void		set_signal(t_shell *shell, void(*func)(int));
 
 //execute
-void		exec_cmds(t_exec *info);
-void		set_cmds(t_exec *info);
-void		set_process(t_exec *info);
+void		exec_cmds(t_shell *shell);
+void		set_cmds(t_shell *shell);
+void		set_process(t_shell *shell);
 built_in	find_builtin(int index);
 char		*read_val_strs(char *strs[], char *key);
-int			set_pwd(char **cwd);
-int			ft_pwd(t_exec *info, t_process p);
-int			ft_env(t_exec *info, t_process p);
-int			ft_exit(t_exec *info, t_process p);
-int 		ft_export(t_exec *info, t_process p);
-int 		ft_cd(t_exec *info, t_process p);
-int			ft_echo(t_exec *info, t_process p);
-int			ft_unset(t_exec *info, t_process p);
+int			set_cwd(char **cwd);
+int			ft_pwd(t_shell *shell, t_process p);
+int			ft_env(t_shell *shell, t_process p);
+int			ft_exit(t_shell *shell, t_process p);
+int 		ft_export(t_shell *shell, t_process p);
+int 		ft_cd(t_shell *shell, t_process p);
+int			ft_echo(t_shell *shell, t_process p);
+int			ft_unset(t_shell *shell, t_process p);
 
 // free
 void		free_token(t_token *t);
 void		free_data(t_data d);
 void		free_tprocess(t_process *p, size_t size);
-void		free_info(t_exec info);
+void		free_shell(t_shell shell);
+
+/* signal.c */
+void		set_signal(t_shell *shell, void(*signal_handler)(int));
+void		signal_handler(int signo);
+void		replace_line(void);
+void		child_handler(int signo);
+
 #endif

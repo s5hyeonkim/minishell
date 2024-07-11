@@ -14,7 +14,7 @@ int	set_quote(t_pairs *keyval, char c)
 	return (TRUE);
 }
 
-int	is_close(t_exec *info, char *str)
+int	is_close(t_shell *shell, char *str)
 {
 	t_deques	*rec;
 	int			index;
@@ -24,7 +24,7 @@ int	is_close(t_exec *info, char *str)
 	rec = create_deques();
 	keyval.mid = -1;
 	if (!rec || push_back(rec, keyval))
-		exit_process(info, NULL, MALLOC_FAILED);
+		exit_process(shell, NULL, MALLOC_FAILED);
 	index = -1;
 	ret = FALSE;
 	while(str[++index])
@@ -34,7 +34,7 @@ int	is_close(t_exec *info, char *str)
 		else if (set_quote(&keyval, str[index]) && push_back(rec, keyval))
 		{
 			free_deques(&rec);
-			exit_process(info, NULL, MALLOC_FAILED);
+			exit_process(shell, NULL, MALLOC_FAILED);
 		}
 	}
 	if (rec->tail->keyval.mid == -1)

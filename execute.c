@@ -140,7 +140,7 @@ char	**get_cmdargs(char *cmd)
 
 /* program */
 	/* builtin */
-int	exec_builtin(t_exec *info, t_process p)
+int	exec_builtin(t_shell *shell, t_process p)
 {
 	const char	*cmds[] = {"echo", "cd", "pwd", "export", "unset", "env", "exit"};
 	int			index;
@@ -153,20 +153,20 @@ int	exec_builtin(t_exec *info, t_process p)
 			break ;
 		index++;
 	}
-	return (find_builtin(index)(info, p));
+	return (find_builtin(index)(shell, p));
 }
 
 	/* external */
-void	exec_program(t_exec *info, t_process p)
+void	exec_program(t_shell *shell, t_process p)
 {
 	char	**envp;
 
 	//printf("external %s %s\n", p.path, p.args[0]);
-	envp = deqtoenvp(info->data.envps, ENV);
+	envp = deqtoenvp(shell->data.envps, ENV);
 	if (!envp)
-		exit_process(info, NULL, EXTRA_ERROR);
+		exit_process(shell, NULL, EXTRA_ERROR);
 	if (execve(p.path, p.args, envp) == -1)
-		exit_process(info, p.args[0], CMD_NOT_FOUND);
+		exit_process(shell, p.args[0], CMD_NOT_FOUND);
 }
 
 
@@ -184,166 +184,166 @@ size_t	find_pipe(t_token *t)
 	return (pipe_num);
 }
 
-void	set_args(t_exec *info, t_process *p)
+void	set_args(t_shell *shell, t_process *p)
 {
 	// simple cmd로 수정 필요, 지금 t.cmd type은 redirection 포함한 cmd
 	// printf("enter set args: %s\n", p->t.cmd);
 	p->args = get_cmdargs(p->t.cmd);
 	if (!p->args)
-		exit_process(info, NULL, EXTRA_ERROR);
+		exit_process(shell, NULL, EXTRA_ERROR);
 }
 
-void	set_path(t_exec *info, t_process *p)
+void	set_path(t_shell *shell, t_process *p)
 {
-	p->path = get_cmdpath(info->data.paths, p->args[0]);
+	p->path = get_cmdpath(shell->data.paths, p->args[0]);
 	if (!p->path)
-		exit_process(info, NULL, EXTRA_ERROR);
+		exit_process(shell, NULL, EXTRA_ERROR);
 }
 
-void	set_cmds(t_exec *info)
+void	set_cmds(t_shell *shell)
 {
 	size_t	index;
 
 	index = 0;
-	while (index < info->size)
+	while (index < shell->p_size)
 	{
-		set_args(info, &info->p[index]);
-		// printf("first commad: %s\n", info->p[index].args[0]);
-		set_path(info, &info->p[index]);
-		// printf("path/command: %s\n", info->p[index].path);
+		set_args(shell, &shell->p[index]);
+		// printf("first commad: %s\n", shell->p[index].args[0]);
+		set_path(shell, &shell->p[index]);
+		// printf("path/command: %s\n", shell->p[index].path);
 		index++;
 	}
 }
 
-void	set_token_process(t_exec *info, t_token *t, int *index)
+void	set_token_process(t_shell *shell, t_token *t, int *index)
 {
 	if (!t)
 		return ;
 	if (t->type == SIMPLE_CMD || t->type == REDIRECT)
 	{
 		// printf("set SIMPLE CMD\n");
-		info->p[*index].t = *t;
+		shell->p[*index].t = *t;
 		(*index)++;
 		return ;
 	}
 	else if (t->type)
 	{
 		if (t->left && t->left->cmd && t->left->cmd[0])
-			set_token_process(info, t->left, index);
+			set_token_process(shell, t->left, index);
 		if (t->right && t->right->cmd && t->right->cmd[0])
-			set_token_process(info, t->right, index);
+			set_token_process(shell, t->right, index);
 	}
 }
 
-void	set_process(t_exec *info)
+void	set_process(t_shell *shell)
 {
 	int	index;
 
 	index = 0;
-	info->size = find_pipe(info->t) + 1;
-	info->p = ft_calloc(info->size, sizeof(t_process));
-	if (!info->p)
-		exit_process(info, NULL, EXTRA_ERROR);
-	set_token_process(info, info->t, &index);
+	shell->p_size = find_pipe(shell->t) + 1;
+	shell->p = ft_calloc(shell->p_size, sizeof(t_process));
+	if (!shell->p)
+		exit_process(shell, NULL, EXTRA_ERROR);
+	set_token_process(shell, shell->t, &index);
 	// printf("set process\n");
 }
 
-void	open_pipe(t_exec *info, int index)
+void	open_pipe(t_shell *shell, int index)
 {
-	if (info->p[index + 1].path)
+	if (shell->p[index + 1].path)
 	{
-		if (pipe(info->p[index].fd))
-			exit_process(info, NULL, EXTRA_ERROR);
+		if (pipe(shell->p[index].fd))
+			exit_process(shell, NULL, EXTRA_ERROR);
 	}
 }
 
-void	close_pipe(t_exec *info, int index)
+void	close_pipe(t_shell *shell, int index)
 {
-	if (info->p[index + 1].path)
-		close(info->p[index].fd[1]);
+	if (shell->p[index + 1].path)
+		close(shell->p[index].fd[1]);
 }
 
-void	child(t_exec *info, int index)
+void	child(t_shell *shell, int index)
 {
 	// printf("child process start\n");
 	int	ret;
 
-	set_signal(info, child_handler);
-	if (is_builtin(info->p[index].path))
+	set_signal(shell, child_handler);
+	if (is_builtin(shell->p[index].path))
 	{
-		ret = exec_builtin(info, info->p[index]);
-		exit_process(info, NULL, ret);
+		ret = exec_builtin(shell, shell->p[index]);
+		exit_process(shell, NULL, ret);
 	}
 	else
-		exec_program(info, info->p[index]);
+		exec_program(shell, shell->p[index]);
 }
 
-void	parent(t_exec *info, int index)
+void	parent(t_shell *shell, int index)
 {
-	close_pipe(info, index);
-	waitpid(info->p[index].pid, 0, WNOHANG);
+	close_pipe(shell, index);
+	waitpid(shell->p[index].pid, 0, WNOHANG);
 }
 
-void	get_child(t_exec *info, int index)
+void	get_child(t_shell *shell, int index)
 {
-	info->p[index].pid = fork();
-	if (info->p[index].pid == -1)
-		exit_process(info, NULL, EXTRA_ERROR);
-	else if (!info->p[index].pid)
-		child(info, index);
+	shell->p[index].pid = fork();
+	if (shell->p[index].pid == -1)
+		exit_process(shell, NULL, EXTRA_ERROR);
+	else if (!shell->p[index].pid)
+		child(shell, index);
 	else
-		parent(info, index);
+		parent(shell, index);
 }
 
-void	subprocess(t_exec *info)
+void	subprocess(t_shell *shell)
 {
 	size_t	index;
 
 	index = 0;
 	printf("execute in child process\n");
-	while (index < info->size)
+	while (index < shell->p_size)
 	{
-		open_pipe(info, index);
-		get_child(info, index);
-		close_pipe(info, index);
+		open_pipe(shell, index);
+		get_child(shell, index);
+		close_pipe(shell, index);
 		index++;
 	}
 }
 
-void	inprocess(t_exec *info)
+void	inprocess(t_shell *shell)
 {
 	printf("execute in current process\n");
-	// printf("%s\n", info->p[0].path);	
-	info->status = exec_builtin(info, info->p[0]);
+	// printf("%s\n", shell->p[0].path);	
+	shell->status = exec_builtin(shell, shell->p[0]);
 }
 
-void	wait_process(t_exec *info)
+void	wait_process(t_shell *shell)
 {
 	int	index;
 	int	status;
 
 	index = 0;
-	while (info->p[index].path)
+	while (shell->p[index].path)
 	{
-		waitpid(info->p[index].pid, &status, 0);
+		waitpid(shell->p[index].pid, &status, 0);
 		if (WIFEXITED(status))
 			status = WEXITSTATUS(status);
 		index++;
 	}
-	info->status = status;
+	shell->status = status;
 }
 
-void	exec_cmds(t_exec *info)
+void	exec_cmds(t_shell *shell)
 {
-	if (info->size > 1 || !is_builtin(info->p[0].path))
+	if (shell->p_size > 1 || !is_builtin(shell->p[0].path))
 	{
-		subprocess(info);
-		wait_process(info);
+		subprocess(shell);
+		wait_process(shell);
 	}
 	else
 	{
-		inprocess(info);
-		//print_deques(info->data.envps);
+		inprocess(shell);
+		//print_deques(shell->data.envps);
 	}
 }
 

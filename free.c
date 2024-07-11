@@ -38,10 +38,10 @@ void	free_tprocess(t_process *p, size_t size)
 	free(p);
 }
 
-void	free_info(t_exec info)
+void	free_shell(t_shell shell)
 {
-	free_token(info.t);
-	free_data(info.data);
-	free_tprocess(info.p, info.size);
-	ft_memset(&info, 0, sizeof(t_exec));
+	free_token(shell.t);
+	free_data(shell.data);
+	free_tprocess(shell.p, shell.p_size);
+	ft_memset(&shell, 0, sizeof(t_shell));
 }

@@ -1,6 +1,6 @@
 #include "../minishell.h"
 
-int	ft_env(t_exec *info, t_process p)
+int	ft_env(t_shell *shell, t_process p)
 {
 	int		index;
 	char	**envs;
@@ -10,7 +10,7 @@ int	ft_env(t_exec *info, t_process p)
 		handle_error(p.args[0], NULL, INVALID_OPT);
 		return (BUILTIN_ERROR);
 	}
-	envs = deqtoenvp(info->data.envps, ENV);
+	envs = deqtoenvp(shell->data.envps, ENV);
 	if (!envs)
 	{
 		handle_error(p.args[0], NULL, EXTRA_ERROR);

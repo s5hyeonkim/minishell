@@ -1,8 +1,8 @@
 #include "../minishell.h"
 
-int ft_unset(t_exec *info, t_process p)
+int ft_unset(t_shell *shell, t_process p)
 {
-    (void) info;
+    (void) shell;
     (void) p;
     return (0);
 }

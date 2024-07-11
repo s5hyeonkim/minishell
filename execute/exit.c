@@ -80,13 +80,13 @@ long	ft_atol(const char *str)
 }
 
 // --처리 필요
-int ft_exit(t_exec *info, t_process p)
+int ft_exit(t_shell *shell, t_process p)
 {
     long    exit_code;
 	int		index;
 
 	index = 1;
-	exit_code = info->status;
+	exit_code = shell->status;
 	ft_putstr_fd("exit\n", STDERR_FILENO);
 	if (p.args[index] && !ft_memcmp(p.args[index], "--", 3))
 		index++;
@@ -101,7 +101,7 @@ int ft_exit(t_exec *info, t_process p)
 		else if (p.args[index + 1])
 			return (handle_error(p.args[0], NULL, INVALID_ARGV));
     }
-	free_info(*info);
+	free_shell(*shell);
     exit(exit_code);
 	return (0);
 }

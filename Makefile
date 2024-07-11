@@ -4,6 +4,7 @@ CPPFLAGS = -I${HOME}/.brew/opt/readline/include -Iminishell.h -Ift_err.h -MMD -M
 LDFLAGS = -L${HOME}/.brew/opt/readline/lib -Llibft -Lexecute/deque
 LDLIBS = -lreadline -lft -lftdeque
 EXEC = ./execute/
+SRC = ./src/
 SRCS = ./main.c \
 	   ./print.c \
 	   ./execute.c \
@@ -16,6 +17,7 @@ SRCS = ./main.c \
 	   $(EXEC)export.c \
 	   $(EXEC)pwd.c \
 	   $(EXEC)unset.c \
+	   $(SRC)signal.c
 
 #./main.c
 	   

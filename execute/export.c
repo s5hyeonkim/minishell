@@ -64,7 +64,7 @@ void	ft_sort(char **strs)
 }
 
 
-int ft_export(t_exec *info, t_process p)
+int ft_export(t_shell *shell, t_process p)
 {
 	char	**envs;
 	int		index;
@@ -73,7 +73,7 @@ int ft_export(t_exec *info, t_process p)
 	status = EXIT_SUCCESS;
 	if (!p.args[1] || !ft_memcmp(p.args[1], "--", 3))
 	{
-		envs = deqtoenvp(info->data.envps, ENV);
+		envs = deqtoenvp(shell->data.envps, ENV);
 		if (!envs)
 			return (handle_error(p.args[0], NULL, EXTRA_ERROR));
 		ft_sort(envs);
@@ -88,11 +88,11 @@ int ft_export(t_exec *info, t_process p)
 		printf("p.args[index]: %s\n", p.args[1]);
 		if (!ft_isalpha(p.args[index][0]))
 			status = EXIT_FAILURE;
-		else if (replace_back(info->data.envps, p.args[index]))
+		else if (replace_back(shell->data.envps, p.args[index]))
 		{
 			handle_error(p.args[0], NULL, EXTRA_ERROR);
 			return (BUILTIN_ERROR);
-			printf("%s\n", info->data.envps->tail->keyval.key);
+			printf("%s\n", shell->data.envps->tail->keyval.key);
 		}
 	}
 	return (status);

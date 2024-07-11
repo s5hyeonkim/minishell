@@ -9,14 +9,14 @@ int	navigate_dir(char *to_dir)
 	return (EXIT_SUCCESS);
 }
 
-int	set_pwd(t_exec *info, char *dir)
+int	set_pwd(t_shell *shell, char *dir)
 {
 	char	*str;
 
-	if (!read_val_deq(info->data.envps, "PWD"))
+	if (!read_val_deq(shell->data.envps, "PWD"))
 		return (EXIT_SUCCESS);
 	str = ft_strjoin("PWD=", dir);
-	if (!str || replace_back(info->data.envps, str))
+	if (!str || replace_back(shell->data.envps, str))
 	{
 		free(str);
 		return (handle_error("cd", NULL, EXTRA_ERROR));
@@ -25,14 +25,14 @@ int	set_pwd(t_exec *info, char *dir)
 	return (EXIT_SUCCESS);	
 }
 
-int	set_oldpwd(t_exec *info, char *dir)
+int	set_oldpwd(t_shell *shell, char *dir)
 {
 	char	*str;
 
-	if (!read_val_deq(info->data.envps, "OLDPWD"))
+	if (!read_val_deq(shell->data.envps, "OLDPWD"))
 		return (EXIT_SUCCESS);
 	str = ft_strjoin("OLDPWD=", dir);
-	if (!str || replace_back(info->data.envps, str))
+	if (!str || replace_back(shell->data.envps, str))
 	{
 		free(str);
 		return (handle_error("cd", NULL, EXTRA_ERROR));
@@ -41,43 +41,43 @@ int	set_oldpwd(t_exec *info, char *dir)
 	return (EXIT_SUCCESS);	
 }
 
-int	navigate_var(t_exec *info, char *var)
+int	navigate_var(t_shell *shell, char *var)
 {
-	if (!read_val_deq(info->data.envps, var))
+	if (!read_val_deq(shell->data.envps, var))
 		return (handle_error("cd", var, NOT_SET));
-	return (navigate_dir(read_val_deq(info->data.envps, var)));
+	return (navigate_dir(read_val_deq(shell->data.envps, var)));
 }
 
-int	to_dest(t_exec *info, char *to_dir)
+int	to_dest(t_shell *shell, char *to_dir)
 {
 	char	*dest;
 
 	dest = NULL;
 	if (!to_dir || !ft_memcmp(to_dir, "--", 3))
-		return (navigate_var(info, "HOME"));
+		return (navigate_var(shell, "HOME"));
 	else if (!ft_memcmp(to_dir, "-", 2))
-		return (navigate_var(info, "OLDPWD"));
+		return (navigate_var(shell, "OLDPWD"));
 	// else if (!ft_memcmp(to_dir, "~/", 2) || !ft_memcmp(to_dir, "~", 2))
-		// return (navigate_dir(ft_strjoin(info->data.home, &to_dir[1])));
+		// return (navigate_dir(ft_strjoin(shell->data.home, &to_dir[1])));
 	return (navigate_dir(to_dir));
 }
 
 // relative path
-int ft_cd(t_exec *info, t_process p)
+int ft_cd(t_shell *shell, t_process p)
 {
 	char	*cwd;
 	int		status;
 
 	status = EXIT_SUCCESS;
-	if (to_dest(info, p.args[1]))
+	if (to_dest(shell, p.args[1]))
 		return (BUILTIN_ERROR);
 	else if (!set_cwd(&cwd))
 	{
-		status = set_oldpwd(info, cwd);
+		status = set_oldpwd(shell, cwd);
 		free(cwd);
 		if (!set_cwd(&cwd))
 		{
-			status = set_pwd(info, cwd);
+			status = set_pwd(shell, cwd);
 			free(cwd);
 			return (status);
 		}

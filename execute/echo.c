@@ -31,12 +31,12 @@ char	*read_val_strs(char *strs[], char *key)
 	return (ret);
 }
 
-int	ft_echo(t_exec *info, t_process p)
+int	ft_echo(t_shell *shell, t_process p)
 {
 	int 	index;
 
 	//envs 각자 구하기.
-	(void) info;
+	(void) shell;
 	index = 1;
 	if (is_no_nl(p.args[1]))
 		index++;
