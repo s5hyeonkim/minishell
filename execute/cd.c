@@ -2,8 +2,6 @@
 
 int	navigate_dir(char *to_dir)
 {
-	if (!to_dir)
-		return (handle_error("cd", NULL, EXTRA_ERROR));
 	if (access(to_dir, X_OK) || chdir(to_dir) == -1)
 		return (handle_error("cd", to_dir, EXTRA_ERROR));
 	return (EXIT_SUCCESS);
@@ -28,35 +26,42 @@ int	set_pwd(t_shell *shell, char *dir)
 int	set_oldpwd(t_shell *shell, char *dir)
 {
 	char	*str;
+	t_deque	*deq;
 
-	if (!read_val_deq(shell->data.envps, "OLDPWD"))
+	deq = find_deq(shell->data.envps, "OLDPWD");
+	if (!deq)
 		return (EXIT_SUCCESS);
+	if (!deq->state)
+	{
+		deq->state = ENV;
+		return (replace_back(shell->data.envps, "OLDPWD="));
+	}
 	str = ft_strjoin("OLDPWD=", dir);
 	if (!str || replace_back(shell->data.envps, str))
 	{
 		free(str);
-		return (handle_error("cd", NULL, EXTRA_ERROR));
+		return (EXIT_FAILURE);
 	}
 	free(str);
 	return (EXIT_SUCCESS);	
 }
 
-int	navigate_var(t_shell *shell, char *var)
+int	navigate_var(t_deques *envps, char *var)
 {
-	if (!read_val_deq(shell->data.envps, var))
+	if (!read_val_deq(envps, var))
 		return (handle_error("cd", var, NOT_SET));
-	return (navigate_dir(read_val_deq(shell->data.envps, var)));
+	return (navigate_dir(read_val_deq(envps, var)));
 }
 
-int	to_dest(t_shell *shell, char *to_dir)
+int	change_cwd(t_shell *shell, char *to_dir)
 {
 	char	*dest;
 
 	dest = NULL;
 	if (!to_dir || !ft_memcmp(to_dir, "--", 3))
-		return (navigate_var(shell, "HOME"));
+		return (navigate_var(shell->data.envps, "HOME"));
 	else if (!ft_memcmp(to_dir, "-", 2))
-		return (navigate_var(shell, "OLDPWD"));
+		return (navigate_var(shell->data.envps, "OLDPWD"));
 	// else if (!ft_memcmp(to_dir, "~/", 2) || !ft_memcmp(to_dir, "~", 2))
 		// return (navigate_dir(ft_strjoin(shell->data.home, &to_dir[1])));
 	return (navigate_dir(to_dir));
@@ -69,19 +74,22 @@ int ft_cd(t_shell *shell, t_process p)
 	int		status;
 
 	status = EXIT_SUCCESS;
-	if (to_dest(shell, p.args[1]))
-		return (BUILTIN_ERROR);
-	else if (!set_cwd(&cwd))
+	cwd = NULL;
+	if (set_cwd(&cwd))
+		return (handle_error("cd", NULL, EXTRA_ERROR));
+	if (change_cwd(shell, p.args[1]))
+		return (EXTRA_ERROR);
+	else if (set_oldpwd(shell, cwd))
 	{
-		status = set_oldpwd(shell, cwd);
 		free(cwd);
-		if (!set_cwd(&cwd))
-		{
-			status = set_pwd(shell, cwd);
-			free(cwd);
-			return (status);
-		}
+		return (handle_error("cd", NULL, EXTRA_ERROR));
 	}
-	handle_error("cd", NULL, EXTRA_ERROR);
-	return (BUILTIN_ERROR);
+	free(cwd);
+	if (set_cwd(&cwd) || set_pwd(shell, cwd))
+	{
+		free(cwd);
+		handle_error("cd", NULL, EXTRA_ERROR);
+		return (BUILTIN_ERROR);
+	}
+	return (EXIT_SUCCESS);
 }

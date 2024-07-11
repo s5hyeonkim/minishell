@@ -12,7 +12,7 @@ SRCS = utils.c \
 	   pop.c \
 	   push.c \
 	   utils.c \
-	   pair.c
+	   map.c
 
 OBJS = $(SRCS:.c=.o)
 NAME = libftdeque.a

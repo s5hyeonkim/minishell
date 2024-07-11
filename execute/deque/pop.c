@@ -77,7 +77,7 @@ t_deque	*find_deq(t_deques *deq, char *key)
 	return (NULL);
 }
 
-t_deque	*pop(t_deques *deqs, t_deque *target)
+t_deque	*pop_target(t_deques *deqs, t_deque *target)
 {
 	t_deque	*node;
 

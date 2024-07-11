@@ -6,10 +6,11 @@
 /*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/11 16:50:52 by sohykim           #+#    #+#             */
-/*   Updated: 2024/05/23 18:55:54 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/07/11 12:50:48 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "deque.h"
+
 void	set_state(t_deque *deq)
 {
 	if (deq->keyval.val[0])
@@ -18,24 +19,24 @@ void	set_state(t_deque *deq)
 		deq->state = EXPORT;
 }
 
-int	set_deque(t_deque **deq, t_pairs keyval)
+int	set_deque(t_deque **deq, t_map keyval)
 {
 
 	*deq = create_deque();
 	if (*deq == NULL)
 		return (EXTRA_ERROR);
-	ft_memcpy(&((*deq)->keyval), &keyval, sizeof(t_pairs));
+	ft_memcpy(&((*deq)->keyval), &keyval, sizeof(t_map));
 	set_state(*deq);
 	return (EXIT_SUCCESS);
 }
 
-int	push_back(t_deques *deques, t_pairs keyval)
+int	push_back(t_deques *deques, t_map keyval)
 {
 	t_deque	*new_deque;
 
 	if (set_deque(&new_deque, keyval))
 	{
-		free_keyval(keyval);
+		free_map(keyval);
 		free_deque(new_deque);
 		return (EXTRA_ERROR);
 	}
@@ -82,19 +83,18 @@ int	push_front(t_deques *deques)
 
 int	replace_back(t_deques *deqs, char *str)
 {
-	t_deque	*node;
-	t_pairs	keyval;
+	t_map	keyval;
 	char	*key;
 
-	key = get_key_str(str);
+	key = get_key(str);
 	if (!key)
 		return (EXIT_FAILURE);
-	node = pop(deqs, find_deq(deqs, key));
-	free_deque(node);
+	if (find_deq(deqs, key))
+		remove_targetdeq(deqs, find_deq(deqs, key));
 	free(key);
-	if (set_keyval(str, &keyval) || push_back(deqs, keyval))
+	if (set_map(str, &keyval) || push_back(deqs, keyval))
 	{
-		free_keyval(keyval);
+		free_map(keyval);
 		return (EXIT_FAILURE);
 	}
 	return (EXIT_SUCCESS);
@@ -102,9 +102,9 @@ int	replace_back(t_deques *deqs, char *str)
 
 int	push_keyback(t_deques *deques, char *str)
 {
-	t_pairs	keyval;
+	t_map	keyval;
 
-	ft_memset(&keyval, 0, sizeof(t_pairs));
+	ft_memset(&keyval, 0, sizeof(t_map));
 	keyval.key = ft_strdup(str);
 	if (keyval.key)
 		keyval.val = ft_strdup("");

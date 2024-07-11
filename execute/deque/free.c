@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   free.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/07/11 12:50:25 by sohykim           #+#    #+#             */
+/*   Updated: 2024/07/11 12:50:31 by sohykim          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 #include "deque.h"
 
 void	free_strs(char **strs)
@@ -15,7 +26,7 @@ void	free_strs(char **strs)
 	free(strs);
 }
 
-void    free_keyval(t_pairs keyval)
+void    free_map(t_map keyval)
 {
     free(keyval.key);
 	keyval.key = NULL;
@@ -32,7 +43,7 @@ void	free_deque(t_deque *deque)
 	while (deque)
 	{
 		next = deque->next;
-		free_keyval(deque->keyval);
+		free_map(deque->keyval);
 		free(deque);
 		deque = next;
 	}
@@ -47,4 +58,10 @@ void	free_deques(t_deques **deques)
 	}
 	free(*deques);
 	(*deques) = NULL;
+}
+
+void	remove_targetdeq(t_deques *deqs, t_deque *target)
+{
+	pop_target(deqs, target);
+	free_deque(target);
 }

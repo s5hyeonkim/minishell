@@ -6,7 +6,7 @@
 /*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/11 16:50:52 by sohykim           #+#    #+#             */
-/*   Updated: 2024/05/23 18:55:54 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/07/11 12:50:53 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "deque.h"
@@ -35,7 +35,7 @@ char	**deqtoenvp(t_deques *deqs, t_state state)
 	size_t	index;
 	size_t	size;
 	t_deque	*deq;
-	t_pairs	keyval;
+	t_map	keyval;
 
 	size = ft_deqlen(deqs->head, state);
 	ret = ft_calloc(size + 1, sizeof(char *));
@@ -62,7 +62,7 @@ char	**deqtoenvp(t_deques *deqs, t_state state)
 t_deques	*strstodeq(char **strs)
 {
 	t_deques	*new;
-	t_pairs		keyval;
+	t_map		keyval;
 	int			index;
 
 	index = 0;
@@ -71,7 +71,7 @@ t_deques	*strstodeq(char **strs)
 		return (NULL);
 	while (strs[index])
 	{
-		if (set_keyval(strs[index], &keyval) \
+		if (set_map(strs[index], &keyval) \
 		|| push_back(new, keyval))
 		{
 			free_deques(&new);
@@ -80,7 +80,7 @@ t_deques	*strstodeq(char **strs)
 		new->tail->state = ENV;
 		index++;
 	}
-	if (!index && (set_keyval("", &keyval) || push_back(new, keyval)))
+	if (!index && (set_map("", &keyval) || push_back(new, keyval)))
 	{
 		free_deques(&new);
 		return (NULL);

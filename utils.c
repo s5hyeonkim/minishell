@@ -1,4 +1,16 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/07/11 12:52:00 by sohykim           #+#    #+#             */
+/*   Updated: 2024/07/11 12:52:09 by sohykim          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 # include "minishell.h"
+
 int	is_equalquote(char prev, char next)
 {
 	if (prev != next)
@@ -8,7 +20,7 @@ int	is_equalquote(char prev, char next)
 	return (TRUE);
 }
 
-int	set_quote(t_pairs *keyval, char c)
+int	set_quote(t_map *keyval, char c)
 {
 	keyval->mid = c;
 	return (TRUE);
@@ -18,13 +30,13 @@ int	is_close(t_shell *shell, char *str)
 {
 	t_deques	*rec;
 	int			index;
-	t_pairs		keyval;
+	t_map		keyval;
 	int			ret;
 
 	rec = create_deques();
 	keyval.mid = -1;
 	if (!rec || push_back(rec, keyval))
-		exit_process(shell, NULL, MALLOC_FAILED);
+		exit_process(shell, NULL, EXTRA_ERROR);
 	index = -1;
 	ret = FALSE;
 	while(str[++index])
@@ -34,7 +46,7 @@ int	is_close(t_shell *shell, char *str)
 		else if (set_quote(&keyval, str[index]) && push_back(rec, keyval))
 		{
 			free_deques(&rec);
-			exit_process(shell, NULL, MALLOC_FAILED);
+			exit_process(shell, NULL, EXTRA_ERROR);
 		}
 	}
 	if (rec->tail->keyval.mid == -1)

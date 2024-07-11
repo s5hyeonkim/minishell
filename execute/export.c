@@ -63,7 +63,6 @@ void	ft_sort(char **strs)
 	}
 }
 
-
 int ft_export(t_shell *shell, t_process p)
 {
 	char	**envs;
@@ -84,8 +83,6 @@ int ft_export(t_shell *shell, t_process p)
 	index = 0;
 	while (p.args[++index])
 	{
-		printf("p.args[index]: %s\n", p.args[0]);
-		printf("p.args[index]: %s\n", p.args[1]);
 		if (!ft_isalpha(p.args[index][0]))
 			status = EXIT_FAILURE;
 		else if (replace_back(shell->data.envps, p.args[index]))
