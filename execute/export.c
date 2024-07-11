@@ -84,13 +84,9 @@ int ft_export(t_shell *shell, t_process p)
 	while (p.args[++index])
 	{
 		if (!ft_isalpha(p.args[index][0]))
-			status = EXIT_FAILURE;
+			status = handle_error(p.args[0], p.args[1], INVALID_IDF);
 		else if (replace_back(shell->data.envps, p.args[index]))
-		{
-			handle_error(p.args[0], NULL, EXTRA_ERROR);
-			return (BUILTIN_ERROR);
-			printf("%s\n", shell->data.envps->tail->keyval.key);
-		}
+			return (handle_error(p.args[0], NULL, EXTRA_ERROR));
 	}
 	return (status);
 }
