@@ -4,7 +4,7 @@ void	free_token(t_token *t)
 {
 	if (t)
 	{
-		printf("here\n");
+		// printf("here\n");
 		free_token(t->left);
 		t->left = NULL;
 		free_token(t->right);

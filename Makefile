@@ -3,24 +3,26 @@ CFLAGS = -Wall -Wextra -Werror
 CPPFLAGS = -I${HOME}/.brew/opt/readline/include -Iminishell.h -Ift_err.h -MMD -MP
 LDFLAGS = -L${HOME}/.brew/opt/readline/lib -Llibft -Lexecute/deque
 LDLIBS = -lreadline -lft -lftdeque
-EXEC = ./execute/
-SRC = ./src/
+EXECDIR = ./execute/
+SRCDIR = ./src/
+OBJDIR = ./obj/
 SRCS = ./main.c \
-	   ./print.c \
-	   ./execute.c \
-	   ./free.c \
-	   $(EXEC)cd.c \
-	   $(EXEC)echo.c \
-	   $(EXEC)env.c \
-	   $(EXEC)execute.c \
-	   $(EXEC)exit.c \
-	   $(EXEC)export.c \
-	   $(EXEC)pwd.c \
-	   $(EXEC)unset.c \
-	   $(SRC)signal.c
+		./print.c \
+		./execute.c \
+		./free.c \
+		$(EXECDIR)cd.c \
+		$(EXECDIR)echo.c \
+		$(EXECDIR)env.c \
+		$(EXECDIR)execute.c \
+		$(EXECDIR)exit.c \
+		$(EXECDIR)export.c \
+		$(EXECDIR)pwd.c \
+		$(EXECDIR)unset.c \
+		$(SRCDIR)signal.c \
+		$(SRCDIR)terminal.c \
 
 #./main.c
-	   
+
 OBJS = $(SRCS:.c=.o)
 DEPS = $(SRCS:.c=.d)
 NAME = minishell
@@ -35,7 +37,7 @@ $(NAME) : $(OBJS)
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) $^ -o $@
 
 
-$(EXEC)%.o : $(EXEC)%.c
+$(EXECDIR)%.o : $(EXECDIR)%.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 %.o : %.c
@@ -43,16 +45,13 @@ $(EXEC)%.o : $(EXEC)%.c
 
 clean :
 	make clean -C libft
-	make fclean -C execute/deque
-	rm -f $(DEPS)
-	rm -f $(OBJS)
+	make clean -C execute/deque
+	rm -f $(OBJS) $(DEPS)
 
 fclean :
 	make fclean -C libft
 	make fclean -C execute/deque
-	rm -f $(OBJS)
-	rm -f $(DEPS)
-	rm -f $(NAME)
+	rm -f $(OBJS) $(DEPS) $(NAME)
 
 re : fclean
 	make all

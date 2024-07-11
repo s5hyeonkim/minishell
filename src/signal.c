@@ -1,41 +1,53 @@
 #include "../minishell.h"
 
+/* utils */
+void	move_cursor(void)
+{
+	ft_putstr_fd("\033[1A", STDERR_FILENO);
+	ft_putstr_fd("\033[12C", STDERR_FILENO);
+}
+
 /* signal*/
-void	replace_line(void)
+void	replace_line(int redisplayon)
 {
 	ft_putchar_fd('\n', STDERR_FILENO);
 	rl_on_new_line();
 	rl_replace_line("", 0);
-	rl_redisplay();
+	if (redisplayon == TRUE)
+		rl_redisplay();
 }
 
 void	child_handler(int signo)
 {
-	(void) signo;
-	status = signo + 128;
-	//printf("signal receive %d\n", status);
+	status = signo + SIGEXIT;
+	// printf("signal receive %d\n", status);
 	if (signo == SIGINT)
-		exit(status);
+	{	
+		ft_putstr_fd("aa\n", STDERR_FILENO);
+		//exit(1);
+	}
 }
 
 void	signal_handler(int signo)
 {
-	status = signo + 128;
-	//printf("signal receive %d\n", status);
+	status = signo + SIGEXIT;
+	// printf("signal receive %d\n", status);
 	if (signo == SIGINT)
-		replace_line();
-		
-}
+	{
+		replace_line(TRUE);
+	}
+	if (signo == SIGQUIT)
+	{
+		// SIG_IGN;
+		// ft_putstr_fd("\033[12C", STDERR_FILENO);
+		// move_cursor();
+	}
+	if (signo == SIGTERM)
+	{
+		printf("sigterm?");
 
-// void	set_signal(t_shell *shell, void(*func)(int))
-// {
-// 	if (signal(SIGINT, func) == SIG_ERR)
-// 		exit_process(shell, NULL, EXTRA_ERROR);
-// 	if (signal(SIGTERM, func) == SIG_ERR)
-// 		exit_process(shell, NULL, EXTRA_ERROR);
-// 	if (signal(SIGQUIT, func) == SIG_ERR)
-// 		exit_process(shell, NULL, EXTRA_ERROR);
-// }
+	}
+}
 
 void set_signal(t_shell *shell, void(*signal_handler)(int))
 {
@@ -46,8 +58,9 @@ void set_signal(t_shell *shell, void(*signal_handler)(int))
 	action.sa_flags = 0;
 	if (sigaction(SIGINT, &action, NULL) == (int)SIG_ERR)
 		exit_process(shell, NULL, EXTRA_ERROR);
-	if (sigaction(SIGQUIT, &action, NULL) == (int)SIG_ERR)
+	else if (sigaction(SIGTERM, &action, NULL) == (int)SIG_ERR)
 		exit_process(shell, NULL, EXTRA_ERROR);
-	if (sigaction(SIGTERM, &action, NULL) == (int)SIG_ERR)
+	action.sa_handler = SIG_IGN;
+	if (sigaction(SIGQUIT, &action, NULL) == (int)SIG_ERR)
 		exit_process(shell, NULL, EXTRA_ERROR);
 }

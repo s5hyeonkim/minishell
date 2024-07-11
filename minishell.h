@@ -27,6 +27,9 @@
 # include "./src/src.h"
 # define NAME_MAX 256
 # define PATH_MAX 1024
+# define SIGEXIT 128
+// # define PROMPT_MSG "minishell$ "
+# define PROMPT_MSG "\033[36mminishell ❯\033[0m "
 
 typedef enum e_type
 {
@@ -81,7 +84,6 @@ typedef struct sigaction t_sigaction;
 
 //minishell
 void		exit_process(t_shell *shell, char *obj, int errcode);
-void		replace_line(void);
 void		child_handler(int signo);
 void		set_signal(t_shell *shell, void(*func)(int));
 
@@ -109,7 +111,7 @@ void		free_shell(t_shell shell);
 /* signal.c */
 void		set_signal(t_shell *shell, void(*signal_handler)(int));
 void		signal_handler(int signo);
-void		replace_line(void);
+void		replace_line(int redisplayon);
 void		child_handler(int signo);
 
 #endif
