@@ -82,12 +82,13 @@ volatile int	status;
 typedef int (*built_in)(t_shell *shell, t_process p);
 typedef struct sigaction t_sigaction;
 
-//minishell
+/* minishell */
 void		exit_process(t_shell *shell, char *obj, int errcode);
 void		child_handler(int signo);
 void		set_signal(t_shell *shell, void(*func)(int));
+char		**get_env_paths(char *envp[]);
 
-//execute
+/* execute.c */
 void		exec_cmds(t_shell *shell);
 void		set_cmds(t_shell *shell);
 void		set_process(t_shell *shell);
@@ -102,7 +103,7 @@ int 		ft_cd(t_shell *shell, t_process p);
 int			ft_echo(t_shell *shell, t_process p);
 int			ft_unset(t_shell *shell, t_process p);
 
-// free
+/* free.c */
 void		free_token(t_token *t);
 void		free_data(t_data d);
 void		free_tprocess(t_process *p, size_t size);
@@ -113,5 +114,8 @@ void		set_signal(t_shell *shell, void(*signal_handler)(int));
 void		signal_handler(int signo);
 void		replace_line(int redisplayon);
 void		child_handler(int signo);
+
+/* setting.c */
+void	set_shell(t_shell *shell, char *envp[]);
 
 #endif

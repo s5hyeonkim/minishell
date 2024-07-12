@@ -10,6 +10,7 @@ SRCS = ./main.c \
 		./print.c \
 		./execute.c \
 		./free.c \
+		./setting.c \
 		$(EXECDIR)cd.c \
 		$(EXECDIR)echo.c \
 		$(EXECDIR)env.c \
