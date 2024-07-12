@@ -33,7 +33,7 @@ void	exec_cmds(t_shell *shell)
 	{
 		subprocess(shell);
 		wait_process(shell);
-		set_signal(shell, signal_handler);
+		set_signal(shell, main_handler);
 	}
 	else
 	{
@@ -52,8 +52,8 @@ void	exit_process(t_shell *shell, char *obj, int errcode)
 		exit(handle_error(obj, NULL, errcode));
 	if (errcode == SIGEXIT + SIGTERM)
 	{
-		move_cursor();
-		ft_putstr_fd("exit\n", STDERR_FILENO);
+		// move_cursor();
+		// ft_putstr_fd("exit\n", STDERR_FILENO);
 		errcode = 0;
 	}
 	exit(errcode);
@@ -116,14 +116,16 @@ void	init(t_shell *shell, int argc, char *envp[])
 {
 	set_shell(shell, envp);
 	check_valid(shell, argc);
-	set_signal(shell, signal_handler);
+	set_signal(shell, main_handler);
 	set_terminal_printoff();
 }
 
 void	readlines(t_shell *shell, char **buffer)
 {
 	*buffer = readline(PROMPT_MSG);
+	// (void) shell;
 	if (*buffer == 0)
+		// return ;
 		exit_process(shell, NULL, SIGTERM + SIGEXIT);
 	if (**buffer)
 		add_history(*buffer);
@@ -143,7 +145,10 @@ void	loop(t_shell *shell)
 	rl_clear_history();
 	while(1)
 	{
+		// printf("signal receive %d\n", status);
 		readlines(shell, &buffer);
+		// if (!buffer)
+		// 	continue;
 		// printf("buffer: %s\n", buffer);
 		set_status(shell);
 		set_tokens(shell, buffer);
@@ -155,8 +160,15 @@ void	loop(t_shell *shell)
 	}
 }
 
+void leaks ()
+{
+	system("leaks minishell");
+}
+
+
 int	main(int argc, char *argv[], char *envp[])
 {
+	atexit(leaks);
 	t_shell	shell;
 
 	(void)argv;

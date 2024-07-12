@@ -122,7 +122,7 @@ void		free_tprocess(t_process *p, size_t size);
 void		free_shell(t_shell shell);
 
 /* signal.c */
-void		signal_handler(int signo);
+void		main_handler(int signo);
 void		set_signal(t_shell *shell, void(*handler)(int));
 
 /* setting.c */

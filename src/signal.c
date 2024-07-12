@@ -28,16 +28,15 @@ void	child_handler(int signo)
 	}
 }
 
-void	signal_handler(int signo)
+void	main_handler(int signo)
 {
 	status = signo + SIGEXIT;
 	// printf("signal receive %d\n", status);
 	if (signo == SIGINT)
-	{
 		replace_line(TRUE);
-	}
 	if (signo == SIGQUIT)
 	{
+
 		// SIG_IGN;
 		// ft_putstr_fd("\033[12C", STDERR_FILENO);
 		// move_cursor();
@@ -45,7 +44,9 @@ void	signal_handler(int signo)
 	if (signo == SIGTERM)
 	{
 		printf("sigterm?");
-
+		move_cursor();
+		ft_putstr_fd("exit\n", STDERR_FILENO);
+		exit(1);
 	}
 }
 
@@ -58,9 +59,13 @@ void set_signal(t_shell *shell, void(*handler)(int))
 	action.sa_flags = 0;
 	if (sigaction(SIGINT, &action, NULL) == (int)SIG_ERR)
 		exit_process(shell, NULL, EXTRA_ERROR);
-	else if (sigaction(SIGTERM, &action, NULL) == (int)SIG_ERR)
+	if (sigaction(SIGTERM, &action, NULL) == (int)SIG_ERR)
 		exit_process(shell, NULL, EXTRA_ERROR);
 	action.sa_handler = SIG_IGN;
 	if (sigaction(SIGQUIT, &action, NULL) == (int)SIG_ERR)
 		exit_process(shell, NULL, EXTRA_ERROR);
 }
+
+//메인 프로세스 - set signal(main_handler)
+//자식 프로세스 - set signal(child handler)
+//부모 프로세스 - set signal(parent handler)
