@@ -49,11 +49,11 @@ void	signal_handler(int signo)
 	}
 }
 
-void set_signal(t_shell *shell, void(*signal_handler)(int))
+void set_signal(t_shell *shell, void(*handler)(int))
 {
 	t_sigaction action;
 
-	action.sa_handler = signal_handler;
+	action.sa_handler = handler;
 	sigemptyset(&action.sa_mask);
 	action.sa_flags = 0;
 	if (sigaction(SIGINT, &action, NULL) == (int)SIG_ERR)

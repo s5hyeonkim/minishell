@@ -263,27 +263,6 @@ void	close_pipe(t_shell *shell, int index)
 		close(shell->p[index].fd[1]);
 }
 
-void	child(t_shell *shell, int index)
-{
-	// printf("child process start\n");
-	int	ret;
-
-	set_signal(shell, child_handler);
-	if (is_builtin(shell->p[index].path))
-	{
-		ret = exec_builtin(shell, shell->p[index]);
-		exit_process(shell, NULL, ret);
-	}
-	else
-		exec_program(shell, shell->p[index]);
-}
-
-void	parent(t_shell *shell, int index)
-{
-	close_pipe(shell, index);
-	waitpid(shell->p[index].pid, 0, WNOHANG);
-}
-
 void	get_child(t_shell *shell, int index)
 {
 	shell->p[index].pid = fork();
@@ -332,19 +311,3 @@ void	wait_process(t_shell *shell)
 	}
 	shell->status = status;
 }
-
-void	exec_cmds(t_shell *shell)
-{
-	if (shell->p_size > 1 || !is_builtin(shell->p[0].path))
-	{
-		subprocess(shell);
-		wait_process(shell);
-	}
-	else
-	{
-		inprocess(shell);
-		//print_deques(shell->data.envps);
-	}
-}
-
-
