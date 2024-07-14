@@ -65,33 +65,25 @@ int	change_cwd(t_shell *shell, char *to_dir)
 // relative path
 int ft_cd(t_shell *shell, t_process p)
 {
-	char	*cwd;
-	int		status;
+	char	**wd;
 	int		index;
 
-	status = EXIT_SUCCESS;
-	cwd = NULL;
 	index = 1;
-	if (set_cwd(&cwd))
+	wd = ft_calloc(3, sizeof(char *));
+	if (!wd || set_cwd(&wd[0]))
 		return (handle_error("cd", NULL, EXTRA_ERROR));
 	if (!ft_memcmp(p.args[index], "--", 3) && p.args[index + 1])
 		index++;
 	if (change_cwd(shell, p.args[1]))
 	{
-		free(cwd);
+		free_strs(wd);
 		return (EXTRA_ERROR);
 	}
-	else if (set_oldpwd(shell, cwd))
+	if (set_oldpwd(shell, wd[0]) || set_cwd(&wd[1]) || set_pwd(shell, wd[1]))
 	{
-		free(cwd);
+		free_strs(wd);
 		return (handle_error("cd", NULL, EXTRA_ERROR));
 	}
-	free(cwd);
-	if (set_cwd(&cwd) || set_pwd(shell, cwd))
-	{
-		free(cwd);
-		return (handle_error("cd", NULL, EXTRA_ERROR));
-	}
-	free(cwd);
+	free_strs(wd);
 	return (EXIT_SUCCESS);
 }
