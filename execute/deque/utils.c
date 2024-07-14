@@ -11,25 +11,24 @@
 /* ************************************************************************** */
 #include "deque.h"
 
-size_t	ft_deqlen(t_deque *head, t_state state)
+size_t	ft_deqlen(t_deque *head)
 {
 	t_deque	*deq;
 	size_t	size;
 
+	if (!head)
+		return (0);
+	size = 1;
 	deq = head;
-	size = 0;
-	while (deq)
+	while (deq != head->prev)
 	{
-		if (deq->state >= state)
-			size++;
-		if (deq->next == head)
-			break ;
+		size++;
 		deq = deq->next;
 	}
 	return (size);
 }
 
-char	**deqtoenvp(t_deques *deqs, t_state state)
+char	**deqtostrs(t_deques *deqs)
 {
 	char	**ret;
 	size_t	index;
@@ -37,7 +36,7 @@ char	**deqtoenvp(t_deques *deqs, t_state state)
 	t_deque	*deq;
 	t_map	keyval;
 
-	size = ft_deqlen(deqs->head, state);
+	size = ft_deqlen(deqs->head);
 	ret = ft_calloc(size + 1, sizeof(char *));
 	if (!ret)
 		return (NULL);
@@ -46,14 +45,21 @@ char	**deqtoenvp(t_deques *deqs, t_state state)
 	while (index < size)
 	{
 		deq = deq->next;
-		if (deq->state != state)
-			continue ;
 		keyval = deq->keyval;
 		ret[index] = ft_pairjoin(keyval.key, keyval.mid, keyval.val);
 		if (!ret[index++])
 		{
 			free_strs(ret);
 			return (NULL);
+		}
+	}
+	if (!size)
+	{
+		ret[size] = ft_strdup("");
+		if (!ret[size])
+		{
+			free_strs(ret);
+			ret = NULL;
 		}
 	}
 	return (ret);
@@ -71,13 +77,11 @@ t_deques	*strstodeq(char **strs)
 		return (NULL);
 	while (strs[index])
 	{
-		if (set_map(strs[index], &keyval) \
-		|| push_back(new, keyval))
+		if (set_map(strs[index], &keyval) || push_back(new, keyval))
 		{
 			free_deques(&new);
 			return (NULL);
 		}
-		new->tail->state = ENV;
 		index++;
 	}
 	if (!index && (set_map("", &keyval) || push_back(new, keyval)))
@@ -88,31 +92,29 @@ t_deques	*strstodeq(char **strs)
 	return (new);
 }
 
-void	print_deques(t_deques *deq)
-{
-	t_deque	*node;
-
-	node  = deq->head;
-	while (node)
-	{
-		if (node->keyval.mid)
-			printf("%s=%s\n", node->keyval.key, node->keyval.val);
-		else
-			printf("%s\n", node->keyval.key);
-		node = node->next;
-		if (node == deq->head)
-			break ;
-	}
-}
-
-char	*read_val_deq(t_deques *deq, char *key)
+char	*read_val_deq(t_deques *deqs, char *key)
 {
 	char	*val;
 	t_deque	*node;
 
 	val = NULL;
-	node = find_deq(deq, key);
+	node = find_deq(deqs, key);
 	if (node)
 		val = node->keyval.val;
 	return (val);
+}
+
+void	print_deques(t_deques *deqs, t_state state)
+{
+	t_deque	*node;
+
+	node = deqs->head;
+	while (node)
+	{
+		if (state <= node->state)
+			printf("%s\n", node->keyval.key);
+		node = node->next;
+		if (node == deqs->head)
+			break ;
+	}
 }

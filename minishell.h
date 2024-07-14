@@ -123,6 +123,7 @@ void		free_token(t_token *t);
 void		free_data(t_data d);
 void		free_tprocess(t_process *p, size_t size);
 void		free_shell(t_shell shell);
+void 		free_cmds(t_token **t, t_process **p, size_t psize);
 
 /* signal.c */
 void		main_handler(int signo);

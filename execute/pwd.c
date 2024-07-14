@@ -6,10 +6,10 @@ int	is_valid_option(char *opt)
 		return (TRUE);
 	if (!ft_memcmp(opt, "--", 3) || !ft_memcmp(opt, "-", 2) || opt[0] != '-')
 		return (TRUE);
-	handle_error("pwd", opt, INVALID_OPT);
 	return (FALSE);
 }
 
+//PATH_MAX value need to be changed
 int	set_cwd(char **cwd)
 {
 	*cwd = ft_calloc(PATH_MAX, sizeof(char));
@@ -23,12 +23,13 @@ int	ft_pwd(t_shell *shell, t_process p)
 	char	*cwd;
 
 	(void) shell;
+	cwd = NULL;
 	if (!is_valid_option(p.args[1]))
-		return (EXIT_FAILURE);
+		return (handle_error(p.args[0], p.args[1], INVALID_OPT));
 	if (set_cwd(&cwd))
 	{
-		handle_error("pwd", NULL, EXTRA_ERROR);
-		return (BUILTIN_ERROR);
+		free(cwd);
+		return (handle_error(p.args[0], NULL, EXTRA_ERROR));
 	}
 	printf("%s\n", cwd);
 	free(cwd);

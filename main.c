@@ -210,6 +210,7 @@ void	loop(t_shell *shell)
 		set_process(shell);
 		set_cmds(shell);
 		exec_cmds(shell);
+		free_cmds(&shell->t, &shell->p, shell->p_size);
 		set_signal_default(shell, main_handler);
 	}
 }

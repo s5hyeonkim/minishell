@@ -10,7 +10,7 @@ int	ft_env(t_shell *shell, t_process p)
 		handle_error(p.args[0], NULL, INVALID_OPT);
 		return (BUILTIN_ERROR);
 	}
-	envs = deqtoenvp(shell->data.envps, ENV);
+	envs = deqtostrs(shell->data.envps);
 	if (!envs)
 	{
 		handle_error(p.args[0], NULL, EXTRA_ERROR);
@@ -18,7 +18,11 @@ int	ft_env(t_shell *shell, t_process p)
 	}
 	index = 0;
 	while (envs[index])
-		ft_putendl_fd(envs[index++], STDOUT_FILENO);
-	free(envs);
+	{
+		if (ft_strchr(envs[index], '='))
+			ft_putendl_fd(envs[index], STDOUT_FILENO);
+		index++;
+	}
+	free_strs(envs);
     return (EXIT_SUCCESS);
 }

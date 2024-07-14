@@ -55,13 +55,12 @@ int	set_map(char *str, t_map *keyval)
     ft_memset(keyval, 0, sizeof(keyval));
 	if (ft_strchr(str, '='))
 		keyval->mid = '=';
+    // printf("new: %s\n", str);
     keyval->key = get_key(str);
     keyval->val = get_value(str);
 	if (!keyval->key || !keyval->val)
 	{
-		free_map(*keyval);
-		keyval->key = NULL;
-		keyval->val = NULL;
+		free_map(keyval);
 		return (EXTRA_ERROR);
 	}
 	return (EXIT_SUCCESS);

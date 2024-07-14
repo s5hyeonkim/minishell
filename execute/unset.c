@@ -20,6 +20,7 @@ int ft_unset(t_shell *shell, t_process p)
             if (!key)
                 return (handle_error(p.args[0], NULL, EXTRA_ERROR));
 			remove_targetdeq(shell->data.envps, find_deq(shell->data.envps, key));
+			free(key);
 		}
 	}
 	return (status);
