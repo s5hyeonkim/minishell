@@ -20,7 +20,6 @@ SRCS = ./main.c \
 		$(EXECDIR)pwd.c \
 		$(EXECDIR)unset.c \
 		$(SRCDIR)signal.c \
-		$(SRCDIR)terminal.c \
 
 #./main.c
 
