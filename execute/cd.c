@@ -32,10 +32,7 @@ int	set_oldpwd(t_shell *shell, char *dir)
 	if (!deq)
 		return (EXIT_SUCCESS);
 	if (!deq->state)
-	{
-		deq->state = ENV;
 		return (replace_back(shell->data.envps, "OLDPWD="));
-	}
 	str = ft_strjoin("OLDPWD=", dir);
 	if (!str || replace_back(shell->data.envps, str))
 	{
@@ -62,8 +59,6 @@ int	change_cwd(t_shell *shell, char *to_dir)
 		return (navigate_var(shell->data.envps, "HOME"));
 	else if (!ft_memcmp(to_dir, "-", 2))
 		return (navigate_var(shell->data.envps, "OLDPWD"));
-	// else if (!ft_memcmp(to_dir, "~/", 2) || !ft_memcmp(to_dir, "~", 2))
-		// return (navigate_dir(ft_strjoin(shell->data.home, &to_dir[1])));
 	return (navigate_dir(to_dir));
 }
 
@@ -72,13 +67,20 @@ int ft_cd(t_shell *shell, t_process p)
 {
 	char	*cwd;
 	int		status;
+	int		index;
 
 	status = EXIT_SUCCESS;
 	cwd = NULL;
+	index = 1;
 	if (set_cwd(&cwd))
 		return (handle_error("cd", NULL, EXTRA_ERROR));
+	if (!ft_memcmp(p.args[index], "--", 3) && p.args[index + 1])
+		index++;
 	if (change_cwd(shell, p.args[1]))
+	{
+		free(cwd);
 		return (EXTRA_ERROR);
+	}
 	else if (set_oldpwd(shell, cwd))
 	{
 		free(cwd);
@@ -88,8 +90,8 @@ int ft_cd(t_shell *shell, t_process p)
 	if (set_cwd(&cwd) || set_pwd(shell, cwd))
 	{
 		free(cwd);
-		handle_error("cd", NULL, EXTRA_ERROR);
-		return (BUILTIN_ERROR);
+		return (handle_error("cd", NULL, EXTRA_ERROR));
 	}
+	free(cwd);
 	return (EXIT_SUCCESS);
 }

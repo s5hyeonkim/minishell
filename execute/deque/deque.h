@@ -44,25 +44,35 @@ typedef struct s_deques
 
 t_deques	*create_deques(void);
 t_deque		*create_deque(void);
-t_deques	*strstodeq(char **strs);
-char		**deqtoenvp(t_deques *deqs, t_state state);
+
+// push
 int			push_back(t_deques *deques, t_map keyval);
 int			push_front(t_deques *deques);
+int			replace_back(t_deques *deqs, char *str);
+int			push_keyback(t_deques *deques, char *str);
+
+//free
 void		free_deque(t_deque *deque);
 void		free_deques(t_deques **deques);
 void		free_strs(char **strs);
-void		free_map(t_map keyval);
-char    	*get_key(char *str);
-int			set_map(char *str, t_map *keyval);
-char		*ft_pairjoin(char *key, char mid, char *val);
-t_deque		*find_deq(t_deques *deq, char *key);
-t_deque		*pop_target(t_deques *deqs, t_deque *target);
-void		print_deques(t_deques *deq);
-char		*read_val_deq(t_deques *deq, char *key);
-int			replace_back(t_deques *deqs, char *str);
-int			push_keyback(t_deques *deques, char *str);
+void		free_map(t_map *keyval);
+
+//pop
 void		remove_targetdeq(t_deques *deqs, t_deque *target);
 t_deque		*pop_front(t_deques *deques);
 t_deque		*pop_back(t_deques *deques);
+t_deque		*pop_target(t_deques *deqs, t_deque *target);
+
+// pairs with deq
+char    	*get_key(char *str);
+int			set_map(char *str, t_map *keyval);
+t_deque		*find_deq(t_deques *deq, char *key);
+char		*read_val_deq(t_deques *deq, char *key);
+
+// utils
+void		print_deques(t_deques *deqs, t_state state);
+char		*ft_pairjoin(char *key, char mid, char *val);
+char		**deqtostrs(t_deques *deqs);
+t_deques	*strstodeq(char **strs);
 
 #endif

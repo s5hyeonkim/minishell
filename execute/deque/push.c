@@ -13,10 +13,9 @@
 
 void	set_state(t_deque *deq)
 {
-	if (deq->keyval.val[0])
+	deq->state = EXPORT;
+	if (deq->keyval.mid)
 		deq->state = ENV;
-	else if (deq->keyval.mid)
-		deq->state = EXPORT;
 }
 
 int	set_deque(t_deque **deq, t_map keyval)
@@ -36,7 +35,7 @@ int	push_back(t_deques *deques, t_map keyval)
 
 	if (set_deque(&new_deque, keyval))
 	{
-		free_map(keyval);
+		free_map(&keyval);
 		free_deque(new_deque);
 		return (EXTRA_ERROR);
 	}
@@ -57,30 +56,6 @@ int	push_back(t_deques *deques, t_map keyval)
 	return (EXIT_SUCCESS);
 }
 
-int	push_front(t_deques *deques)
-{
-	t_deque	*new_deque;
-
-	new_deque = create_deque();
-	if (new_deque == NULL)
-		return (EXTRA_ERROR);
-	if (deques->head == NULL)
-	{
-		deques->tail = new_deque;
-		new_deque->next = new_deque;
-		new_deque->prev = new_deque;
-	}	
-	else
-	{
-		new_deque->prev = deques->tail;
-		new_deque->next = deques->head;
-		deques->head->prev = new_deque;
-		deques->tail->next = new_deque;
-	}
-	deques->head = new_deque;
-	return (EXIT_SUCCESS);
-}
-
 int	replace_back(t_deques *deqs, char *str)
 {
 	t_map	keyval;
@@ -94,7 +69,7 @@ int	replace_back(t_deques *deqs, char *str)
 	free(key);
 	if (set_map(str, &keyval) || push_back(deqs, keyval))
 	{
-		free_map(keyval);
+		free_map(&keyval);
 		return (EXIT_FAILURE);
 	}
 	return (EXIT_SUCCESS);
@@ -110,8 +85,7 @@ int	push_keyback(t_deques *deques, char *str)
 		keyval.val = ft_strdup("");
 	if (!keyval.key || !keyval.val)
 	{
-		free(keyval.key);
-		free(keyval.val);
+		free_map(&keyval);
 		return (EXTRA_ERROR);
 	}
 	return (push_back(deques, keyval));

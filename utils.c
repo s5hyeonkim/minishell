@@ -34,7 +34,7 @@ int	is_close(t_shell *shell, char *str)
 	int			ret;
 
 	rec = create_deques();
-	keyval.mid = -1;
+	ft_memset(&keyval, 0, sizeof(t_map));
 	if (!rec || push_back(rec, keyval))
 		exit_process(shell, NULL, EXTRA_ERROR);
 	index = -1;

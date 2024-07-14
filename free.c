@@ -12,7 +12,7 @@ void	free_token(t_token *t)
 		free(t->cmd);
 		t->cmd = NULL;
 	}
-	// free(t);
+	free(t);
 }
 
 void	free_data(t_data d)
@@ -37,11 +37,18 @@ void	free_tprocess(t_process *p, size_t size)
 	}
 	free(p);
 }
+// loop 안 추가 필요
+void free_cmds(t_token **t, t_process **p, size_t psize)
+{
+	free_token(*t);
+	*t = NULL;
+	free_tprocess(*p, psize);
+	*p = NULL;
+}
 
 void	free_shell(t_shell shell)
 {
-	free_token(shell.t);
 	free_data(shell.data);
-	free_tprocess(shell.p, shell.p_size);
+	free_cmds(&shell.t, &shell.p, shell.p_size);
 	ft_memset(&shell, 0, sizeof(t_shell));
 }

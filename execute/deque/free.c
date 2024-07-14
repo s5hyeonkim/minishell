@@ -26,12 +26,12 @@ void	free_strs(char **strs)
 	free(strs);
 }
 
-void    free_map(t_map keyval)
+void    free_map(t_map *keyval)
 {
-    free(keyval.key);
-	keyval.key = NULL;
-    free(keyval.val);
-	keyval.val = NULL;
+    free(keyval->key);
+	keyval->key = NULL;
+    free(keyval->val);
+	keyval->val = NULL;
 }
 
 void	free_deque(t_deque *deque)
@@ -43,7 +43,7 @@ void	free_deque(t_deque *deque)
 	while (deque)
 	{
 		next = deque->next;
-		free_map(deque->keyval);
+		free_map(&deque->keyval);
 		free(deque);
 		deque = next;
 	}

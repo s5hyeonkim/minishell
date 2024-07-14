@@ -116,7 +116,6 @@ int	set_parsing_deques(t_deques **deqs, char *cmd)
 		if (!str || push_keyback(*deqs, str))
 		{
 			free(str);
-			free_deques(deqs);
 			return (EXTRA_ERROR);
 		}
 		free(str);
@@ -132,8 +131,11 @@ char	**get_cmdargs(char *cmd)
 
 	deqs = create_deques();
 	if (!deqs || set_parsing_deques(&deqs, cmd))
+	{
+		free_deques(&deqs);
 		return (NULL);
-	str = deqtoenvp(deqs, NO);
+	}
+	str = deqtostrs(deqs);
 	free_deques(&deqs);
 	return (str);
 }
@@ -162,7 +164,7 @@ void	exec_program(t_shell *shell, t_process p)
 	char	**envp;
 
 	//printf("external %s %s\n", p.path, p.args[0]);
-	envp = deqtoenvp(shell->data.envps, ENV);
+	envp = deqtostrs(shell->data.envps);
 	if (!envp)
 		exit_process(shell, NULL, EXTRA_ERROR);
 	if (execve(p.path, p.args, envp) == -1)
