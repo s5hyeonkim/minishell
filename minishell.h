@@ -24,12 +24,15 @@
 # include "ft_err.h"
 # include "./execute/deque/deque.h"
 # include "./execute/execute.h"
-# include "./src/src.h"
 # define NAME_MAX 256
 # define PATH_MAX 1024
 # define SIGEXIT 128
 // # define PROMPT_MSG "minishell$ "
 # define PROMPT_MSG "\033[36mminishell ❯\033[0m "
+
+volatile int	status;
+typedef struct sigaction t_sigaction;
+typedef	struct termios	t_termios;
 
 typedef enum e_type
 {
@@ -79,9 +82,8 @@ typedef struct s_shell
 	t_termios		term;
 }	t_shell;
 
-volatile int	status;
 typedef int (*built_in)(t_shell *shell, t_process p);
-typedef struct sigaction t_sigaction;
+
 
 /* main.c */
 void		exit_process(t_shell *shell, char *obj, int errcode);
@@ -126,14 +128,22 @@ void		free_shell(t_shell shell);
 void 		free_cmds(t_token **t, t_process **p, size_t psize);
 
 /* signal.c */
-void		main_handler(int signo);
-void		set_signal_default(t_shell *shell, void(*handler)(int));
-void		set_signal_parent(t_shell *shell, void(*handler)(int));
-void		set_signal_child(t_shell *shell, void(*handler)(int));
+void		set_signal(t_shell *shell, void(*handler)(int), int signo);
+void		set_signal_init(t_shell *shell, void(*handler)(int));
+void		set_signal_sub(t_shell *shell, void(*handler)(int));
+void		handler_init(int signo);
+void		handler_sub(int signo);
+
+/* signal_utils.c  */
+void	move_cursor(void);
+void	replace_line(int redisplayon);
+
+/* terminal.c */
+void	init_terminal(t_shell *shell);
+void	set_terminal_printoff(void);
+void	set_terminal_printon(t_shell *shell);
 
 /* setting.c */
 void	set_shell(t_shell *shell, char *envp[]);
-
-
 
 #endif
