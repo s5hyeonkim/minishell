@@ -14,7 +14,6 @@ void set_signal(t_shell *shell, void(*handler)(int), int signo)
 void set_signal_init(t_shell *shell, void(*handler)(int))
 {
 	set_terminal_printoff();
-
 	set_signal(shell, handler, SIGINT);
 	set_signal(shell, handler, SIGTERM);
 	set_signal(shell, SIG_IGN, SIGQUIT);
@@ -48,5 +47,9 @@ void	handler_sub(int signo)
 	if (signo == SIGINT)
 		replace_line(FALSE);
 	if (signo == SIGQUIT)
-		ft_putstr_fd("Quit: 3\n", STDERR_FILENO);
+	{
+		ft_putstr_fd("Quit: ", STDERR_FILENO);
+		ft_putstr_fd(ft_itoa(signo), STDERR_FILENO);
+		ft_putstr_fd("\n", STDERR_FILENO);
+	}
 }

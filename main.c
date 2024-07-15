@@ -40,12 +40,17 @@ void	exec_cmds(t_shell *shell)
 /* exit */
 void	exit_process(t_shell *shell, char *obj, int errcode)
 {
-	free_shell(*shell);
 	set_terminal_printon(shell);
-	if (errcode && errcode <= 127)
-		exit(handle_error(obj, NULL, errcode));
+	if (errcode && errcode < CMD_NOT_FOUND)
+	{
+		errcode = EXIT_FAILURE;
+		handle_error(obj, NULL, errcode);
+	}
+	else if (errcode == CMD_NOT_FOUND)
+		handle_error(obj, NULL, errcode);
 	if (errcode == SIGEXIT + SIGTERM)
-		errcode = 0;
+		errcode = EXIT_SUCCESS;
+	free_shell(*shell);
 	exit(errcode);
 }
 
@@ -134,7 +139,7 @@ void	loop(t_shell *shell)
 {
 	char	*buffer;
 
-	rl_clear_history();
+	// rl_clear_history();
 	while(1)
 	{
 		readlines(shell, &buffer);
