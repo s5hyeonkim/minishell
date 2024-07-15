@@ -96,12 +96,13 @@ void	parsing_cmd(char *cmd, size_t *start, size_t *end)
 	*end = size;
 }
 
-int	set_parsing_deques(t_deques **deqs, char *cmd)
+int	set_parsing_deques(t_deques *deqs, char *cmd)
 {
 	size_t		start;
 	size_t		end;
 	size_t		len;
 	char		*str;
+	t_map		keyval;
 
 	start = 0;
 	end = 0;
@@ -110,12 +111,13 @@ int	set_parsing_deques(t_deques **deqs, char *cmd)
 	{
 		parsing_cmd(cmd, &start, &end);
 		// printf("%zu %zu\n", start, end);
-		if (start >= len && end == start)
+		if (start >= len)
 			break ;
 		str = ft_substr(cmd, start, end - start);
-		if (!str || push_keyback(*deqs, str))
+		if (!str || set_keyval(&keyval, str, 0, "") || push_back(deqs, keyval))
 		{
 			free(str);
+			free_map(&keyval);
 			return (EXTRA_ERROR);
 		}
 		free(str);
@@ -127,17 +129,18 @@ int	set_parsing_deques(t_deques **deqs, char *cmd)
 char	**get_cmdargs(char *cmd)
 {
 	t_deques	*deqs;
-	char		**str;
+	char		**strs;
 
 	deqs = create_deques();
-	if (!deqs || set_parsing_deques(&deqs, cmd))
+	if (!deqs || set_parsing_deques(deqs, cmd))
 	{
 		free_deques(&deqs);
 		return (NULL);
 	}
-	str = deqtostrs(deqs);
+	strs = deqtostrs(deqs);
+	// printf("%s\n", strs[0]);
 	free_deques(&deqs);
-	return (str);
+	return (strs);
 }
 
 /* program */
@@ -167,6 +170,8 @@ void	exec_program(t_shell *shell, t_process p)
 	envp = deqtostrs(shell->data.envps);
 	if (!envp)
 		exit_process(shell, NULL, EXTRA_ERROR);
+	printf("%s\n", p.path);
+	printf("%s\n", p.args[0]);
 	if (execve(p.path, p.args, envp) == -1)
 		exit_process(shell, p.args[0], CMD_NOT_FOUND);
 }

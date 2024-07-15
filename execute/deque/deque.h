@@ -48,8 +48,7 @@ t_deque		*create_deque(void);
 // push
 int			push_back(t_deques *deques, t_map keyval);
 int			push_front(t_deques *deques);
-int			replace_back(t_deques *deqs, char *str);
-int			push_keyback(t_deques *deques, char *str);
+int			replace_back(t_deques *deqs, t_map keyval);
 
 //free
 void		free_deque(t_deque *deque);
@@ -65,14 +64,16 @@ t_deque		*pop_target(t_deques *deqs, t_deque *target);
 
 // pairs with deq
 char    	*get_key(char *str);
-int			set_map(char *str, t_map *keyval);
+int			set_map(t_map *keyval, char *str);
 t_deque		*find_deq(t_deques *deq, char *key);
 char		*read_val_deq(t_deques *deq, char *key);
+int 		set_keyval(t_map *keyval, char *key, char mid, char *val);
 
 // utils
 void		print_deques(t_deques *deqs, t_state state);
 char		*ft_pairjoin(char *key, char mid, char *val);
 char		**deqtostrs(t_deques *deqs);
 t_deques	*strstodeq(char **strs);
+void		set_state(t_deque *deq);
 
 #endif

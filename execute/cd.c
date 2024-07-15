@@ -7,42 +7,6 @@ int	navigate_dir(char *to_dir)
 	return (EXIT_SUCCESS);
 }
 
-int	set_pwd(t_shell *shell, char *dir)
-{
-	char	*str;
-
-	if (!read_val_deq(shell->data.envps, "PWD"))
-		return (EXIT_SUCCESS);
-	str = ft_strjoin("PWD=", dir);
-	if (!str || replace_back(shell->data.envps, str))
-	{
-		free(str);
-		return (handle_error("cd", NULL, EXTRA_ERROR));
-	}
-	free(str);
-	return (EXIT_SUCCESS);	
-}
-
-int	set_oldpwd(t_shell *shell, char *dir)
-{
-	char	*str;
-	t_deque	*deq;
-
-	deq = find_deq(shell->data.envps, "OLDPWD");
-	if (!deq)
-		return (EXIT_SUCCESS);
-	if (!deq->state)
-		return (replace_back(shell->data.envps, "OLDPWD="));
-	str = ft_strjoin("OLDPWD=", dir);
-	if (!str || replace_back(shell->data.envps, str))
-	{
-		free(str);
-		return (EXIT_FAILURE);
-	}
-	free(str);
-	return (EXIT_SUCCESS);	
-}
-
 int	navigate_var(t_deques *envps, char *var)
 {
 	if (!read_val_deq(envps, var))
@@ -62,24 +26,115 @@ int	change_cwd(t_shell *shell, char *to_dir)
 	return (navigate_dir(to_dir));
 }
 
-// relative path
+int	set_pwd(t_deques *deqs, char *key, char *val)
+{
+	t_map	keyval;
+
+	if (!find_deq(deqs, key))	
+		return (EXIT_SUCCESS);
+	if (set_keyval(&keyval, key, '=', val) || replace_back(deqs, keyval))
+	{
+		free_map(&keyval);
+		return (EXTRA_ERROR);
+	}
+	return (EXIT_SUCCESS);
+}
+
+// static int	is_folder(char *path, size_t len)
+// {
+// 	char	*dir;
+// 	struct stat	sb;
+
+// 	dir = ft_substr(path, 0, len);
+// 	if (!dir)
+// 		return (EXTRA_ERROR);
+// 	if ((stat(dir, &sb)))
+// 	{
+// 		if (((sb.st_mode & S_IFMT) != S_IFDIR))
+// 			return (FALSE);
+// 		return (TRUE);
+// 	}
+// 	return (EXTRA_ERROR);
+// }
+
+void	set_wd(char *wd, char *now, size_t len)
+{
+	char	*end;
+
+	end = strrchr(wd, '/');
+	printf("%zu %s\n", len, now);
+	if (len == 2 && !ft_memcmp(now, "..", len))
+	{
+		if (end != wd && end)
+			end[0] = 0;
+		else if (end == wd)
+			end[1] = 0;
+		printf("conv: %s\n", wd);
+		return ;
+	}
+	if (len == 1 && !ft_memcmp(now, ".", len))
+		return ;
+	ft_strlcat(wd, now, ft_strlen(wd) + len + 1);
+	ft_strlcat(wd, "/", PATH_MAX);
+}
+
+char	*next_dir(char *path, char *cwd)
+{
+	char	*now;
+	char	*next;
+	char	*wd;
+
+	wd = ft_calloc(PATH_MAX, sizeof(char));
+	if (!wd)
+		return (NULL);
+	now = path;
+	next = ft_strchr(now, '/');	
+	if (next != now)
+		ft_memcpy(wd, cwd, sizeof(char) * ft_strlen(cwd));
+	ft_strlcat(wd, "/", PATH_MAX);
+	printf("cp: %s\n", wd);
+	// next == NULL 따로 계산 필요 그냥ㅇ size_t로 할까
+	while (TRUE)
+	{
+		if (now != next)
+			set_wd(wd, now, next - now);
+		if (!next)
+			break ;
+		now = next + 1;
+		next = ft_strchr(now, '/');
+	}
+	if (wd[ft_strlen(wd) - 1] == '/')
+		wd[ft_strlen(wd) - 1] = 0;
+	return (wd);
+}
+
+// path cwd로 불러와서 하나씩 없애기
+// symbolic path
 int ft_cd(t_shell *shell, t_process p)
 {
 	char	**wd;
+	char	*d;
 	int		index;
 
 	index = 1;
+	if (p.args[1] && !ft_memcmp(p.args[1], "--", 3) && p.args[2])
+		index = 2;
 	wd = ft_calloc(3, sizeof(char *));
 	if (!wd || set_cwd(&wd[0]))
+	{
+		free_strs(wd);
 		return (handle_error("cd", NULL, EXTRA_ERROR));
-	if (!ft_memcmp(p.args[index], "--", 3) && p.args[index + 1])
-		index++;
+	}
+	d = next_dir(p.args[index], wd[0]);
+	printf("cwd 변환: %s\n", d);
+	free(d);
 	if (change_cwd(shell, p.args[1]))
 	{
 		free_strs(wd);
 		return (EXTRA_ERROR);
 	}
-	if (set_oldpwd(shell, wd[0]) || set_cwd(&wd[1]) || set_pwd(shell, wd[1]))
+	if (set_cwd(&wd[1]) || set_pwd(shell->data.envps, "OLDPWD", wd[0]) \
+	|| set_pwd(shell->data.envps, "PWD", wd[1]))
 	{
 		free_strs(wd);
 		return (handle_error("cd", NULL, EXTRA_ERROR));

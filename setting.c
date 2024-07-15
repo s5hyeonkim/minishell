@@ -22,7 +22,7 @@ static void	set_depth(t_shell *shell)
 {
 	int		depth;
 	char	*itoa;
-	char	*env_depth;
+	t_map	keyval;
 
 	depth = get_depth(read_val_deq(shell->data.envps, "SHLVL")) + 1;
 	if (depth == 1000)
@@ -31,37 +31,34 @@ static void	set_depth(t_shell *shell)
 		itoa = ft_itoa(depth);
 	if (!itoa)
 		exit_process(shell, NULL, EXTRA_ERROR);
-	env_depth = ft_strjoin("SHLVL=", itoa);
-	free(itoa);
-	if (!env_depth || replace_back(shell->data.envps, env_depth))
+	if (set_keyval(&keyval, "SHLVL", '=', itoa) || replace_back(shell->data.envps, keyval))
 	{
-		free(env_depth);
+		free(itoa);
+		free_map(&keyval);
 		exit_process(shell, NULL, EXTRA_ERROR);
 	}
-	free(env_depth);
+	free(itoa);
 }
 
 static void	set_pwd_path(t_shell *shell)
 {
+	t_map	keyval;
 	char	*cwd;
-	char	*env;
 
 	cwd = NULL;
-	if (replace_back(shell->data.envps, "OLDPWD"))
-		exit_process(shell, NULL, EXTRA_ERROR);
-	if (set_cwd(&cwd))
+	if (set_keyval(&keyval, "OLDPWD", '=', "") || replace_back(shell->data.envps, keyval) || set_cwd(&cwd))
 	{
 		free(cwd);
+		free_map(&keyval);
 		exit_process(shell, NULL, EXTRA_ERROR);
 	}
-	env = ft_strjoin("PWD=", cwd);
-	free(cwd);
-	if (!env || replace_back(shell->data.envps, env))
+	if (set_keyval(&keyval, "PWD", '=', cwd) || replace_back(shell->data.envps, keyval))
 	{
-		free(env);
+		free(cwd);
+		free_map(&keyval);
 		exit_process(shell, NULL, EXTRA_ERROR);
 	}
-	free(env);
+	free(cwd);
 }
 
 static void	set_data(t_shell *shell, char *envp[])

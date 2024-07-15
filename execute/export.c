@@ -1,6 +1,6 @@
 #include "../minishell.h"
 
-void	print_strs(char *strs[])
+static void	print_export(char *strs[])
 {
 	int		index;
 	size_t	size;
@@ -21,7 +21,7 @@ void	print_strs(char *strs[])
 	}
 }
 
-int	ft_keycmp(char *a, char *b)
+static int	ft_keycmp(char *a, char *b)
 {
 	int	index;
 
@@ -39,7 +39,7 @@ int	ft_keycmp(char *a, char *b)
 	return (a[index] - b[index]);
 }
 
-void	ft_sort(char **strs)
+static void	ft_sort(char **strs)
 {
 	char	*temp;
 	int		index;
@@ -83,6 +83,7 @@ int ft_export(t_shell *shell, t_process p)
 	char	**envs;
 	int		index;
 	int		status;
+	t_map	keyval;
 
 	status = EXIT_SUCCESS;
 	if (!p.args[1] || !ft_memcmp(p.args[1], "--", 3))
@@ -91,7 +92,7 @@ int ft_export(t_shell *shell, t_process p)
 		if (!envs)
 			return (handle_error(p.args[0], NULL, EXTRA_ERROR));
 		ft_sort(envs);
-		print_strs(envs);
+		print_export(envs);
 		free_strs(envs);
 		return (status);
 	}
@@ -100,7 +101,7 @@ int ft_export(t_shell *shell, t_process p)
 	{
 		if (!is_valid_arg(p.args[index]))
 			status = handle_error(p.args[0], p.args[1], INVALID_IDF);
-		else if (replace_back(shell->data.envps, p.args[index]))
+		else if (set_map(&keyval, p.args[index]) || replace_back(shell->data.envps, keyval))
 			return (handle_error(p.args[0], NULL, EXTRA_ERROR));
 	}
 	return (status);

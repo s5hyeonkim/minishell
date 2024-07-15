@@ -77,14 +77,14 @@ t_deques	*strstodeq(char **strs)
 		return (NULL);
 	while (strs[index])
 	{
-		if (set_map(strs[index], &keyval) || push_back(new, keyval))
+		if (set_map(&keyval, strs[index]) || push_back(new, keyval))
 		{
 			free_deques(&new);
 			return (NULL);
 		}
 		index++;
 	}
-	if (!index && (set_map("", &keyval) || push_back(new, keyval)))
+	if (!index && (set_map(&keyval, "") || push_back(new, keyval)))
 	{
 		free_deques(&new);
 		return (NULL);
@@ -104,17 +104,9 @@ char	*read_val_deq(t_deques *deqs, char *key)
 	return (val);
 }
 
-void	print_deques(t_deques *deqs, t_state state)
+void	set_state(t_deque *deq)
 {
-	t_deque	*node;
-
-	node = deqs->head;
-	while (node)
-	{
-		if (state <= node->state)
-			printf("%s\n", node->keyval.key);
-		node = node->next;
-		if (node == deqs->head)
-			break ;
-	}
+	deq->state = EXPORT;
+	if (deq->keyval.mid == '=')
+		deq->state = ENV;
 }

@@ -11,14 +11,7 @@
 /* ************************************************************************** */
 #include "deque.h"
 
-void	set_state(t_deque *deq)
-{
-	deq->state = EXPORT;
-	if (deq->keyval.mid)
-		deq->state = ENV;
-}
-
-int	set_deque(t_deque **deq, t_map keyval)
+static int	set_deque(t_deque **deq, t_map keyval)
 {
 
 	*deq = create_deque();
@@ -56,37 +49,9 @@ int	push_back(t_deques *deques, t_map keyval)
 	return (EXIT_SUCCESS);
 }
 
-int	replace_back(t_deques *deqs, char *str)
+int	replace_back(t_deques *deqs, t_map keyval)
 {
-	t_map	keyval;
-	char	*key;
-
-	key = get_key(str);
-	if (!key)
-		return (EXIT_FAILURE);
-	if (find_deq(deqs, key))
-		remove_targetdeq(deqs, find_deq(deqs, key));
-	free(key);
-	if (set_map(str, &keyval) || push_back(deqs, keyval))
-	{
-		free_map(&keyval);
-		return (EXIT_FAILURE);
-	}
-	return (EXIT_SUCCESS);
-}
-
-int	push_keyback(t_deques *deques, char *str)
-{
-	t_map	keyval;
-
-	ft_memset(&keyval, 0, sizeof(t_map));
-	keyval.key = ft_strdup(str);
-	if (keyval.key)
-		keyval.val = ft_strdup("");
-	if (!keyval.key || !keyval.val)
-	{
-		free_map(&keyval);
-		return (EXTRA_ERROR);
-	}
-	return (push_back(deques, keyval));
+	if (find_deq(deqs, keyval.key))
+		remove_targetdeq(deqs, find_deq(deqs, keyval.key));
+	return (push_back(deqs, keyval));
 }
