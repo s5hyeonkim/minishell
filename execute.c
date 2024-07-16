@@ -226,7 +226,7 @@ void	set_token_process(t_shell *shell, t_token *t, int *index)
 {
 	if (!t)
 		return ;
-	if (t->type == T_SIMPLE_CMD || t->type == T_REDIRECT)
+	if (t->type == T_SIMPLE_CMD || t->type == T_IO_REDIRECT)
 	{
 		// printf("set SIMPLE CMD\n");
 		shell->p[*index].t = *t;

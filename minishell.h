@@ -56,7 +56,7 @@ typedef struct s_token
 	struct s_token	*right;
 }	t_token;
 
-typedef strauct s_process
+typedef struct s_process
 {
     pid_t   pid;
     char    *path;
