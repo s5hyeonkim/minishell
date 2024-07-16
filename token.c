@@ -37,20 +37,3 @@ void	parent(t_shell *shell, int index)
 	waitpid(shell->p[index].pid, &child_status, WNOHANG);
 }
 
-/* parsing and set tokens 수정 필요 */
-void	tokenization(t_shell *shell, t_token *t)
-{
-	printf("origin cmd: %s\n", t->cmd);
-	t->type = SIMPLE_CMD;
-	(void) shell;
-	//tokenization(shell, t->left);
-	//tokenization(shell, t->right);
-}
-
-int	set_token(t_token **t)
-{
-	*t = ft_calloc(1, sizeof(t_token));
-	if (*t == NULL)
-		return (EXTRA_ERROR);
-	return (EXIT_SUCCESS);
-}
