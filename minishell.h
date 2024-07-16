@@ -39,8 +39,9 @@ typedef enum e_type
 	T_NULL,
 	T_PIPE,
 	T_SIMPLE_CMD,
+	T_CMD_WORD,
 	T_CMD_PREFIX,
-	T_REDIRECT,
+	T_IO_REDIRECT,
 	T_DLESS,		// >>
 	T_DGREAT,		// <<
 	T_LESS,			// >
@@ -55,7 +56,7 @@ typedef struct s_token
 	struct s_token	*right;
 }	t_token;
 
-typedef struct s_process
+typedef strauct s_process
 {
     pid_t   pid;
     char    *path;
@@ -68,8 +69,7 @@ typedef struct s_process
 typedef struct s_data
 {
 	char		**paths;	//path environment variables
-	char		*home;
-	char		*user;
+	char		*lcwd;
 	t_deques	*envps;
 }	t_data;
 
