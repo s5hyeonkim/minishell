@@ -184,7 +184,7 @@ size_t	find_pipe(t_token *t)
 	if (!t)
 		return (0);
 	pipe_num = 0;
-	if (t->type == PIPE)
+	if (t->type == T_PIPE)
 		pipe_num++;
 	pipe_num += find_pipe(t->left);
 	pipe_num += find_pipe(t->right);
@@ -226,7 +226,7 @@ void	set_token_process(t_shell *shell, t_token *t, int *index)
 {
 	if (!t)
 		return ;
-	if (t->type == SIMPLE_CMD || t->type == REDIRECT)
+	if (t->type == T_SIMPLE_CMD || t->type == T_REDIRECT)
 	{
 		// printf("set SIMPLE CMD\n");
 		shell->p[*index].t = *t;

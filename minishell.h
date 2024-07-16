@@ -36,13 +36,15 @@ typedef	struct termios	t_termios;
 
 typedef enum e_type
 {
-	CMD = 1,
-	SIMPLE_CMD,
-	REDIRECT,
-	REDIRECTS,
-	PIPE,
-	AND,
-	OR
+	T_NULL,
+	T_PIPE,
+	T_SIMPLE_CMD,
+	T_CMD_PREFIX,
+	T_REDIRECT,
+	T_DLESS,		// >>
+	T_DGREAT,		// <<
+	T_LESS,			// >
+	T_GREAT 		// < 
 }	t_type;
 
 typedef struct s_token
@@ -52,7 +54,6 @@ typedef struct s_token
 	struct s_token	*left;
 	struct s_token	*right;
 }	t_token;
-
 
 typedef struct s_process
 {
