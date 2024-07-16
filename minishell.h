@@ -145,5 +145,10 @@ void	set_terminal_printon(t_shell *shell);
 
 /* setting.c */
 void	set_shell(t_shell *shell, char *envp[]);
+int		set_token(t_token **t);
+void	tokenization(t_shell *shell, t_token *t);
+void	exec_cmds(t_shell *shell);
+void	parent(t_shell *shell, int index);
+void	child(t_shell *shell, int index);
 
 #endif

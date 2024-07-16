@@ -11,6 +11,7 @@ SRCS = ./main.c \
 		./execute.c \
 		./free.c \
 		./setting.c \
+		./token.c \
 		$(EXECDIR)cd.c \
 		$(EXECDIR)echo.c \
 		$(EXECDIR)env.c \
