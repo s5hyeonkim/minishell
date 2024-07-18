@@ -48,7 +48,7 @@ t_deque		*create_deque(void);
 // push
 int			push_back(t_deques *deques, t_map keyval);
 int			push_front(t_deques *deques);
-int			replace_back(t_deques *deqs, t_map keyval);
+int			replace_back(t_deques *deqs, char *key, char mid, char *val);
 
 //free
 void		free_deque(t_deque *deque);
@@ -75,5 +75,7 @@ char		*ft_pairjoin(char *key, char mid, char *val);
 char		**deqtostrs(t_deques *deqs);
 t_deques	*strstodeq(char **strs);
 void		set_state(t_deque *deq);
+int			is_valid_key(char *s);
+char		*get_val_deq(t_deques *deqs, char *key);
 
 #endif

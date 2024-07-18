@@ -79,6 +79,7 @@ t_deques	*strstodeq(char **strs)
 	{
 		if (set_map(&keyval, strs[index]) || push_back(new, keyval))
 		{
+			free_map(&keyval);
 			free_deques(&new);
 			return (NULL);
 		}
@@ -86,6 +87,7 @@ t_deques	*strstodeq(char **strs)
 	}
 	if (!index && (set_map(&keyval, "") || push_back(new, keyval)))
 	{
+		free_map(&keyval);
 		free_deques(&new);
 		return (NULL);
 	}
@@ -109,4 +111,32 @@ void	set_state(t_deque *deq)
 	deq->state = EXPORT;
 	if (deq->keyval.mid == '=')
 		deq->state = ENV;
+}
+
+int	is_valid_key(char *s)
+{
+	if (ft_isdigit(*s) || *s == '=')
+		return (FALSE);
+	while (*s)
+	{
+		if (*s == '=')
+			break ;
+		if (!ft_isdigit(*s) && !ft_isalpha(*s) && *s != '_')
+			return (FALSE);
+		s++;
+	}
+	return (TRUE);
+}
+
+char	*get_val_deq(t_deques *deqs, char *key)
+{
+	char	*val;
+	t_deque	*node;
+
+	node = find_deq(deqs, key);
+	if (node)
+		val = ft_strdup(node->keyval.val);
+	else
+		val = ft_strdup("");
+	return (val);
 }

@@ -19,6 +19,7 @@ void	free_data(t_data d)
 {
 	free_strs(d.paths);
 	free_deques(&d.envps);
+	free(d.lcwd);
 	// add more?
 }
 

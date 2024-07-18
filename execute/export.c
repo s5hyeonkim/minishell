@@ -63,21 +63,6 @@ static void	ft_sort(char **strs)
 	}
 }
 
-static int	is_valid_arg(char *s)
-{
-	if (ft_isdigit(*s) || *s == '=')
-		return (FALSE);
-	while (*s)
-	{
-		if (*s == '=')
-			break ;
-		if (!ft_isdigit(*s) && !ft_isalpha(*s) && *s != '_')
-			return (FALSE);
-		s++;
-	}
-	return (TRUE);
-}
-
 int ft_export(t_shell *shell, t_process p)
 {
 	char	**envs;
@@ -99,10 +84,13 @@ int ft_export(t_shell *shell, t_process p)
 	index = 0;
 	while (p.args[++index])
 	{
-		if (!is_valid_arg(p.args[index]))
+		if (!is_valid_key(p.args[index]))
 			status = handle_error(p.args[0], p.args[1], INVALID_IDF);
-		else if (set_map(&keyval, p.args[index]) || replace_back(shell->data.envps, keyval))
+		else if (set_map(&keyval, p.args[index]) || replace_back(shell->data.envps, keyval.key, keyval.mid, keyval.val))
+		{
+			free_map(&keyval);
 			return (handle_error(p.args[0], NULL, EXTRA_ERROR));
+		}
 	}
 	return (status);
 }
