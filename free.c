@@ -9,8 +9,8 @@ void	free_token(t_token *t)
 		t->left = NULL;
 		free_token(t->right);
 		t->right = NULL;
-		free(t->cmd);
-		t->cmd = NULL;
+		free(t->word);
+		t->word = NULL;
 	}
 	free(t);
 }

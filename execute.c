@@ -193,9 +193,9 @@ size_t	find_pipe(t_token *t)
 
 void	set_args(t_shell *shell, t_process *p)
 {
-	// simple cmd로 수정 필요, 지금 t.cmd type은 redirection 포함한 cmd
+	// simple cmd로 수정 필요, 지금 t.word type은 redirection 포함한 cmdt.word
 	// printf("enter set args: %s\n", p->t.cmd);
-	p->args = get_cmdargs(p->t.cmd);
+	p->args = get_cmdargs(p->t.word);
 	if (!p->args)
 		exit_process(shell, NULL, EXTRA_ERROR);
 }
@@ -226,7 +226,7 @@ void	set_token_process(t_shell *shell, t_token *t, int *index)
 {
 	if (!t)
 		return ;
-	if (t->type == T_SIMPLE_CMD || t->type == T_IO_REDIRECT)
+	if (t->type == T_SIMPLE_CMD || t->type == T_DGREAT)
 	{
 		// printf("set SIMPLE CMD\n");
 		shell->p[*index].t = *t;
@@ -235,9 +235,9 @@ void	set_token_process(t_shell *shell, t_token *t, int *index)
 	}
 	else if (t->type)
 	{
-		if (t->left && t->left->cmd && t->left->cmd[0])
+		if (t->left && t->left->word && t->left->word[0])
 			set_token_process(shell, t->left, index);
-		if (t->right && t->right->cmd && t->right->cmd[0])
+		if (t->right && t->right->word && t->right->word[0])
 			set_token_process(shell, t->right, index);
 	}
 }

@@ -3,14 +3,23 @@
 /* parsing and set tokens 수정 필요 */
 void	tokenization(t_shell *shell, t_token *t)
 {
-	printf("origin cmd: %s\n", t->cmd);
+	printf("origin cmd: %s\n", t->word);
 	t->type = T_SIMPLE_CMD;
 	(void) shell;
 	//tokenization(shell, t->left);
 	//tokenization(shell, t->right);
 }
 
-int	set_token(t_token **t)
+// int	set_token(t_token **t)
+// {
+// 	*t = ft_calloc(1, sizeof(t_token));
+// 	if (*t == NULL)
+// 		return (EXTRA_ERROR);
+// 	return (EXIT_SUCCESS);
+// }
+
+/* token lst */
+int set_token(t_token **t)
 {
 	*t = ft_calloc(1, sizeof(t_token));
 	if (*t == NULL)
@@ -18,10 +27,84 @@ int	set_token(t_token **t)
 	return (EXIT_SUCCESS);
 }
 
+t_token *token_lstlast(t_token *t)
+{
+	if (t == NULL)
+		return (NULL);
+	while (t->right != NULL)
+		t = t->right;
+	return (t);
+}
+
+void token_lstadd_back(t_token **t, t_token *newtoken)
+{
+	t_token *lasttoken;
+
+	if (*t == NULL)
+		*t = newtoken;
+	else if (newtoken != NULL)
+	{
+		lasttoken= token_lstlast(*t);
+		lasttoken->right = newtoken; 
+	}
+}
+
+void add_token(t_shell *shell, int type, char *str)
+{
+	t_token *newtoken;
+
+	set_token(&newtoken);
+	newtoken->type = type;
+	newtoken->word = str;
+	token_lstadd_back(&shell->t, newtoken);
+}
+
+
+// int	token_type(char b1, char b2)
+// {
+// 	if (b1 == '|' && b2 != '|') // || : or 연산자  |||이상 : syntax error unexpected token '|'
+// 		return (T_PIPE);
+// 	else if (b1 == '<' && b2 == '<')
+
+// 	else if (b1 == '>' && b2 ==)
+// }
+
+//PIPE WORD 
+
+void	set_tokens(t_shell *shell, char *buffer)
+{
+	if (set_token(&(shell->t)))
+		exit_process(shell, NULL, EXTRA_ERROR);
+	shell->t->word = buffer;
+	tokenization(shell, shell->t);
+}
+
+// void lexical_analysis(t_shell *shell, char *buffer)
+// {
+// 	// if (set_token(&(shell->t)))
+// 	// 	exit_process(shell, NULL, EXTRA_ERROR);
+// 	// shell->t->word = buffer;
+// 	//토큰 리스트에 추가
+
+// }
+
+
+// void	parselines(t_shell *shell, char *buffer)
+// {
+
+
+// 	// printf("token start %s\n", shell->t->cmd);
+	
+// 	// printf("token end\n");
+
+// 	lexical_analysis(shell, buffer);
+// }
+
+
 /* exit */
 void	exit_process(t_shell *shell, char *obj, int errcode)
 {
-	set_terminal_printon(shell);
+	terminal_printon(shell);
 	if (errcode && errcode < CMD_NOT_FOUND)
 	{
 		errcode = EXIT_FAILURE;
@@ -34,6 +117,7 @@ void	exit_process(t_shell *shell, char *obj, int errcode)
 	free_shell(*shell);
 	exit(errcode);
 }
+
 
 /* set */
 char	**get_env_paths(char *envp[])
@@ -56,18 +140,6 @@ void	check_valid(t_shell *shell, int argc)
 {
 	if (argc != 1)
 		exit_process(shell, NULL, INVALID_ARGV);
-}
-
-
-
-void	set_tokens(t_shell *shell, char *buffer)
-{
-	if (set_token(&(shell->t)))
-		exit_process(shell, NULL, EXTRA_ERROR);
-	shell->t->cmd = buffer;
-	// printf("token start %s\n", shell->t->cmd);
-	tokenization(shell, shell->t);
-	// printf("token end\n");
 }
 
 /* main */
@@ -111,6 +183,7 @@ void	loop(t_shell *shell)
 		// printf("buffer: %s\n", buffer);
 		set_status(shell);
 		set_tokens(shell, buffer);
+		// parselines(shell, buffer);
 		
 		/* exec */
 		set_process(shell);

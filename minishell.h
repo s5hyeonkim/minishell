@@ -27,6 +27,7 @@
 # define NAME_MAX 256
 # define PATH_MAX 1024
 # define SIGEXIT 128
+
 // # define PROMPT_MSG "minishell$ "
 # define PROMPT_MSG "\033[36mminishell ❯\033[0m "
 
@@ -34,24 +35,27 @@ volatile int	status;
 typedef struct sigaction t_sigaction;
 typedef	struct termios	t_termios;
 
-typedef enum e_type
+# define PIPE '|'
+
+typedef enum e_typeno
 {
 	T_NULL,
 	T_PIPE,
 	T_SIMPLE_CMD,
-	T_CMD_WORD,
-	T_CMD_PREFIX,
-	T_IO_REDIRECT,
+	T_CMD_WORD, //cmd, filename, hereend 
+	T_IO_REDIRECTS, //redirects
 	T_DLESS,		// >>
 	T_DGREAT,		// <<
 	T_LESS,			// >
-	T_GREAT 		// < 
-}	t_type;
+	T_GREAT, 		// < 
+	T_DOUBLE_QUOTES,
+	T_SINGLE_QUOTES
+}	t_typeno;
 
 typedef struct s_token
 {
-	t_type			type;
-	char			*cmd; // or filename
+	t_typeno		type;
+	char			*word; //cmd, filename, hereend 
 	struct s_token	*left;
 	struct s_token	*right;
 }	t_token;
@@ -75,7 +79,7 @@ typedef struct s_data
 
 typedef struct s_shell
 {
-	t_token			*t;
+	t_token			*t; // tree
 	t_process		*p;
 	size_t			p_size;
 	int				status;
@@ -93,8 +97,8 @@ char		**get_env_paths(char *envp[]);
 void		child(t_shell *shell, int index);
 void		parent(t_shell *shell, int index);
 void		exec_cmds(t_shell *shell);
-void	set_terminal_printon(t_shell *shell);
-void	set_terminal_printoff(void);
+void	terminal_printon(t_shell *shell);
+void	terminal_printoff(void);
 
 /* execute dir */
 void		exec_cmds(t_shell *shell);
@@ -141,8 +145,8 @@ void	replace_line(int redisplayon);
 
 /* terminal.c */
 void	init_terminal(t_shell *shell);
-void	set_terminal_printoff(void);
-void	set_terminal_printon(t_shell *shell);
+void	terminal_printoff(void);
+void	terminal_printon(t_shell *shell);
 
 /* setting.c */
 void	set_shell(t_shell *shell, char *envp[]);
