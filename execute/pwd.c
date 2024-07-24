@@ -1,4 +1,15 @@
-#include "../minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   pwd.c                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/07/23 19:32:07 by sohykim           #+#    #+#             */
+/*   Updated: 2024/07/23 19:32:09 by sohykim          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+#include "execute.h"
 
 int	is_valid_option(char *opt)
 {
@@ -10,10 +21,10 @@ int	is_valid_option(char *opt)
 }
 
 //PATH_MAX value need to be changed
-int	ft_pwd(t_shell *shell, t_process p)
+int	ft_pwd(t_process p, t_data *d)
 {
 	if (!is_valid_option(p.args[1]))
 		return (handle_error(p.args[0], p.args[1], INVALID_OPT));
-	printf("%s\n", shell->data.lcwd);
+	printf("%s\n", d->lcwd);
 	return (EXIT_SUCCESS);
 }

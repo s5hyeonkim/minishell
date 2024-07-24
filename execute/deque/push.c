@@ -6,14 +6,13 @@
 /*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/11 16:50:52 by sohykim           #+#    #+#             */
-/*   Updated: 2024/07/11 12:50:48 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/07/23 19:39:25 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "deque.h"
 
 static int	set_deque(t_deque **deq, t_map keyval)
 {
-
 	*deq = create_deque();
 	if (*deq == NULL)
 		return (EXTRA_ERROR);

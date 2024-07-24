@@ -1,4 +1,15 @@
-#include "../minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   cd.c                                               :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/07/23 19:31:24 by sohykim           #+#    #+#             */
+/*   Updated: 2024/07/23 19:31:27 by sohykim          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+#include "execute.h"
 
 static int	check_folder(char *to_dir)
 {
@@ -6,10 +17,7 @@ static int	check_folder(char *to_dir)
 
 	dir = opendir(to_dir);
 	if (!dir)
-	{
-		printf("no dir\n");
 		return (EXTRA_ERROR);
-	}
 	closedir(dir);
 	if (access(to_dir, X_OK))
 		return (EXTRA_ERROR);
@@ -18,7 +26,7 @@ static int	check_folder(char *to_dir)
 
 int	navigate_dir(char *to_dir, char *origin)
 {
-	printf("to_dir: %s\n", to_dir);
+	// printf("to_dir: %s\n", to_dir);
 	if (check_folder(to_dir) || chdir(to_dir) == -1)
 		return (handle_error("cd", origin, EXTRA_ERROR));
 	return (EXIT_SUCCESS);
@@ -96,35 +104,34 @@ int	navigate_targetdir(t_data d, char *to_dir, char **nwd)
 		return (handle_error("cd", NULL, EXTRA_ERROR));
 	printf("next dir: %s\n", *nwd);
 	status = navigate_dir(*nwd, to_dir);
-	return (status);	
+	return (status);
 }
 
-
-int ft_cd(t_shell *shell, t_process p)
+int	ft_cd(t_process p, t_data *d)
 {
-	char	*nwd;
-	int		index;
-	t_data	d;
+	char		*nwd;
+	int			index;
+	t_deques	*deqs;
 
 	index = 1;
-	d = shell->data;
+	deqs = d->envps;
 	nwd = NULL;
 	if (p.args[1] && !ft_memcmp(p.args[1], "--", 3) && p.args[2])
 		index = 2;
-	if (navigate_targetdir(shell->data, p.args[index], &nwd))
+	if (navigate_targetdir(*d, p.args[index], &nwd))
 	{
 		free(nwd);
 		return (EXTRA_ERROR);
 	}
-	if (find_deq(d.envps, "OLDPWD") && replace_back(d.envps, "OLDPWD", '=', d.lcwd))
+	if (find_deq(deqs, "OLDPWD") && replace_back(deqs, "OLDPWD", '=', d->lcwd))
 	{
-		free(shell->data.lcwd);
-		shell->data.lcwd = nwd;
+		free(d->lcwd);
+		d->lcwd = nwd;
 		return (handle_error("cd", NULL, EXTRA_ERROR));
 	}
-	free(shell->data.lcwd);
-	shell->data.lcwd = nwd;
-	if (find_deq(d.envps, "PWD") && replace_back(d.envps, "PWD", '=', shell->data.lcwd))
+	free(d->lcwd);
+	d->lcwd = nwd;
+	if (find_deq(deqs, "PWD") && replace_back(deqs, "PWD", '=', d->lcwd))
 		return (handle_error("cd", NULL, EXTRA_ERROR));
 	return (EXIT_SUCCESS);
 }

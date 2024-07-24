@@ -6,7 +6,7 @@
 /*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/11 16:50:52 by sohykim           #+#    #+#             */
-/*   Updated: 2024/07/11 12:50:53 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/07/23 19:43:19 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "deque.h"
@@ -37,7 +37,7 @@ char	**deqtostrs(t_deques *deqs)
 	t_map	keyval;
 
 	size = ft_deqlen(deqs->head);
-	ret = ft_calloc(size + 1, sizeof(char *));
+	ret = ft_calloc(size + 2, sizeof(char *));
 	if (!ret)
 		return (NULL);
 	index = 0;

@@ -6,7 +6,7 @@
 /*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/11 16:50:52 by sohykim           #+#    #+#             */
-/*   Updated: 2024/05/23 18:55:54 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/07/23 19:39:08 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "deque.h"
@@ -69,7 +69,7 @@ t_deque	*find_deq(t_deques *deq, char *key)
 	while (node)
 	{
 		node = node->next;
-		if (ft_strlen(key) == ft_strlen(node->keyval.key) && !ft_memcmp(node->keyval.key, key, ft_strlen(key)))
+		if (!ft_memcmp(node->keyval.key, key, ft_strlen(key) + 1))
 			return (node);
 		if (node == deq->tail)
 			break ;

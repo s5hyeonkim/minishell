@@ -24,9 +24,7 @@
 # include "ft_err.h"
 # include "./execute/deque/deque.h"
 # include "./execute/execute.h"
-# define NAME_MAX 256
 # define PATH_MAX 1024
-# define SIGEXIT 128
 
 // # define PROMPT_MSG "minishell$ "
 # define PROMPT_MSG "\033[36mminishell ❯\033[0m "
@@ -60,77 +58,48 @@ typedef struct s_token
 	struct s_token	*right;
 }	t_token;
 
-typedef struct s_process
-{
-    pid_t   pid;
-    char    *path;
-    char    **args;
-    int     flag;
-	int		fd[2];
-	t_token	t;
-}   t_process;
-
-typedef struct s_data
-{
-	char		**paths;	//path environment variables
-	char		*lcwd;
-	t_deques	*envps;
-}	t_data;
-
 typedef struct s_shell
 {
 	t_token			*t; // tree
 	t_process		*p;
 	size_t			p_size;
-	int				status;
 	t_data			data;
 	t_termios		term;
 }	t_shell;
-
-typedef int (*built_in)(t_shell *shell, t_process p);
 
 
 /* main.c */
 void		exit_process(t_shell *shell, char *obj, int errcode);
 // void		child_handler(int signo);
 char		**get_env_paths(char *envp[]);
-void		child(t_shell *shell, int index);
-void		parent(t_shell *shell, int index);
-void		exec_cmds(t_shell *shell);
 void	terminal_printon(t_shell *shell);
 void	terminal_printoff(void);
 
 /* execute dir */
-void		exec_cmds(t_shell *shell);
 void		set_cmds(t_shell *shell);
 void		set_process(t_shell *shell);
-built_in	find_builtin(int index);
+t_builtin	find_builtin(int index);
 char		*read_val_strs(char *strs[], char *key);
 int			set_cwd(char **cwd);
-int			ft_pwd(t_shell *shell, t_process p);
-int			ft_env(t_shell *shell, t_process p);
-int			ft_exit(t_shell *shell, t_process p);
-int 		ft_export(t_shell *shell, t_process p);
-int 		ft_cd(t_shell *shell, t_process p);
-int			ft_echo(t_shell *shell, t_process p);
-int			ft_unset(t_shell *shell, t_process p);
 
 /* execute */
-int	is_builtin(char *cmd);
-int	exec_builtin(t_shell *shell, t_process p);
+int		is_builtin(char *cmd);
+int		exec_builtin(t_process p, t_data *d);
 void	wait_process(t_shell *shell);
 void	exec_program(t_shell *shell, t_process p);
 void	set_process(t_shell *shell);
 void	close_pipe(t_shell *shell, int index);
 void	subprocess(t_shell *shell);
 void	inprocess(t_shell *shell);
+void   	exec_cmds(t_shell *shell);
 
 /* free.c */
 void		free_token(t_token *t);
 void		free_data(t_data d);
 void		free_tprocess(t_process *p, size_t size);
 void		free_shell(t_shell shell);
-void 		free_cmds(t_token **t, t_process **p, size_t psize);
+void 		free_cmds(t_token **t, t_process **p, size_t *psize);
+void		clean_cmds(t_shell *shell);
 
 /* signal.c */
 void		set_signal(t_shell *shell, void(*handler)(int), int signo);
@@ -152,8 +121,12 @@ void	terminal_printon(t_shell *shell);
 void	set_shell(t_shell *shell, char *envp[]);
 int		set_token(t_token **t);
 void	tokenization(t_shell *shell, t_token *t);
-void	exec_cmds(t_shell *shell);
-void	parent(t_shell *shell, int index);
-void	child(t_shell *shell, int index);
+void	parent(t_shell *shell, size_t index);
+void	child(t_shell *shell, size_t index);
+char	*get_cmdpath(char **paths, char *cmd);
+char	**get_cmdargs(char *cmd);
+int		open_redirect(t_process *p, t_token *t);
+void	open_pipe(t_shell *shell, size_t index);
+size_t	find_pipe(t_token *t);
 
 #endif

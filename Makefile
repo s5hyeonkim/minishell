@@ -7,11 +7,14 @@ EXECDIR = ./execute/
 SRCDIR = ./src/
 OBJDIR = ./obj/
 SRCS = ./main.c \
-		./print.c \
+		./builtin.c \
+		./cmdline.c \
 		./execute.c \
 		./free.c \
 		./setting.c \
-		./token.c \
+		./process.c \
+		./pipeline.c \
+		./print.c \
 		$(EXECDIR)cd.c \
 		$(EXECDIR)echo.c \
 		$(EXECDIR)env.c \
@@ -22,9 +25,7 @@ SRCS = ./main.c \
 		$(EXECDIR)unset.c \
 		$(SRCDIR)signal.c \
 		$(SRCDIR)signal_utils.c \
-		$(SRCDIR)terminal.c \
-
-#./main.c
+		$(SRCDIR)terminal.c
 
 OBJS = $(SRCS:.c=.o)
 DEPS = $(SRCS:.c=.d)

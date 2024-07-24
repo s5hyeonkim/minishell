@@ -1,17 +1,27 @@
-#include "../minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   echo.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/07/23 19:31:30 by sohykim           #+#    #+#             */
+/*   Updated: 2024/07/23 19:31:33 by sohykim          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+#include "execute.h"
 
-// $? 환경변수 기능 추가 필요
 int	is_no_nl(char *str)
 {
-	if (str && !ft_memcmp(str, "-n", 3))		
+	if (str && !ft_memcmp(str, "-n", 3))
 		return (TRUE);
 	return (FALSE);
 }
 
 char	*read_val_strs(char *strs[], char *key)
 {
-	char    *ret;	
-	int     index;
+	char	*ret;
+	int		index;
 	size_t	size;
 
 	index = 0;
@@ -23,7 +33,7 @@ char	*read_val_strs(char *strs[], char *key)
 		size = ft_strchr(strs[index], '=') - strs[index];
 		if (!ft_memcmp(strs[index], key, size) && ft_strlen(key) == size)
 		{
-		    ret = strs[index] + size + 1;
+			ret = strs[index] + size + 1;
 			break ;
 		}
 		index++;
@@ -31,12 +41,11 @@ char	*read_val_strs(char *strs[], char *key)
 	return (ret);
 }
 
-int	ft_echo(t_shell *shell, t_process p)
+int	ft_echo(t_process p, t_data *d)
 {
-	int 	index;
+	int	index;
 
-	//envs 각자 구하기.
-	(void) shell;
+	(void) d;
 	index = 1;
 	if (is_no_nl(p.args[1]))
 		index++;

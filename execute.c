@@ -1,165 +1,9 @@
 #include "minishell.h"
-#include "execute/execute.h"
 
 /* execute parsing*/
-char	*get_pathcmd(char **paths, char *cmd)
-{
-	int		index;
-	char	*ret;
-
-	index = 0;
-	while (paths[index])
-	{
-		ret = ft_pairjoin(paths[index++],'/', cmd);
-		if (!ret || !access(ret, X_OK))
-			return (ret);
-		free(ret);
-	}
-	return (ft_strdup(cmd));
-}
-
-int	is_builtin(char *cmd)
-{
-	const char	*cmds[] = {"echo", "cd", "pwd", "export", "unset", "env", "exit"};
-	size_t		len;
-	int			index;
-
-	index = 0;
-	while (index < 7)
-	{
-		len = ft_strlen(cmds[index]);
-		if (!ft_memcmp(cmds[index], cmd, len + 1))
-			return (TRUE);
-		if (!ft_memcmp(cmds[index], cmd, len) && cmd[len] == ' ')
-			return (TRUE);
-		index++;
-	}
-	return (FALSE);
-}
-
-char	*get_cmdpath(char **paths, char *cmd)
-{
-	int		err;
-	char	*ret;
-
-	err = EXIT_SUCCESS;
-	if (is_builtin(cmd))
-		ret = ft_strdup(cmd);
-	else
-		ret = get_pathcmd(paths, cmd);
-	return (ret);
-}
-
-int	is_valid_quotation(size_t *start, int *open1, int open2)
-{
-	*open1 = !(*open1);
-	if (!open2)
-	{
-		if (!(*open1))
-			(*start)++;
-		return (TRUE);
-	}
-	return (FALSE);
-}
-
-// redirection 추가 필요
-int	check_quotation_flag(int *flag, int flag2)
-{
-	*flag = !(*flag);
-	if (!flag2)
-		return (TRUE);
-	return (FALSE);
-}
-
-void	parsing_cmd(char *cmd, size_t *start, size_t *end)
-{
-	size_t		size;
-	int			flag;
-	int			flag1;
-
-	size = *start;
-	flag = 0;
-	flag1 = 0;
-	while (cmd[size] == ' ')
-		size++;
-	*start = size;
-	while (cmd[size])
-	{
-		if (cmd[size] == '\'' && check_quotation_flag(&flag, flag1))
-			size++;
-		if (cmd[size] == '\"' && check_quotation_flag(&flag1, flag))
-			size++;
-		if (!flag1 && !flag && cmd[size] == ' ')
-			break ;
-		size++;
-	}
-	*end = size;
-}
-
-int	set_parsing_deques(t_deques *deqs, char *cmd)
-{
-	size_t		start;
-	size_t		end;
-	size_t		len;
-	char		*str;
-	t_map		keyval;
-
-	start = 0;
-	end = 0;
-	len = ft_strlen(cmd);
-	while (start < len)
-	{
-		parsing_cmd(cmd, &start, &end);
-		// printf("%zu %zu\n", start, end);
-		if (start >= len)
-			break ;
-		str = ft_substr(cmd, start, end - start);
-		if (!str || set_keyval(&keyval, str, 0, "") || push_back(deqs, keyval))
-		{
-			free(str);
-			free_map(&keyval);
-			return (EXTRA_ERROR);
-		}
-		free(str);
-		start = ++end;
-	}
-	return (EXIT_SUCCESS);
-}
-
-char	**get_cmdargs(char *cmd)
-{
-	t_deques	*deqs;
-	char		**strs;
-
-	deqs = create_deques();
-	if (!deqs || set_parsing_deques(deqs, cmd))
-	{
-		free_deques(&deqs);
-		return (NULL);
-	}
-	strs = deqtostrs(deqs);
-	// printf("%s\n", strs[0]);
-	free_deques(&deqs);
-	return (strs);
-}
 
 /* program */
 	/* builtin */
-int	exec_builtin(t_shell *shell, t_process p)
-{
-	const char	*cmds[] = {"echo", "cd", "pwd", "export", "unset", "env", "exit"};
-	int			index;
-
-	index = 0;
-	// printf("builtin?\n");
-	while (index < 7)
-	{
-		if (!ft_memcmp(cmds[index], p.path, ft_strlen(cmds[index]) + 1))
-			break ;
-		index++;
-	}
-	return (find_builtin(index)(shell, p));
-}
 
 	/* external */
 void	exec_program(t_shell *shell, t_process p)
@@ -170,151 +14,98 @@ void	exec_program(t_shell *shell, t_process p)
 	envp = deqtostrs(shell->data.envps);
 	if (!envp)
 		exit_process(shell, NULL, EXTRA_ERROR);
-	printf("%s\n", p.path);
-	printf("%s\n", p.args[0]);
 	if (execve(p.path, p.args, envp) == -1)
 		exit_process(shell, p.args[0], CMD_NOT_FOUND);
 }
 
-
-size_t	find_pipe(t_token *t)
+int	open_token(t_token *t)
 {
-	size_t	pipe_num;
+	int	fd;
 
-	if (!t)
-		return (0);
-	pipe_num = 0;
-	if (t->type == T_PIPE)
-		pipe_num++;
-	pipe_num += find_pipe(t->left);
-	pipe_num += find_pipe(t->right);
-	return (pipe_num);
+	fd = 0;
+	if (t->type == T_GREAT || t->type == T_DGREAT)
+		fd = open(t->word, O_RDONLY);
+	if (t->type == T_LESS)
+		fd = open(t->word, O_CREAT | O_TRUNC | O_WRONLY);
+	if (t->type == T_DLESS)
+		fd = open(t->word, O_CREAT | O_APPEND | O_WRONLY);
+	return (fd);
 }
 
-void	set_args(t_shell *shell, t_process *p)
+//close_fd print_error 뒤에
+int	open_redirect(t_process *p, t_token *t)
 {
-	// simple cmd로 수정 필요, 지금 t.word type은 redirection 포함한 cmdt.word
-	// printf("enter set args: %s\n", p->t.cmd);
-	p->args = get_cmdargs(p->t.word);
-	if (!p->args)
-		exit_process(shell, NULL, EXTRA_ERROR);
-}
-
-void	set_path(t_shell *shell, t_process *p)
-{
-	p->path = get_cmdpath(shell->data.paths, p->args[0]);
-	if (!p->path)
-		exit_process(shell, NULL, EXTRA_ERROR);
-}
-
-void	set_cmds(t_shell *shell)
-{
-	size_t	index;
-
-	index = 0;
-	while (index < shell->p_size)
-	{
-		set_args(shell, &shell->p[index]);
-		// printf("first commad: %s\n", shell->p[index].args[0]);
-		set_path(shell, &shell->p[index]);
-		// printf("path/command: %s\n", shell->p[index].path);
-		index++;
-	}
-}
-
-void	set_token_process(t_shell *shell, t_token *t, int *index)
-{
-	if (!t)
-		return ;
-	if (t->type == T_SIMPLE_CMD || t->type == T_DGREAT)
-	{
-		// printf("set SIMPLE CMD\n");
-		shell->p[*index].t = *t;
-		(*index)++;
-		return ;
-	}
-	else if (t->type)
-	{
-		if (t->left && t->left->word && t->left->word[0])
-			set_token_process(shell, t->left, index);
-		if (t->right && t->right->word && t->right->word[0])
-			set_token_process(shell, t->right, index);
-	}
-}
-
-void	set_process(t_shell *shell)
-{
-	int	index;
-
-	index = 0;
-	shell->p_size = find_pipe(shell->t) + 1;
-	shell->p = ft_calloc(shell->p_size, sizeof(t_process));
-	if (!shell->p)
-		exit_process(shell, NULL, EXTRA_ERROR);
-	set_token_process(shell, shell->t, &index);
-	// printf("set process\n");
-}
-
-void	open_pipe(t_shell *shell, int index)
-{
-	if (shell->p[index + 1].path)
-	{
-		if (pipe(shell->p[index].fd))
-			exit_process(shell, NULL, EXTRA_ERROR);
-	}
-}
-
-void	close_pipe(t_shell *shell, int index)
-{
-	if (shell->p[index + 1].path)
-		close(shell->p[index].fd[1]);
-}
-
-void	get_child(t_shell *shell, int index)
-{
-	shell->p[index].pid = fork();
-	if (shell->p[index].pid == -1)
-		exit_process(shell, NULL, EXTRA_ERROR);
-	else if (!shell->p[index].pid)
-		child(shell, index);
-	else
-		parent(shell, index);
-}
-
-void	subprocess(t_shell *shell)
-{
-	size_t	index;
-
-	index = 0;
-	printf("execute in child process\n");
-	while (index < shell->p_size)
-	{
-		open_pipe(shell, index);
-		get_child(shell, index);
-		close_pipe(shell, index);
-		index++;
-	}
-}
-
-void	inprocess(t_shell *shell)
-{
-	printf("execute in current process\n");
-	// printf("%s\n", shell->p[0].path);	
-	shell->status = exec_builtin(shell, shell->p[0]);
-}
-
-void	wait_process(t_shell *shell)
-{
-	int	index;
 	int	status;
 
-	index = 0;
-	while (shell->p[index].path)
+	status = EXIT_SUCCESS;
+	if (t->type == T_GREAT || t->type == T_DGREAT || \
+	t->type == T_DLESS ||	t->type == T_LESS)
 	{
-		waitpid(shell->p[index].pid, &status, 0);
-		if (WIFEXITED(status))
-			status = WEXITSTATUS(status);
-		index++;
+		if (p->redirect_fd[t->type % 2])
+			close(p->redirect_fd[t->type % 2]);
+		p->redirect_fd[t->type % 2] = open_token(t);
+		return (p->redirect_fd[t->type % 2]);
 	}
-	shell->status = status;
+	if (t->left)
+		status = open_redirect(p, t->left);
+	if (status >= 0 && t->right)
+		status = open_redirect(p, t->right);
+	return (status);
+}
+
+// pipe = process - 1
+// p[p_size].fd x
+
+void	dup_fd(int *fd, size_t index)
+{
+	dup2(*fd, index);
+	close(*fd);
+	*fd = 0;
+}
+
+void	set_fd(t_shell *shell, size_t index)
+{
+	if (shell->p[index].redirect_fd[0] > 0)
+		dup_fd(&shell->p[index].redirect_fd[0], 0);
+	else if (index)
+		dup_fd(&shell->p[index - 1].pipe_fd[0], 0);
+	if (shell->p[index].redirect_fd[1] > 0)
+		dup_fd(&shell->p[index].redirect_fd[1], 1);
+	else if (index != shell->p_size - 1)
+		dup_fd(&shell->p[index].pipe_fd[1], 1);
+}
+
+void	child(t_shell *shell, size_t index)
+{
+	int	ret;
+
+	if (shell->p[index].pid)
+		return ;
+	if (index != shell->p_size - 1)
+	{
+		close(shell->p[index].pipe_fd[0]);
+		shell->p[index].pipe_fd[0] = 0;
+	}
+	set_fd(shell, index);
+	if (is_builtin(shell->p[index].path))
+	{
+		ret = exec_builtin(shell->p[index], &shell->data);
+		if (!ft_memcmp(shell->p[index].path, "exit", 5) && !ret)
+			ret = shell->data.status;
+		exit_process(shell, NULL, ret);
+	}
+	else
+		exec_program(shell, shell->p[index]);
+}
+
+void	parent(t_shell *shell, size_t index)
+{
+	if (!shell->p[index].pid)
+		return ;
+	if (index != shell->p_size - 1)
+	{
+		close(shell->p[index].pipe_fd[1]);
+		shell->p[index].pipe_fd[1] = 0;
+	}
+	waitpid(shell->p[index].pid, 0, WNOHANG);
 }

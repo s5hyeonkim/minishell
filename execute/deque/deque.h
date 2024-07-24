@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   deque.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
+/*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/03/05 10:50:14 by sohykim           #+#    #+#             */
-/*   Updated: 2024/07/11 12:50:16 by sohykim          ###   ########.fr       */
+/*   Created: 2024/07/23 19:33:19 by sohykim           #+#    #+#             */
+/*   Updated: 2024/07/23 19:33:54 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #ifndef DEQUE_H
@@ -63,11 +63,11 @@ t_deque		*pop_back(t_deques *deques);
 t_deque		*pop_target(t_deques *deqs, t_deque *target);
 
 // pairs with deq
-char    	*get_key(char *str);
+char		*get_key(char *str);
 int			set_map(t_map *keyval, char *str);
 t_deque		*find_deq(t_deques *deq, char *key);
 char		*read_val_deq(t_deques *deq, char *key);
-int 		set_keyval(t_map *keyval, char *key, char mid, char *val);
+int			set_keyval(t_map *keyval, char *key, char mid, char *val);
 
 // utils
 void		print_deques(t_deques *deqs, t_state state);

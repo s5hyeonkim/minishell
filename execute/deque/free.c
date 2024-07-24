@@ -6,7 +6,7 @@
 /*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/11 12:50:25 by sohykim           #+#    #+#             */
-/*   Updated: 2024/07/11 12:50:31 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/07/23 19:37:47 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "deque.h"
@@ -26,11 +26,11 @@ void	free_strs(char **strs)
 	free(strs);
 }
 
-void    free_map(t_map *keyval)
+void	free_map(t_map *keyval)
 {
-    free(keyval->key);
+	free(keyval->key);
 	keyval->key = NULL;
-    free(keyval->val);
+	free(keyval->val);
 	keyval->val = NULL;
 }
 

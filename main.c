@@ -1,5 +1,37 @@
 #include "minishell.h"
 
+void	clean_cmds(t_shell *shell)
+{
+	size_t	index;
+
+	index = 0;
+	while (index < shell->p_size)
+	{
+		if (shell->p[index].redirect_fd[0] > 0)
+		{
+			close(shell->p[index].redirect_fd[0]);
+			shell->p[index].redirect_fd[0] = 0;
+		}
+		if (shell->p[index].redirect_fd[1] > 0)
+		{
+			close(shell->p[index].redirect_fd[1]);
+			shell->p[index].redirect_fd[1] = 0;
+		}
+		if (shell->p[index].pipe_fd[0] > 0)
+		{
+			close(shell->p[index].pipe_fd[0]);
+			shell->p[index].pipe_fd[0] = 0;
+		}
+		if (shell->p[index].pipe_fd[1] > 0)
+		{
+			close(shell->p[index].pipe_fd[1]);
+			shell->p[index].pipe_fd[1] = 0;
+		}
+		index++;
+	}
+	free_cmds(&shell->t, &shell->p, &shell->p_size);
+}
+
 /* parsing and set tokens 수정 필요 */
 void	tokenization(t_shell *shell, t_token *t)
 {
@@ -168,7 +200,7 @@ void	readlines(t_shell *shell, char **buffer)
 void	set_status(t_shell *shell)
 {
 	if (status)
-		shell->status = status;
+		shell->data.status = status;
 	status = 0;
 }
 
@@ -184,24 +216,19 @@ void	loop(t_shell *shell)
 		set_status(shell);
 		set_tokens(shell, buffer);
 		// parselines(shell, buffer);
-		
-		/* exec */
-		set_process(shell);
-		set_cmds(shell);
 		exec_cmds(shell);
-		free_cmds(&shell->t, &shell->p, shell->p_size);
-		set_signal_init(shell, handler_init);
+		clean_cmds(shell);
 	}
 }
 
-// void leaks ()
-// {
-// 	system("leaks minishell");
-// }
+void leaks ()
+{
+	system("leaks minishell");
+}
 
 int	main(int argc, char *argv[], char *envp[])
 {
-	// atexit(leaks);
+	atexit(leaks);
 	t_shell	shell;
 
 	(void)argv;
