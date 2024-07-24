@@ -30,6 +30,8 @@ typedef enum e_err
 	NOT_NUM,
 	EXTRA_ERROR,
 	CMD_NOT_FOUND = 127,
+	SIGEXIT = 128,
+	SYNTAX_ERROR = 258
 }	t_err;
 
 int		handle_error(char *exec, char *obj, int code);
