@@ -49,6 +49,8 @@ void	inprocess(t_shell *shell)
 	shell->data.status = status;
 }
 
+
+
 int   token_to_process(t_shell *shell, t_token *t, size_t *index)
 {
     int         status;
@@ -58,13 +60,15 @@ int   token_to_process(t_shell *shell, t_token *t, size_t *index)
     status = EXIT_SUCCESS;
     if (t->type == T_SIMPLE_CMD)
     {
-        p->args = get_cmdargs(t->word);
+		
+        p->args = get_cmdargs(t->right->argv);
         if (p->args)
-            p->path = get_cmdpath(shell->data.paths, p->args[0]);
-		// printf("args %s\n", shell->p[*index].args[0]);
-        if (!p->args || !p->path || open_redirect(p, t))
-            return (EXTRA_ERROR);
+            p->path = get_cmdpath(shell->data.paths, t->right->word);
+		// for (int i = 0; shell->p[*index].args[i] != 0; i++)
+			// printf("args %s\n", shell->p[*index].args[i]);
 		// printf("path %s\n", shell->p[*index].path);
+        if (!p->args || !p->path || (t->left && open_redirect(p, t->left)))
+            return (EXTRA_ERROR);
         return (EXIT_SUCCESS);
     }
     if (t->left)

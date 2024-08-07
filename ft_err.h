@@ -19,6 +19,8 @@
 # define MSG_SET "not set\n"
 # define MSG_NUM "numeric argument required\n"
 # define MSG_CMD "command not found\n"
+# define MSG_SYN_TOK "syntax error near unexpected token\n"
+# define MSG_SYN_TERM "syntax error: unexpected end of file\n"
 
 typedef enum e_err
 {
@@ -31,7 +33,9 @@ typedef enum e_err
 	EXTRA_ERROR,
 	CMD_NOT_FOUND = 127,
 	SIGEXIT = 128,
-	SYNTAX_ERROR = 258
+	SYNTAX_ERROR = 258,
+	SYN_TOK,
+	SYN_TERM
 }	t_err;
 
 int		handle_error(char *exec, char *obj, int code);

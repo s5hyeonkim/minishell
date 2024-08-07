@@ -3,12 +3,13 @@
 /*                                                        :::      ::::::::   */
 /*   print.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/11 12:51:46 by sohykim           #+#    #+#             */
-/*   Updated: 2024/07/11 12:51:56 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/07/24 20:34:55 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "ft_err.h"
 
 int	ft_putstr_err(t_err code)
@@ -19,6 +20,16 @@ int	ft_putstr_err(t_err code)
 	{
 		ft_putstr_fd(MSG_CMD, STDERR_FILENO);
 		return (code);
+	}
+	else if (code == SYN_TOK)
+	{
+		ft_putstr_fd(MSG_SYN_TOK, STDERR_FILENO);
+		return (SYNTAX_ERROR);
+	}
+	else if (code == SYN_TERM)
+	{
+		ft_putstr_fd(MSG_SYN_TERM, STDERR_FILENO);
+		return (SYNTAX_ERROR);
 	}
 	if (code == EXTRA_ERROR)
 		perror("");

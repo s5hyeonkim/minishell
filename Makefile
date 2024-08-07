@@ -1,5 +1,5 @@
 CC = cc
-CFLAGS = -Wall -Wextra -Werror 
+CFLAGS = -Wall -Wextra -Werror -g
 CPPFLAGS = -I${HOME}/.brew/opt/readline/include -Iminishell.h -Ift_err.h -MMD -MP
 LDFLAGS = -L${HOME}/.brew/opt/readline/lib -Llibft -Lexecute/deque
 LDLIBS = -lreadline -lft -lftdeque
@@ -25,7 +25,10 @@ SRCS = ./main.c \
 		$(EXECDIR)unset.c \
 		$(SRCDIR)signal.c \
 		$(SRCDIR)signal_utils.c \
-		$(SRCDIR)terminal.c
+		$(SRCDIR)terminal.c \
+		$(SRCDIR)parsing.c \
+		$(SRCDIR)quote.c \
+		$(SRCDIR)syntax.c \
 
 OBJS = $(SRCS:.c=.o)
 DEPS = $(SRCS:.c=.d)

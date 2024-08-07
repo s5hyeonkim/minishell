@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   libft.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yubin <yubin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/11 11:35:18 by yubshin           #+#    #+#             */
-/*   Updated: 2024/06/26 18:51:11 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/07/29 15:50:56 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ int			ft_isdigit(int c);
 int			ft_isalnum(int c);
 int			ft_isascii(int c);
 int			ft_isprint(int c);
-int			ft_isspace(char **str);
+int			ft_isspace(int c);
 
 size_t		ft_strlen(const char *str);
 size_t		ft_strlcpy(char *dst, const char *src, size_t dstsize);
@@ -89,6 +89,6 @@ int			ft_malloc_str(char **str, long long malloc_size);
 void		ft_swap(int *a, int *b);
 
 void	free_str(char *str);
-void	free_strs(char **strs);
+// void	free_strs(char **strs);
 
 #endif 

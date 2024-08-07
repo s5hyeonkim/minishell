@@ -47,9 +47,5 @@ void	handler_sub(int signo)
 	if (signo == SIGINT)
 		replace_line(FALSE);
 	if (signo == SIGQUIT)
-	{
-		ft_putstr_fd("Quit: ", STDERR_FILENO);
-		ft_putstr_fd(ft_itoa(signo), STDERR_FILENO);
-		ft_putstr_fd("\n", STDERR_FILENO);
-	}
+		ft_putstr_fd("Quit: 3\n", STDERR_FILENO);
 }

@@ -42,14 +42,6 @@ void	tokenization(t_shell *shell, t_token *t)
 	//tokenization(shell, t->right);
 }
 
-// int	set_token(t_token **t)
-// {
-// 	*t = ft_calloc(1, sizeof(t_token));
-// 	if (*t == NULL)
-// 		return (EXTRA_ERROR);
-// 	return (EXIT_SUCCESS);
-// }
-
 /* token lst */
 int set_token(t_token **t)
 {
@@ -59,50 +51,6 @@ int set_token(t_token **t)
 	return (EXIT_SUCCESS);
 }
 
-t_token *token_lstlast(t_token *t)
-{
-	if (t == NULL)
-		return (NULL);
-	while (t->right != NULL)
-		t = t->right;
-	return (t);
-}
-
-void token_lstadd_back(t_token **t, t_token *newtoken)
-{
-	t_token *lasttoken;
-
-	if (*t == NULL)
-		*t = newtoken;
-	else if (newtoken != NULL)
-	{
-		lasttoken= token_lstlast(*t);
-		lasttoken->right = newtoken; 
-	}
-}
-
-void add_token(t_shell *shell, int type, char *str)
-{
-	t_token *newtoken;
-
-	set_token(&newtoken);
-	newtoken->type = type;
-	newtoken->word = str;
-	token_lstadd_back(&shell->t, newtoken);
-}
-
-
-// int	token_type(char b1, char b2)
-// {
-// 	if (b1 == '|' && b2 != '|') // || : or 연산자  |||이상 : syntax error unexpected token '|'
-// 		return (T_PIPE);
-// 	else if (b1 == '<' && b2 == '<')
-
-// 	else if (b1 == '>' && b2 ==)
-// }
-
-//PIPE WORD 
-
 void	set_tokens(t_shell *shell, char *buffer)
 {
 	if (set_token(&(shell->t)))
@@ -110,27 +58,6 @@ void	set_tokens(t_shell *shell, char *buffer)
 	shell->t->word = buffer;
 	tokenization(shell, shell->t);
 }
-
-// void lexical_analysis(t_shell *shell, char *buffer)
-// {
-// 	// if (set_token(&(shell->t)))
-// 	// 	exit_process(shell, NULL, EXTRA_ERROR);
-// 	// shell->t->word = buffer;
-// 	//토큰 리스트에 추가
-
-// }
-
-
-// void	parselines(t_shell *shell, char *buffer)
-// {
-
-
-// 	// printf("token start %s\n", shell->t->cmd);
-	
-// 	// printf("token end\n");
-
-// 	lexical_analysis(shell, buffer);
-// }
 
 
 /* exit */
@@ -214,8 +141,11 @@ void	loop(t_shell *shell)
 		readlines(shell, &buffer);
 		// printf("buffer: %s\n", buffer);
 		set_status(shell);
-		set_tokens(shell, buffer);
-		// parselines(shell, buffer);
+		// set_tokens(shell, buffer); //make
+		parselines(shell, buffer); //유빈 수정중 
+		// printf("==loop==\n");
+		// print_tree(shell->t, 2, 0);
+
 		exec_cmds(shell);
 		clean_cmds(shell);
 	}
@@ -228,7 +158,7 @@ void leaks ()
 
 int	main(int argc, char *argv[], char *envp[])
 {
-	atexit(leaks);
+	// atexit(leaks);
 	t_shell	shell;
 
 	(void)argv;

@@ -24,6 +24,7 @@
 # include "ft_err.h"
 # include "./execute/deque/deque.h"
 # include "./execute/execute.h"
+# include "./src/parsing.h"
 # define PATH_MAX 1024
 
 // # define PROMPT_MSG "minishell$ "
@@ -33,30 +34,6 @@ volatile int	status;
 typedef struct sigaction t_sigaction;
 typedef	struct termios	t_termios;
 
-# define PIPE '|'
-
-typedef enum e_typeno
-{
-	T_NULL,
-	T_PIPE,
-	T_SIMPLE_CMD,
-	T_CMD_WORD, //cmd, filename, hereend 
-	T_IO_REDIRECTS, //redirects
-	T_DLESS,		// >>
-	T_DGREAT,		// <<
-	T_LESS,			// >
-	T_GREAT, 		// < 
-	T_DOUBLE_QUOTES,
-	T_SINGLE_QUOTES
-}	t_typeno;
-
-typedef struct s_token
-{
-	t_typeno		type;
-	char			*word; //cmd, filename, hereend 
-	struct s_token	*left;
-	struct s_token	*right;
-}	t_token;
 
 typedef struct s_shell
 {
@@ -128,5 +105,8 @@ char	**get_cmdargs(char *cmd);
 int		open_redirect(t_process *p, t_token *t);
 void	open_pipe(t_shell *shell, size_t index);
 size_t	find_pipe(t_token *t);
+
+/* parsing.c */
+void	parselines(t_shell *shell, char *buffer);
 
 #endif

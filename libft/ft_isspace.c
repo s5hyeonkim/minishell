@@ -6,28 +6,14 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/28 21:54:47 by yubshin           #+#    #+#             */
-/*   Updated: 2024/05/28 21:58:18 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/07/19 16:11:17 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-int ft_isspace(char **str)
+int	ft_isspace(int c)
 {
-	int i;
-	int j;
-	
-	i = 0;
-	while (str && str[i])	
-	{
-		j = 0;
-		while (str[i] && str[i][j])
-		{
-			if (str[i][j] == ' ')
-				return (1);
-			j++;
-		}
-		i++;
-	}
-	return (0);
+	return (c == ' ' || c == '\t' || c == '\n' || \
+			c == '\v' || c == '\f' || c == '\r');
 }

@@ -3,12 +3,13 @@
 /*                                                        :::      ::::::::   */
 /*   deque.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 19:33:19 by sohykim           #+#    #+#             */
-/*   Updated: 2024/07/23 19:33:54 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/07/29 15:49:48 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #ifndef DEQUE_H
 # define DEQUE_H
 # include "../../libft/libft.h"
