@@ -40,7 +40,7 @@ char	*read_val_strs(char *strs[], char *key)
 	}
 	return (ret);
 }
-
+// echo 스페이스바 구분 없애주기
 int	ft_echo(t_process p, t_data *d)
 {
 	int	index;
@@ -50,11 +50,7 @@ int	ft_echo(t_process p, t_data *d)
 	if (is_no_nl(p.args[1]))
 		index++;
 	while (p.args[index])
-	{
-		ft_putstr_fd(p.args[index], p.redirect_fd[1]);
-		if (p.args[++index])
-			ft_putchar_fd(' ', p.redirect_fd[1]);
-	}
+		ft_putstr_fd(p.args[index++], p.redirect_fd[1]);
 	if (!is_no_nl(p.args[1]))
 		ft_putchar_fd('\n', p.redirect_fd[1]);
 	return (EXIT_SUCCESS);

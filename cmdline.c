@@ -99,6 +99,7 @@ int	set_parsing_deques(t_deques *deqs, char *cmd)
 	}
 	return (EXIT_SUCCESS);
 }
+// argv 파싱할때 가공하는거에서 quotation 없으면 가공안하는 걸로 바꿔주기
 
 char	**get_cmdargs(char **cmds)
 {
@@ -112,7 +113,8 @@ char	**get_cmdargs(char **cmds)
 		return (NULL);
 	while (cmds[index])
 	{
-		if (set_parsing_deques(deqs, cmds[index]))
+		if ((ft_strchr(cmds[index], '\'') || ft_strchr(cmds[index], '\"')) \
+		&& set_parsing_deques(deqs, cmds[index]))
 		{
 			free_deques(&deqs);
 			return (NULL);

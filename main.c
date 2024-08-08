@@ -7,22 +7,22 @@ void	clean_cmds(t_shell *shell)
 	index = 0;
 	while (index < shell->p_size)
 	{
-		if (shell->p[index].redirect_fd[0] > 0)
+		if (shell->p[index].redirect_fd[0] > 2)
 		{
 			close(shell->p[index].redirect_fd[0]);
 			shell->p[index].redirect_fd[0] = 0;
 		}
-		if (shell->p[index].redirect_fd[1] > 0)
+		if (shell->p[index].redirect_fd[1] > 2)
 		{
 			close(shell->p[index].redirect_fd[1]);
 			shell->p[index].redirect_fd[1] = 0;
 		}
-		if (shell->p[index].pipe_fd[0] > 0)
+		if (shell->p[index].pipe_fd[0] > 2)
 		{
 			close(shell->p[index].pipe_fd[0]);
 			shell->p[index].pipe_fd[0] = 0;
 		}
-		if (shell->p[index].pipe_fd[1] > 0)
+		if (shell->p[index].pipe_fd[1] > 2)
 		{
 			close(shell->p[index].pipe_fd[1]);
 			shell->p[index].pipe_fd[1] = 0;
@@ -143,9 +143,9 @@ void	loop(t_shell *shell)
 		set_status(shell);
 		// set_tokens(shell, buffer); //make
 		parselines(shell, buffer); // parseline에서 malloc실패 등 에러나면 continue 분기문 만들어주기
-		// printf("==loop==\n");
-		// print_tree(shell->t, 2, 0);
-		// printf("========\n");
+		printf("==loop==\n");
+		print_tree(shell->t, 2, 0);
+		printf("========\n");
 
 		exec_cmds(shell);
 		clean_cmds(shell);

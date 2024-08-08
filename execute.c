@@ -29,6 +29,7 @@ int	open_token(t_token *t)
 		fd = open(t->word, O_CREAT | O_TRUNC | O_WRONLY, 0666);
 	if (t->type == T_DLESS)
 		fd = open(t->word, O_CREAT | O_APPEND | O_WRONLY, 0666);
+	printf("t->word: %s %d\n", t->word, fd);
 	return (fd);
 }
 
@@ -43,7 +44,7 @@ int	open_redirect(t_process *p, t_token *t)
 	if (t->type == T_GREAT || t->type == T_DGREAT || \
 	t->type == T_DLESS ||	t->type == T_LESS)
 	{
-		if (p->redirect_fd[t->type % 2])
+		if (p->redirect_fd[t->type % 2] > 0)
 			close(p->redirect_fd[t->type % 2]);
 		p->redirect_fd[t->type % 2] = open_token(t);
 		return (p->redirect_fd[t->type % 2]);
@@ -52,6 +53,7 @@ int	open_redirect(t_process *p, t_token *t)
 		status = open_redirect(p, t->left);
 	if (status >= 0 && t->right)
 		status = open_redirect(p, t->right);
+	printf("word %s, in %d out %d\n", p->path, p->redirect_fd[0], p->redirect_fd[1]);
 	return (status);
 }
 
@@ -67,13 +69,13 @@ void	dup_fd(int *fd, int std)
 void	set_fd(t_shell *shell, size_t index)
 {
 	printf("red: input %d output %d\n", shell->p[index].redirect_fd[0], shell->p[index].redirect_fd[1]);
-	if (shell->p[index].redirect_fd[0] > 0)
+	if (shell->p[index].redirect_fd[0] > 2)
 		dup_fd(&shell->p[index].redirect_fd[0], 0);
-	else if (index)
+	else if (index && shell->p[index - 1].pipe_fd[0])
 		dup_fd(&shell->p[index - 1].pipe_fd[0], 0);
-	if (shell->p[index].redirect_fd[1] > 0)
+	if (shell->p[index].redirect_fd[1] > 2)
 		dup_fd(&shell->p[index].redirect_fd[1], 1);
-	else if (index != shell->p_size - 1)
+	else if (index != shell->p_size - 1 && shell->p[index].pipe_fd[1])
 		dup_fd(&shell->p[index].pipe_fd[1], 1);
 }
 
@@ -88,7 +90,6 @@ void	child(t_shell *shell, size_t index)
 		close(shell->p[index].pipe_fd[0]);
 		shell->p[index].pipe_fd[0] = 0;
 	}
-	// printf("pindex: %zu %zu\n", index, shell->p_size);
 	set_fd(shell, index);
 	if (is_builtin(shell->p[index].path))
 	{
@@ -105,7 +106,7 @@ void	parent(t_shell *shell, size_t index)
 {
 	if (!shell->p[index].pid)
 		return ;
-	if (index != shell->p_size - 1)
+	if (index && index != shell->p_size - 1)
 	{
 		close(shell->p[index].pipe_fd[1]);
 		shell->p[index].pipe_fd[1] = 0;
