@@ -39,6 +39,7 @@ void	inprocess(t_shell *shell)
 
 	// printf("execute in current process\n");
 	// printf("%s\n", shell->p[0].path);
+	set_fd(shell, 0);
 	status = exec_builtin(shell->p[0], &shell->data);
 	if (!ft_memcmp(shell->p[0].args[0], "exit", 5) && !status)
 	{
@@ -49,6 +50,29 @@ void	inprocess(t_shell *shell)
 	shell->data.status = status;
 }
 
+char	**debug(char *path, char **args)
+{
+	size_t	index;
+	size_t	size;
+	size_t	add;
+	char	**debug;
+
+	index = 0;
+	size = 0;
+	add = 0;
+	while (args[size])
+		size++;
+	debug = ft_calloc(size + 2 , sizeof(char *));
+	if (ft_memcmp(path, args[0], ft_strlen(path) + 1))
+		debug[add++] = ft_strdup(path);
+	while (index < size)
+	{
+		debug[index + add] = args[index];
+		index++;
+	}
+	debug[++index] = 0;
+	return debug;
+}
 
 
 int   token_to_process(t_shell *shell, t_token *t, size_t *index)
@@ -64,10 +88,11 @@ int   token_to_process(t_shell *shell, t_token *t, size_t *index)
         p->args = get_cmdargs(t->right->argv);
         if (p->args)
             p->path = get_cmdpath(shell->data.paths, t->right->word);
+		// p->args = debug(t->right->word, p->args);
 		// for (int i = 0; shell->p[*index].args[i] != 0; i++)
-			// printf("args %s\n", shell->p[*index].args[i]);
+			// printf("i: %d args %s\n", i, shell->p[*index].args[i]);
 		// printf("path %s\n", shell->p[*index].path);
-        if (!p->args || !p->path || (t->left && open_redirect(p, t->left)))
+        if (!p->args || !p->path || open_redirect(p, t->left) == -1)
             return (EXTRA_ERROR);
         return (EXIT_SUCCESS);
     }
@@ -75,6 +100,7 @@ int   token_to_process(t_shell *shell, t_token *t, size_t *index)
         status = token_to_process(shell, t->left, index);
     if (!status && t->right)
         status = token_to_process(shell, t->right, index);
+	// printf("ok ttop %d\n", status);
     return (status);
 }
 

@@ -26,9 +26,9 @@ int	open_token(t_token *t)
 	if (t->type == T_GREAT || t->type == T_DGREAT)
 		fd = open(t->word, O_RDONLY);
 	if (t->type == T_LESS)
-		fd = open(t->word, O_CREAT | O_TRUNC | O_WRONLY);
+		fd = open(t->word, O_CREAT | O_TRUNC | O_WRONLY, 0666);
 	if (t->type == T_DLESS)
-		fd = open(t->word, O_CREAT | O_APPEND | O_WRONLY);
+		fd = open(t->word, O_CREAT | O_APPEND | O_WRONLY, 0666);
 	return (fd);
 }
 
@@ -58,22 +58,25 @@ int	open_redirect(t_process *p, t_token *t)
 // pipe = process - 1
 // p[p_size].fd x
 
-void	dup_fd(int *fd, size_t index)
+void	dup_fd(int *fd, int std)
 {
-	dup2(*fd, index);
+	if (*fd <= 2)
+		return ;
+	dup2(*fd, std);
 	close(*fd);
 	*fd = 0;
 }
 
 void	set_fd(t_shell *shell, size_t index)
 {
+	// printf("red: input %d output %d\n", shell->p[index].redirect_fd[0], shell->p[index].redirect_fd[1]);
 	if (shell->p[index].redirect_fd[0] > 0)
 		dup_fd(&shell->p[index].redirect_fd[0], 0);
 	else if (index)
 		dup_fd(&shell->p[index - 1].pipe_fd[0], 0);
 	if (shell->p[index].redirect_fd[1] > 0)
 		dup_fd(&shell->p[index].redirect_fd[1], 1);
-	else if (index != shell->p_size - 1)
+	else if (index && index != shell->p_size - 1)
 		dup_fd(&shell->p[index].pipe_fd[1], 1);
 }
 
@@ -88,6 +91,7 @@ void	child(t_shell *shell, size_t index)
 		close(shell->p[index].pipe_fd[0]);
 		shell->p[index].pipe_fd[0] = 0;
 	}
+	// printf("pindex: %zu %zu\n", index, shell->p_size);
 	set_fd(shell, index);
 	if (is_builtin(shell->p[index].path))
 	{
