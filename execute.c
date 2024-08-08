@@ -55,9 +55,6 @@ int	open_redirect(t_process *p, t_token *t)
 	return (status);
 }
 
-// pipe = process - 1
-// p[p_size].fd x
-
 void	dup_fd(int *fd, int std)
 {
 	if (*fd <= 2)
@@ -69,14 +66,14 @@ void	dup_fd(int *fd, int std)
 
 void	set_fd(t_shell *shell, size_t index)
 {
-	// printf("red: input %d output %d\n", shell->p[index].redirect_fd[0], shell->p[index].redirect_fd[1]);
+	printf("red: input %d output %d\n", shell->p[index].redirect_fd[0], shell->p[index].redirect_fd[1]);
 	if (shell->p[index].redirect_fd[0] > 0)
 		dup_fd(&shell->p[index].redirect_fd[0], 0);
 	else if (index)
 		dup_fd(&shell->p[index - 1].pipe_fd[0], 0);
 	if (shell->p[index].redirect_fd[1] > 0)
 		dup_fd(&shell->p[index].redirect_fd[1], 1);
-	else if (index && index != shell->p_size - 1)
+	else if (index != shell->p_size - 1)
 		dup_fd(&shell->p[index].pipe_fd[1], 1);
 }
 
@@ -100,7 +97,7 @@ void	child(t_shell *shell, size_t index)
 			ret = shell->data.status;
 		exit_process(shell, NULL, ret);
 	}
-	else
+	else 
 		exec_program(shell, shell->p[index]);
 }
 

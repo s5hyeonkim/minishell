@@ -69,7 +69,7 @@ void	close_pipe(t_shell *shell, int index);
 void	subprocess(t_shell *shell);
 void	inprocess(t_shell *shell);
 void   	exec_cmds(t_shell *shell);
-void	set_fd(t_shell *shell, size_t index);
+void	dup_fd(int *fd, int std);
 
 /* free.c */
 void		free_token(t_token *t);

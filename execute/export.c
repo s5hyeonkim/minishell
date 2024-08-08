@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 #include "execute.h"
 
-static void	print_export(char *strs[])
+static void	print_export(char *strs[], int write)
 {
 	int		index;
 	size_t	size;
@@ -19,17 +19,17 @@ static void	print_export(char *strs[])
 	index = 0;
 	while (strs[index])
 	{
-		ft_putstr_fd("export ", STDOUT_FILENO);
+		ft_putstr_fd("export ", write);
 		if (!ft_strchr(strs[index], '='))
-			ft_putendl_fd(strs[index], STDOUT_FILENO);
+			ft_putendl_fd(strs[index], write);
 		else
 		{
 			size = ft_strchr(strs[index], '=') - strs[index];
 			strs[index][size] = 0;
-			ft_putstr_fd(strs[index], STDOUT_FILENO);
-			ft_putstr_fd("=\"", STDOUT_FILENO);
-			ft_putstr_fd(strs[index] + size + 1, STDOUT_FILENO);
-			ft_putendl_fd("\"", STDOUT_FILENO);
+			ft_putstr_fd(strs[index], write);
+			ft_putstr_fd("=\"", write);
+			ft_putstr_fd(strs[index] + size + 1, write);
+			ft_putendl_fd("\"", write);
 			strs[index][size] = '=';
 		}
 		index++;
@@ -92,7 +92,7 @@ int	ft_export(t_process p, t_data *d)
 		if (!envs)
 			return (handle_error(p.args[0], NULL, EXTRA_ERROR));
 		ft_sort(envs);
-		print_export(envs);
+		print_export(envs, p.redirect_fd[1]);
 		free_strs(envs);
 		return (status);
 	}

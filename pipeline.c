@@ -7,7 +7,7 @@ size_t	find_pipe(t_token *t)
 	if (!t)
 		return (0);
 	pipe_num = 0;
-	if (t->type == T_PIPE)
+	if (t->type == T_PIPE && t->right)
 		pipe_num++;
 	pipe_num += find_pipe(t->left);
 	pipe_num += find_pipe(t->right);

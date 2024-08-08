@@ -33,13 +33,30 @@ void	subprocess(t_shell *shell)
 	set_signal_init(shell, handler_init);
 }
 
+void	set_fd_builtin(t_process *p)
+{
+	int	fd_in;
+	int	fd_out;
+
+	fd_in = dup(STDOUT_FILENO);
+	fd_out = dup(STDIN_FILENO);
+	if (p->redirect_fd[0] > 0)
+		dup_fd(&p->redirect_fd[0], fd_in);
+	if (p->redirect_fd[1] > 0)
+		dup_fd(&p->redirect_fd[1], fd_out);
+	p->redirect_fd[0] = fd_in;
+	p->redirect_fd[1] = fd_out;
+}
+
 void	inprocess(t_shell *shell)
 {
 	long	status;
 
-	// printf("execute in current process\n");
+	printf("execute in current process\n");
 	// printf("%s\n", shell->p[0].path);
-	set_fd(shell, 0);
+	// for (int i = 0; shell->p[0].args[i]; i++)
+		// printf("%s\n", shell->p[0].args[i]);
+	set_fd_builtin(shell->p);
 	status = exec_builtin(shell->p[0], &shell->data);
 	if (!ft_memcmp(shell->p[0].args[0], "exit", 5) && !status)
 	{
@@ -109,7 +126,7 @@ void    exec_cmds(t_shell *shell)
     size_t  index;
 
     index = 0;
-    shell->p_size = find_pipe(shell->t);
+    shell->p_size = find_pipe(shell->t) + 1;
     shell->p = ft_calloc(shell->p_size + 1, sizeof(t_process));
     if (!shell->p || token_to_process(shell, shell->t, &index))
     {

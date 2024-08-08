@@ -51,11 +51,11 @@ int	ft_echo(t_process p, t_data *d)
 		index++;
 	while (p.args[index])
 	{
-		ft_putstr_fd(p.args[index], 1);
+		ft_putstr_fd(p.args[index], p.redirect_fd[1]);
 		if (p.args[++index])
-			ft_putchar_fd(' ', 1);
+			ft_putchar_fd(' ', p.redirect_fd[1]);
 	}
 	if (!is_no_nl(p.args[1]))
-		ft_putchar_fd('\n', 1);
+		ft_putchar_fd('\n', p.redirect_fd[1]);
 	return (EXIT_SUCCESS);
 }
