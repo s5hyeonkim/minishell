@@ -261,11 +261,11 @@ char *get_token_trim(char *str)
 {
 	char	*old_str;
 	
-	if (ft_strchr(str, ' ') || ft_strchr(str, '|'))
+	if (ft_strchr(str, SPACE) || ft_strchr(str, PIPE))
 	{
 		old_str = str;
 		str = ft_strtrim(str, " |");
-		free(old_str);
+		free (old_str);
 	}
 	return (str);
 }
@@ -293,11 +293,11 @@ char *trim_quote(char *str)
 	new_str = NULL;
 	while (str && *str)
 	{
-		char *next = find_wordend(str, 0, 0);
+		char *next = find_wordend(str, 0, 0) + 1;
 		// printf("next: %s\n", next);
 		if (next)
 		{
-			len = next + 1 - str;
+			len = next - str;
 			// printf("len2: %d\n", len);
 			if ((*str == SGL_QUOTE || *str == DBL_QUOTE))
 				new_str = substr_strjoin(str + 1, new_str, 0, len - 2);
@@ -388,7 +388,6 @@ char *replace_word(t_deques *deqs, char *str)
 	(void) str;
 	char *new_str;
 
-	// new_str = str;
 	new_str = get_token_trim(str);
 	// printf("new_str: %s\n", new_str);
 	new_str = replace_envp(deqs, new_str);
@@ -423,34 +422,12 @@ char *get_filename(char *str, int typeno)
 	return (filename);
 }
 
-int token_redirect(t_shell *shell, char *str)
+int wordlen(char *str, int space_opt)
 {
-	int		typeno;
-	char	*filename;
-	int		filename_len;
-
-	while(*str)
-	{
-		str = find_redirect_start(str);	// printf("redirect start: %s\n", str);
-		typeno = read_redirect_typeno(str);
-		str = find_filename_start(str);
-		filename = get_filename(str, typeno);
-		if (!filename)
-			return (status);
-		if (typeno >= T_DLESS && typeno <= T_GREAT)
-		{
-			filename_len = find_wordend(str, SPACE, 1) - str + 1;
-			filename = replace_word(shell->data.envps, filename);
-			add_token(shell, typeno, filename, NULL);
-			str += filename_len;
-		}
-		else
-			str++;
-		// printf("filename_lne: %d\n", filename_len);
-	}
-	// printf("ok10\n");
-	return (EXIT_SUCCESS);
+	return ( find_wordend(str, space_opt, 1) - str + 1);
 }
+
+
 
 
 char *get_words(char *dst_words, char *str, int len)
@@ -480,7 +457,7 @@ int	count_argv(char *argv)
 	n = 0;
 	index = 0;
 	// printf(">%s#\n", argv);
-	while (*argv)
+	while (argv && *argv)
 	{
 		n++;
 		argv = find_wordend(argv, SPACE, 0);
@@ -519,6 +496,33 @@ char **get_argvs(char *word, char *argv)
 	return (argvs);
 }
 
+int token_redirect(t_shell *shell, char *str)
+{
+	int		typeno;
+	char	*filename;
+	int		filenamelen;
+
+	while(*str)
+	{
+		str = find_redirect_start(str);	// printf("redirect start: %s\n", str);
+		typeno = read_redirect_typeno(str);
+		str = find_filename_start(str);
+		filename = get_filename(str, typeno);
+		if (!filename)
+			return (status);
+		if (typeno >= T_DLESS && typeno <= T_GREAT)
+		{
+			filenamelen = wordlen(str, SPACE);
+			filename = replace_word(shell->data.envps, filename);
+			add_token(shell, typeno, filename, NULL);
+			str += filenamelen;
+		}
+		else
+			str++;
+	}
+	return (EXIT_SUCCESS);
+}
+
 void token_word(t_shell *shell, char *str)
 {
 	char	*words;
@@ -533,10 +537,9 @@ void token_word(t_shell *shell, char *str)
 	words = NULL;
 	while (*str)
 	{
-		len = 0;
-		while(str[len] && str[len] != LESS && str[len] != GREAT)
-			len++;
-		words = get_words(words, str, len);
+		len = find_redirect_start(str) - str;
+		if (len > 0)
+			words = get_words(words, str, len);
 		str += len;
 		// printf("get_words len:%d\n", len);
 		if (*str)
@@ -565,9 +568,9 @@ void token_word(t_shell *shell, char *str)
 		argv = ft_substr(words + len, 0, ft_strlen(words + len));
 		// printf("words + len = %s\n", argv);
 		// printf("word: %s\n", word);
-		// printf("argv: %s\n", argv);
 		word = replace_word(shell->data.envps, word);
 		argv = replace_word(shell->data.envps, argv);
+		// printf("argv: %s\n", argv);
 		char **argvs = get_argvs(word, argv);
 		// free(words);
 		add_token(shell, T_CMD_WORD, word, argvs);
@@ -578,31 +581,6 @@ void token_pipe(t_shell *shell)
 {
 	add_token(shell, T_PIPE, NULL, NULL);
 }
-
-
-// void	tokentrim(t_token *token)
-// {
-// 	char *old_word;
-// 	char *old_argv;
-
-// 	while (token)
-// 	{
-// 		if (token->word)
-// 		{
-// 			old_word = token->word;
-// 			token->word = ft_strtrim(token->word, " ");
-// 			free(old_word);
-// 		}
-// 		if (token->argv)
-// 		{
-// 			old_argv = token->argv;
-// 			token->argv = ft_strtrim(token->argv, " ");
-// 			free(old_argv);
-// 		}
-// 		token = token->right;
-// 	}
-// }
-
 
 int tokenizer(t_shell *shell, char **strs)
 {
