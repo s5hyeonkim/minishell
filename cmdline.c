@@ -100,16 +100,24 @@ int	set_parsing_deques(t_deques *deqs, char *cmd)
 	return (EXIT_SUCCESS);
 }
 
-char	**get_cmdargs(char *cmd)
+char	**get_cmdargs(char **cmds)
 {
 	t_deques	*deqs;
+	size_t		index;
 	char		**strs;
 
 	deqs = create_deques();
-	if (!deqs || set_parsing_deques(deqs, cmd))
-	{
-		free_deques(&deqs);
+	index = 0;
+	if (!deqs)
 		return (NULL);
+	while (cmds[index])
+	{
+		if (set_parsing_deques(deqs, cmds[index]))
+		{
+			free_deques(&deqs);
+			return (NULL);
+		}
+		index++;
 	}
 	strs = deqtostrs(deqs);
 	// printf("%s\n", strs[0]);

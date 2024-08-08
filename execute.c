@@ -38,6 +38,8 @@ int	open_redirect(t_process *p, t_token *t)
 	int	status;
 
 	status = EXIT_SUCCESS;
+	if (!t)
+		return (EXIT_SUCCESS);
 	if (t->type == T_GREAT || t->type == T_DGREAT || \
 	t->type == T_DLESS ||	t->type == T_LESS)
 	{
