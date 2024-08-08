@@ -424,7 +424,7 @@ char *get_filename(char *str, int typeno)
 
 int wordlen(char *str, int space_opt)
 {
-	return ( find_wordend(str, space_opt, 1) - str + 1);
+	return (find_wordend(str, space_opt, 1) - str + 1);
 }
 
 
@@ -454,16 +454,14 @@ int	count_argv(char *argv)
 	size_t	index;
 
 	size = ft_strlen(argv);
-	n = 0;
+	n = 1;
 	index = 0;
-	// printf(">%s#\n", argv);
 	while (argv && *argv)
 	{
 		n++;
 		argv = find_wordend(argv, SPACE, 0);
 		if (argv)
 			argv++;
-		// printf(">>%s\n", argv);
 	}
 	return (n);
 }
@@ -472,27 +470,38 @@ int	count_argv(char *argv)
 char **get_argvs(char *word, char *argv)
 {
 	char	**argvs;
-	char 	*next;
+	// char 	*next;
 	int		n; 
 	int		i;
+	int		len;
 
-	n = count_argv(argv) + 1;
-	// printf("%d\n", n);
-	argvs = ft_calloc(n, sizeof(char *));
+	n = count_argv(argv);
+	argvs = ft_calloc(++n, sizeof(char *));
 	argvs[0] = ft_strdup(word);
+	// printf("argvs[0]: %s\n", argvs[0]);
 	// argvs[1] = 0;
 	i = 1;
 	while (i < n && argv)
 	{
+		// printf("argvs[0]: %s\n", argvs[0]);
+
 		// printf("argv: %s\n", argv);
-		next = find_wordend(argv, SPACE, 0) + 1;
-		// printf("next-argv: %ld\n", next - argv);
-		argvs[i] = ft_substr(argv, 0, next - argv);
-		argv = next;
+		len = wordlen(argv, SPACE);
+		// printf("len: %d\n", len);
+		if (len > 0)
+			argvs[i++] = ft_substr(argv, 0, len);
+		else 
+			break;
+		argv += len;
 		// printf("argvs: %s\n", argvs[i]);
-		i++;
 	}
-	argvs[i] = 0;
+	// printf("i: %d\n", i);
+	// // if (i != 1)
+	// printf("n: %d\n", n);
+
+	// // argvs[i] = "\0";
+	// printf("argvs[0]: %s\n", argvs[0]);
+	
 	return (argvs);
 }
 
@@ -567,9 +576,9 @@ void token_word(t_shell *shell, char *str)
 		word = ft_substr(words, 0, len);
 		argv = ft_substr(words + len, 0, ft_strlen(words + len));
 		// printf("words + len = %s\n", argv);
-		// printf("word: %s\n", word);
 		word = replace_word(shell->data.envps, word);
 		argv = replace_word(shell->data.envps, argv);
+		// printf("word: %s\n", word);
 		// printf("argv: %s\n", argv);
 		char **argvs = get_argvs(word, argv);
 		// free(words);
