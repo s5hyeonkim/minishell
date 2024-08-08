@@ -29,6 +29,8 @@ SRCS = ./main.c \
 		$(SRCDIR)parsing.c \
 		$(SRCDIR)quote.c \
 		$(SRCDIR)syntax.c \
+		$(SRCDIR)tlst.c \
+		$(SRCDIR)debug.c \
 
 OBJS = $(SRCS:.c=.o)
 DEPS = $(SRCS:.c=.d)

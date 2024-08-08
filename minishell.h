@@ -101,7 +101,7 @@ void	tokenization(t_shell *shell, t_token *t);
 void	parent(t_shell *shell, size_t index);
 void	child(t_shell *shell, size_t index);
 char	*get_cmdpath(char **paths, char *cmd);
-char	**get_cmdargs(char *cmd);
+char	**get_cmdargs(char **cmd);
 int		open_redirect(t_process *p, t_token *t);
 void	open_pipe(t_shell *shell, size_t index);
 size_t	find_pipe(t_token *t);

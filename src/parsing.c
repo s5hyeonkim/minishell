@@ -1,59 +1,8 @@
 #include "../minishell.h"
 
 // /* token lst */
-t_token *tlst_lastright(t_token *t)
-{
-	if (t == NULL)
-		return (NULL);
-	while (t->right != NULL)
-		t = t->right;
-	return (t);
-}
 
-t_token *tlst_lastleft(t_token *t)
-{
-	if (t == NULL)
-		return (NULL);
-	while (t->left != NULL)
-		t = t->left;
-	return (t);
-}
-
-void tlst_addright(t_token **t, t_token *newtoken)
-{
-	t_token *lasttoken;
-
-	if (*t == NULL)
-		*t = newtoken;
-	else if (newtoken != NULL)
-	{
-		lasttoken= tlst_lastright(*t);
-		lasttoken->right = newtoken; 
-		// if (lasttoken)
-		// 	newtoken->left = lasttoken;
-		// else 
-		// 	newtoken->left = NULL;
-		// printf("left: %p\n", newtoken->left);
-		// printf("now: %p\n", newtoken);
-		// printf("right: %p\n", newtoken->right);
-	}
-}
-
-void tlst_addleft(t_token **t, t_token *newtoken)
-{
-	t_token *lasttoken;
-
-	if (*t == NULL)
-		*t = newtoken;
-	else if (newtoken != NULL)
-	{
-		lasttoken= tlst_lastleft(*t);
-		lasttoken->left = newtoken; 
-		// newtoken->right = lasttoken;
-	}
-}
-
-void add_token(t_shell *shell, int type, char *word, char *argv)
+void add_token(t_shell *shell, int type, char *word, char **argv)
 {
 	t_token *newtoken;
 
@@ -65,31 +14,9 @@ void add_token(t_shell *shell, int type, char *word, char *argv)
 	tlst_addright(&shell->t, newtoken);
 }
 
-/* syntax error */
-/*
-pipe - pipe밖에 없는 열이면 syntax err
-	 - pipe로 끝나면 추가 입력 받음 
-redirect - redirect 다음에 redirect/pipe를 제외한 filename 없으면 syntax err
-	ㄴ rediect/pipe
-	ㄴ newline
-*/
-
-//lexlst의 마지막의 직전 리스트의 조건을 확인한 후 syntax error 여부 확인
-// int is_syntax_error(t_token *lexlst)
-// {
-// 	t_token *last_lexlst;
-
-// 	last_lexlst = tlst_lastright(lexlst);
-// 	if (is_control_operator(lexlst->left->type))
-// 		return (SYNTAX_ERROR); //exit로 바꾸기 
-// 	if (is_redirect_operator(lexlst->left->type))
-// 		return (SYNTAX_ERROR);
-// 	return (0);
-// }
-
 int count_pipe(char *buffer)
 {
-	int n;
+	int	n;
 
 	n = 1;
 	while (buffer && *buffer)
@@ -98,22 +25,16 @@ int count_pipe(char *buffer)
 		{
 			if (*(buffer + 1))
 			{	
-				buffer = next_word(buffer, 0, 1) + 1 - 1;
+				buffer = find_wordend(buffer, 0, 1) + 1 - 1;
 				// printf("buffer: %s\n", buffer);
 				if (!buffer)
-				{
-					// printf("ok1\n");
 					break ;
-				}
-				// printf("ok2\n");
 			}
 		}
 		else if (*buffer == PIPE)
 			n++;
 		buffer++;
 	}
-	// printf("ok3\n");
-	// printf("%d\n", n);
 	return (n);
 }
 
@@ -123,7 +44,7 @@ char *next_pipe(char *buffer)
 	{	
 		if (*buffer == SGL_QUOTE || *buffer == DBL_QUOTE)
 		{
-			buffer = next_word(buffer, 0, 1) + 1 - 1;
+			buffer = find_wordend(buffer, 0, 1) + 1 - 1;
 			if (!buffer)
 				return (buffer + 1);
 			// continue;
@@ -237,13 +158,11 @@ char **split_pipe(char *buffer)
 	int		index;
 	int		strlen;
 
-
 	if (!buffer)
 		return (NULL);
 	pipe_num = count_pipe(buffer);
 	strs = ft_calloc(pipe_num + 1, sizeof(char *));
 	index = 0;
-
 	while (index < pipe_num)
 	{
 		while (ft_isspace(*buffer))
@@ -256,15 +175,36 @@ char **split_pipe(char *buffer)
 	return (strs);
 }
 
-
-int ft_isreserved(char chr)
+int ft_isredirect(char chr)
 {
-	if (chr == LESS || chr == GREAT || chr == PIPE)
+	if (chr == LESS || chr == GREAT)
 		return (TRUE);
 	return (FALSE);
 }
 
-char *next_redirect(char *str)
+int ft_ispipe(char chr)
+{
+	if (chr == PIPE)
+		return (TRUE);
+	return (FALSE);
+}
+
+
+int ft_isresword(char chr)
+{
+	if (ft_isredirect(chr) || ft_ispipe(chr))
+		return (TRUE);
+	return (FALSE);
+}
+
+char *find_redirect_start(char *str)
+{
+	while (*str && !ft_isredirect(*str))
+		str++;
+	return (str);
+}
+
+char *find_filename_start(char *str)
 {
 	while (ft_isspace(*str))
 		str++;
@@ -279,10 +219,9 @@ char *next_redirect(char *str)
 	return (str);
 }
 
+//redirect의 typeno을 읽어주는 함수 
 int read_redirect_typeno(char *str)
 {
-	while (ft_isspace(*str))
-		str++;
 	if (*str == LESS && *(str + 1) == LESS)
 		return(T_DLESS);
 	else if (*str == GREAT && *(str + 1) == GREAT)
@@ -296,8 +235,8 @@ int read_redirect_typeno(char *str)
 
 int handle_empty_redirect(char *str)
 {
-	str = next_redirect(str);
-	if (ft_isreserved(*str) == TRUE)
+	str = find_filename_start(str);
+	if (ft_isresword(*str) == TRUE)
 	{	
 		*(str + 1) = '\0';
 		status = handle_error(NULL, str, SYN_TOK);
@@ -354,7 +293,7 @@ char *trim_quote(char *str)
 	new_str = NULL;
 	while (str && *str)
 	{
-		char *next = next_word(str, 0, 0);
+		char *next = find_wordend(str, 0, 0);
 		// printf("next: %s\n", next);
 		if (next)
 		{
@@ -459,6 +398,30 @@ char *replace_word(t_deques *deqs, char *str)
 	return (new_str);
 }
 
+char *get_filename(char *str, int typeno)
+{
+	char	*filename;
+	int		filenamelen;
+
+	filename = NULL;
+	if (typeno >= T_DLESS && typeno <= T_GREAT)
+	{	
+		filenamelen = find_wordend(str, SPACE, 1) - str + 1;
+		filename = ft_substr(str, 0, filenamelen);
+		if (!filename) // ft_substr d
+		{
+			//free
+			handle_error(NULL, NULL, EXTRA_ERROR);
+			return (NULL);
+		}
+		if (*filename == '\0')
+		{
+			status = handle_error(NULL, "newline", SYN_TOK);
+			return (NULL);
+		}
+	}
+	return (filename);
+}
 
 int token_redirect(t_shell *shell, char *str)
 {
@@ -468,23 +431,15 @@ int token_redirect(t_shell *shell, char *str)
 
 	while(*str)
 	{
-		while(*str == '\0' && *str != LESS && *str!= GREAT)
-			str++;
+		str = find_redirect_start(str);	// printf("redirect start: %s\n", str);
 		typeno = read_redirect_typeno(str);
-		str = next_redirect(str);
-		if (typeno >= T_DLESS && typeno <= T_GREAT)
-		{	
-			filename = ft_substr(str, 0, next_word(str, SPACE, 1) - str + 1);
-			if (filename == NULL || *filename == '\0')
-			{
-				status = handle_error(NULL, "newline", SYN_TOK);
-
-				return (status);
-			}
-		}
+		str = find_filename_start(str);
+		filename = get_filename(str, typeno);
+		if (!filename)
+			return (status);
 		if (typeno >= T_DLESS && typeno <= T_GREAT)
 		{
-			filename_len = next_word(str, SPACE, 1) - str + 1;
+			filename_len = find_wordend(str, SPACE, 1) - str + 1;
 			filename = replace_word(shell->data.envps, filename);
 			add_token(shell, typeno, filename, NULL);
 			str += filename_len;
@@ -515,6 +470,55 @@ char *get_words(char *dst_words, char *str, int len)
 }
 
 
+int	count_argv(char *argv)
+{
+	int n;
+	size_t	size;
+	size_t	index;
+
+	size = ft_strlen(argv);
+	n = 0;
+	index = 0;
+	// printf(">%s#\n", argv);
+	while (*argv)
+	{
+		n++;
+		argv = find_wordend(argv, SPACE, 0);
+		if (argv)
+			argv++;
+		// printf(">>%s\n", argv);
+	}
+	return (n);
+}
+
+
+char **get_argvs(char *word, char *argv)
+{
+	char	**argvs;
+	char 	*next;
+	int		n; 
+	int		i;
+
+	n = count_argv(argv) + 1;
+	// printf("%d\n", n);
+	argvs = ft_calloc(n, sizeof(char *));
+	argvs[0] = ft_strdup(word);
+	// argvs[1] = 0;
+	i = 1;
+	while (i < n && argv)
+	{
+		// printf("argv: %s\n", argv);
+		next = find_wordend(argv, SPACE, 0) + 1;
+		// printf("next-argv: %ld\n", next - argv);
+		argvs[i] = ft_substr(argv, 0, next - argv);
+		argv = next;
+		// printf("argvs: %s\n", argvs[i]);
+		i++;
+	}
+	argvs[i] = 0;
+	return (argvs);
+}
+
 void token_word(t_shell *shell, char *str)
 {
 	char	*words;
@@ -523,6 +527,7 @@ void token_word(t_shell *shell, char *str)
 	int		len;
 	(void) shell;
 	(void) argv;
+	(void) word;
 
 	argv = NULL;
 	words = NULL;
@@ -536,36 +541,36 @@ void token_word(t_shell *shell, char *str)
 		// printf("get_words len:%d\n", len);
 		if (*str)
 		{
-			str = next_redirect(str);
-			len = next_word(str, SPACE, 1) + 1 - str;
+			str = find_filename_start(str);
+			len = find_wordend(str, SPACE, 0) + 1 - str;
 			// printf("get_word len2: %d\n", len);
-			str += (len - 1);
+			str += len;
 		}
 	}
 	if (words)
 	{
 		len = 0;
-
 		// printf("words: %s\n", words);
 		// printf("len: %d\n", len);
-		// printf ("next: %p\n",next_word(words, SPACE, 1));
-		char *next = next_word(words, SPACE, 1);
+		// printf ("next: %p\n",find_wordend(words, SPACE, 1));
+		char *next = find_wordend(words, SPACE, 1) + 1;
 		if (next)
-			len = next + 1 - words;
+			len = next - words;
 		// printf("len: %d\n", len);
-		
-		// printf("next: %s\n ", next_word(words, SPACE, 1));
-		if (len <= 0)
-			len = ft_strlen(words);
+		// printf("next: %s\n ", next);
+		// if (len <= 0)
+		// 	len = ft_strlen(words);
 		// printf("len: %d\n", len);
 		word = ft_substr(words, 0, len);
-		argv = ft_strjoin(ft_strdup(word), ft_substr(words + len, 0, ft_strlen(words + len)));
+		argv = ft_substr(words + len, 0, ft_strlen(words + len));
+		// printf("words + len = %s\n", argv);
 		// printf("word: %s\n", word);
 		// printf("argv: %s\n", argv);
-		free(words);
 		word = replace_word(shell->data.envps, word);
 		argv = replace_word(shell->data.envps, argv);
-		add_token(shell, T_CMD_WORD, word, argv);
+		char **argvs = get_argvs(word, argv);
+		// free(words);
+		add_token(shell, T_CMD_WORD, word, argvs);
 	}
 }
 
@@ -575,28 +580,28 @@ void token_pipe(t_shell *shell)
 }
 
 
-void	tokentrim(t_token *token)
-{
-	char *old_word;
-	char *old_argv;
+// void	tokentrim(t_token *token)
+// {
+// 	char *old_word;
+// 	char *old_argv;
 
-	while (token)
-	{
-		if (token->word)
-		{
-			old_word = token->word;
-			token->word = ft_strtrim(token->word, " ");
-			free(old_word);
-		}
-		if (token->argv)
-		{
-			old_argv = token->argv;
-			token->argv = ft_strtrim(token->argv, " ");
-			free(old_argv);
-		}
-		token = token->right;
-	}
-}
+// 	while (token)
+// 	{
+// 		if (token->word)
+// 		{
+// 			old_word = token->word;
+// 			token->word = ft_strtrim(token->word, " ");
+// 			free(old_word);
+// 		}
+// 		if (token->argv)
+// 		{
+// 			old_argv = token->argv;
+// 			token->argv = ft_strtrim(token->argv, " ");
+// 			free(old_argv);
+// 		}
+// 		token = token->right;
+// 	}
+// }
 
 
 int tokenizer(t_shell *shell, char **strs)
@@ -604,8 +609,7 @@ int tokenizer(t_shell *shell, char **strs)
 	//예외처리
 	if (handle_empty_redirects(strs) == EXIT_FAILURE)
 		return (EXIT_FAILURE);
-	
-	//redirect 와 filename 담아서 lexlst에 넣기
+	//token
 	while (strs && *strs)
 	{	
 		token_pipe(shell);
@@ -615,61 +619,29 @@ int tokenizer(t_shell *shell, char **strs)
 		strs++;
 	}
 	/*토큰 출력*/
-	// t_token *token;
-	// token = shell->t;
-	// printf("---- token ----\n");
-	// while (token)
-	// {
-	// 	printf("type: %d#\n", token->type);
-	// 	printf("word: %s#\n", token->word);
-	// 	printf("argv: %s#\n\n", token->argv);
-	// 	token = token->right;
-	// }
-	// printf("-------------\n");
+	// debug_token(shell->t);
 	return (0);
 }
 
-// && & || () -> WORD 처리  
-//deque에 utils에서 환경변수 치환 하면 됨
-//$? 따로 만들어줘야함  -> WORD로 저장 
-//파이프와 파이프 사이에 명령어가 있는지 
 void	lexer(t_shell *shell, char *buffer)
 {
-	(void) shell;
 	char	**buffers;
-	(void) buffers;
-	(void) buffer;
 
-	//파이프 기준으로 2차원 배열 만들기 
 	buffers = split_pipe(buffer);
 	if (!buffers)
 		return ;
-
 	free(buffer);
-	// /*strs 출력*/
-	// int i = 0;
-	// while (buffers[i])
-	// 	printf("%s#\n", buffers[i++]);
-	//tokenizer
+	// debug_buffers(buffers);
 	tokenizer(shell, buffers);
 	free_strs(buffers);
 }
 
-
 void	parselines(t_shell *shell, char *buffer)
 {
-
-	(void) shell;
-	(void) buffer;
-	//valid buffer 
 	buffer = get_valid_buffer(buffer);
 	if (!buffer)
 		return ;
-	// lexer : tokenizer 
 	lexer(shell, buffer);
-	//구문분석 : 트리 만들기 
 	parser(&shell->t);
-	// printf("token end\n");
-
 }
 

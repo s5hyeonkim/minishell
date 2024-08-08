@@ -83,7 +83,7 @@ void    exec_cmds(t_shell *shell)
     size_t  index;
 
     index = 0;
-    shell->p_size = find_pipe(shell->t) + 1;
+    shell->p_size = find_pipe(shell->t);
     shell->p = ft_calloc(shell->p_size + 1, sizeof(t_process));
     if (!shell->p || token_to_process(shell, shell->t, &index))
     {

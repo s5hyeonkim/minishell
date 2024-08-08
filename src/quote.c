@@ -1,13 +1,13 @@
 #include "../minishell.h"
 
-char *ft_ltrim(char *str)
-{
-	while(str && *str && ft_isspace(*str))
-		str++;
-	return (str);
-}
+// char *ft_ltrim(char *str)
+// {
+// 	while(str && *str && ft_isspace(*str))
+// 		str++;
+// 	return (str);
+// }
 
-int is_sgldbl(char chr)
+int issgldbl(char chr)
 {
 	if (chr == SGL_QUOTE)
 		return(T_SINGLE_QUOTES);
@@ -16,8 +16,7 @@ int is_sgldbl(char chr)
 	return (0);
 }
 
- //마지막 쿼트 반환 
-char *next_quote(char *str, int flag)
+char *find_quotend(char *str, int flag)
 {
 	int sgl_open;
 	int dbl_open;
@@ -43,41 +42,28 @@ char *next_quote(char *str, int flag)
 	return (str );
 }
 
-// char *next_quoteline(char *str)
-// {
-// 	str = ft_ltrim(str);
-// 	if (*str == SGL_QUOTE || *str == DBL_QUOTE)
-// 	{
-// 		str = next_quote(str, is_sgldbl(*str));
-// 		return (ft_ltrim(str));
-// 	}
-// 	while (*str)
-// 	{
-// 		if (*str == SGL_QUOTE || *str == DBL_QUOTE)
-// 			break;
-// 		str++;
-// 	}
-// 	return (ft_ltrim(str));
-// }
-
-char *next_word(char *str, int space_opt, int ltrim_opt)
+char *find_wordend(char *str, int space_opt, int ltrim_opt)
 {
 	(void) ltrim_opt;
 	// if (ltrim_opt)
 		// str = ft_ltrim(str);
 	if (*str == SGL_QUOTE || *str == DBL_QUOTE)
 	{
-		str = next_quote(str, is_sgldbl(*str));
+		str = find_quotend(str, issgldbl(*str));
 		// if (ltrim_opt)
 			// return (ft_ltrim(str));
 		return (str);
 	}
 	while (*str)
 	{
-		if (*str == SGL_QUOTE || *str == DBL_QUOTE)
+		// str = ft_ltrim(str);
+		if (*(str + 1) == SGL_QUOTE || *(str + 1) == DBL_QUOTE)
 			break ;
 		else if (space_opt == SPACE && ft_isspace(*str))
+		{
+			// printf("*str is space\n");
 			break ;
+		}
 		str++;
 	}
 	// if (ltrim_opt)
@@ -92,19 +78,15 @@ char *next_word(char *str, int space_opt, int ltrim_opt)
 // 	char *next;
 
 // 	buffer = readline("test>");
-// 	printf("buffer:%p\n", buffer);
-// 	printf("buffer:%s\n", buffer);
 // 	while (*buffer)
 // 	{
-// 		next = next_word(buffer);
+// 		printf("buffer: %s\n", buffer);
+// 		next = find_wordend(buffer, SPACE, 0);
 // 		if (!next)
-// 		{
-// 			printf ("error\n");
-// 			return (0);
-// 		}
-// 		printf("next:%p\n", next);
-// 		printf("next:%s\n", next);
-// 		printf("%ld\n", next - buffer);
-// 		buffer = next;
+// 			printf ("next is emtpy\n");
+// 		if (next)
+// 			buffer = next + 1;
 // 	}
+// 	printf("buffer: %s\n", buffer);
+
 // }

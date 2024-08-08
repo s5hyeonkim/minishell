@@ -142,13 +142,17 @@ void print_tree(t_token *dsttoken, int leftright, int i)
 
 	printf("type: %d#\n", dsttoken->type);
 	printf("word: %s#\n", dsttoken->word);
-	printf("argv: %s#\n\n", dsttoken->argv);
+	int idx = 0;
+	while (dsttoken->argv && dsttoken->argv[idx])
+		printf("argv: %s#\n", dsttoken->argv[idx++]);
 
 	printf("now: %p#\n", dsttoken);
 	printf("left: %p#\n", dsttoken->left);
 	printf("right: %p#\n\n", dsttoken->right);
-	print_tree(dsttoken->left, 0, i + 1);
-	print_tree(dsttoken->right, 1, i + 1);
+	if (dsttoken->left)
+		print_tree(dsttoken->left, 0, i + 1);
+	if (dsttoken->right)
+		print_tree(dsttoken->right, 1, i + 1);
 }
 
 

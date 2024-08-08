@@ -27,30 +27,36 @@ typedef struct s_token
 {
 	t_typeno		type;
 	char			*word; //cmd, filename, hereend 
-	char			*argv;
+	char			**argv;
 	struct s_token	*left;
 	struct s_token	*right;
 }	t_token;
 
-// char *next_word(char *str, int space_opt);
-char *next_word(char *str, int space_opt, int ltrim_opt);
 
-// char *next_word(char *str);
-// char *next_quoteline(char *str);
-char *ft_ltrim(char *str);
-char *next_quote(char *str, int flag);
-int is_sgldbl(char chr);
-t_token	*parser(t_token **token);
-
-
+/* TLST.C */
 t_token *tlst_lastright(t_token *t);
 t_token *tlst_lastleft(t_token *t);
 void tlst_addright(t_token **t, t_token *newtoken);
 void tlst_addleft(t_token **t, t_token *newtoken);
 
+
+/* QUOTE.C */
+char *ft_ltrim(char *str);
+int issgldbl(char chr);
+char *find_quotend(char *str, int flag);
+char *find_wordend(char *str, int space_opt, int ltrim_opt);
+
+
+t_token	*parser(t_token **token);
+
 int set_token(t_token **t);
 
 
 void print_tree(t_token *dsttoken, int leftright, int i);
+
+/*DEBUG*/
+void debug_buffers(char **buffers);
+void debug_token(t_token *token);
+void debug_tree(t_token *dsttoken, int leftright, int i);
 
 #endif
