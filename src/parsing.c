@@ -1,77 +1,91 @@
 #include "../minishell.h"
+char *find_pipeend(char *buffer);
 
-// /* token lst */
+/* utils */
+int	ismadeofchr(char *str, char chr)
+{
+	while (str && *str)
+	{
+		if (*str != chr)
+			return (FALSE);
+		str++;
+	}
+	return (TRUE);
+}
 
-void add_token(t_shell *shell, int type, char *word, char **argv)
+char	*ft_substrjoin (char *str, int start, int len, char *dst)
+{
+	char	*olddst;
+	char	*src;
+
+	olddst = dst;
+	src = ft_substr(str, start, len);
+	if (!src)
+	{
+		free(olddst);
+		return (NULL);
+	}
+	dst = ft_strjoin(dst, src);
+	if (!dst)
+	{
+		free(olddst);
+		free(src);
+		return (NULL);
+	}
+	free(olddst);
+	free(src);
+	return (dst);
+}
+
+/* quote */
+int	wordlen(char *str, int space_opt)
+{
+	char	*wordend;
+
+	wordend = find_wordend(str, space_opt);
+	if (!*wordend)
+		return (wordend - str); //wordend가 널문자 일 때 그대로 반환
+	return (wordend - str + 1);  //아닐 때는 널문자 자리 + 1 해주고 반환 
+}
+
+/* token lst */
+int	add_token(t_token *token, int type, char *word, char **argvs)
 {
 	t_token *newtoken;
 
 	if (set_token(&newtoken))
-		exit_process(shell, NULL, EXTRA_ERROR);
+	{	
+		free(word);
+		free(argvs);
+		return (EXTRA_ERROR);
+	}
 	newtoken->type = type;
 	newtoken->word = word;
-	newtoken->argv = argv;
-	tlst_addright(&shell->t, newtoken);
+	newtoken->argvs = argvs;
+	tlst_addright(&token, newtoken);
+	return (EXIT_SUCCESS);
 }
 
+/* pipe.c */
 int count_pipe(char *buffer)
 {
 	int	n;
 
-	n = 1;
+	n = 1; //buffer가 비어있어도 pipe는 무조건 1개 생성
 	while (buffer && *buffer)
 	{	
-		if (*buffer == SGL_QUOTE || *buffer == DBL_QUOTE)
-		{
-			if (*(buffer + 1))
-			{	
-				buffer = find_wordend(buffer, 0, 1) + 1 - 1;
-				// printf("buffer: %s\n", buffer);
-				if (!buffer)
-					break ;
-			}
-		}
-		else if (*buffer == PIPE)
+		buffer += wordlen(buffer, PIPE);
+		if (*buffer == PIPE)
 			n++;
 		buffer++;
 	}
 	return (n);
 }
 
-char *next_pipe(char *buffer)
-{
-	while (buffer && *buffer)
-	{	
-		if (*buffer == SGL_QUOTE || *buffer == DBL_QUOTE)
-		{
-			buffer = find_wordend(buffer, 0, 1) + 1 - 1;
-			if (!buffer)
-				return (buffer + 1);
-			// continue;
-		}
-		else if (*buffer == PIPE)
-			return (buffer + 1);
-		buffer++;
-	}
-	return (NULL);
-}
-
-// int is_emptypipe(char *str)
-// {
-// 	while (ft_isspace(*str) || *str == PIPE)
-// 		str++;
-// 	if (*str == '\0')
-// 		return(TRUE);
-// 	return(FALSE);
-// }
-
-
 int handle_empty_pipe(char *buffer)
 {
-	char	*head_buffer;
 	int		pipe_open;
 
-	head_buffer = buffer;
 	pipe_open = 0;
 	while(*buffer)
 	{
@@ -83,7 +97,6 @@ int handle_empty_pipe(char *buffer)
 		{
 			*(buffer + 1) = '\0';
 			status = handle_error(NULL, buffer, SYN_TOK);
-			free(head_buffer);
 			return (status);
 		}
 		buffer++;
@@ -110,13 +123,10 @@ int ispipeopen(char *buffer)
 	return (FALSE);
 }
 
-
 char *get_pipeline(char *dst_buffer)
 {
-	char *old_buffer;
 	char *src_buffer;
 
-	old_buffer = dst_buffer;
 	src_buffer = readline(">");
 	if (!src_buffer)
 		dst_buffer = NULL;
@@ -125,31 +135,8 @@ char *get_pipeline(char *dst_buffer)
 		dst_buffer = ft_strjoin(dst_buffer, src_buffer);
 		free(src_buffer);
 	}
-	free(old_buffer);
 	return (dst_buffer);
 }
-
-char *get_valid_buffer(char *buffer)
-{
-	while(1)
-	{
-		if (handle_empty_pipe(buffer) == SYNTAX_ERROR) //비어있는 pipe 에러처리
-			return (NULL);
-		else if (ispipeopen(buffer) == TRUE) //열린 pipe 확인
-		{
-			buffer = get_pipeline(buffer); //추가입력 받기 
-			if (buffer == NULL) //입력 term 종료 했을 때
-			{
-				status = handle_error(NULL, NULL, SYN_TERM);
-				return (NULL);
-			}
-		}
-		else
-			break;
-	}
-	return (buffer);
-}
-
 
 char **split_pipe(char *buffer)
 {
@@ -162,19 +149,55 @@ char **split_pipe(char *buffer)
 		return (NULL);
 	pipe_num = count_pipe(buffer);
 	strs = ft_calloc(pipe_num + 1, sizeof(char *));
+	if (!strs)
+		return (NULL);
 	index = 0;
 	while (index < pipe_num)
 	{
 		while (ft_isspace(*buffer))
 			buffer++;
-		strlen = next_pipe(buffer) - buffer;
+		strlen = find_pipeend(buffer) - buffer + 1;
 		if (strlen)
-			strs[index++] = ft_substr(buffer, 0, strlen);
+		{
+			strs[index] = ft_substr(buffer, 0, strlen);
+			if (!strs[index])
+			{
+				free_strs(strs);
+				return (NULL);
+			}
+			index++;
+		}
 		buffer += strlen;
 	}
 	return (strs);
 }
 
+/* valid_buffer */
+char *get_valid_buffer(char *buffer)
+{
+	char *vbuffer;
+
+	while(1)
+	{
+		if (handle_empty_pipe(buffer) == SYNTAX_ERROR) //비어있는 pipe 에러처리
+			return (NULL);
+		else if (ispipeopen(buffer) == TRUE) //열린 pipe 확인
+		{
+			vbuffer = get_pipeline(buffer); //추가입력 받기 
+			if (!vbuffer) //입력 term 종료 했을 때, 메모리 부족할 때
+			{
+				status = handle_error(NULL, NULL, SYN_TERM);
+				return (NULL);
+			}
+		}
+		else
+			break;
+	}
+	vbuffer = ft_strdup(buffer);
+	return (vbuffer);
+}
+
+/* resword.c */
 int ft_isredirect(char chr)
 {
 	if (chr == LESS || chr == GREAT)
@@ -197,6 +220,7 @@ int ft_isresword(char chr)
 	return (FALSE);
 }
 
+/*find.c*/
 char *find_redirect_start(char *str)
 {
 	while (*str && !ft_isredirect(*str))
@@ -219,20 +243,24 @@ char *find_filename_start(char *str)
 	return (str);
 }
 
-//redirect의 typeno을 읽어주는 함수 
-int read_redirect_typeno(char *str)
+char *find_pipeend(char *buffer)
 {
-	if (*str == LESS && *(str + 1) == LESS)
-		return(T_DLESS);
-	else if (*str == GREAT && *(str + 1) == GREAT)
-		return(T_DGREAT);
-	else if (*str == LESS)
-		return(T_LESS);
-	else if (*str == GREAT)
-		return(T_GREAT);
-	return (EXIT_SUCCESS);
+	while (buffer && *buffer)
+	{	
+		if (*buffer == SGL_QUOTE || *buffer == DBL_QUOTE)
+		{
+			buffer = find_wordend(buffer, 0);
+			if (!buffer)
+				return (buffer);
+		}
+		else if (*buffer == PIPE)
+			return (buffer);
+		buffer++;
+	}
+	return (NULL);
 }
 
+/* handle empty */
 int handle_empty_redirect(char *str)
 {
 	str = find_filename_start(str);
@@ -257,30 +285,24 @@ int handle_empty_redirects(char **strs)
 }
 
 
-char *get_token_trim(char *str)
+/* trim.c */
+char *trim_space(char *str)
 {
 	char	*old_str;
-	
-	if (ft_strchr(str, SPACE) || ft_strchr(str, PIPE))
+
+	if (ismadeofchr(str, SPACE) == TRUE)
+	{
+		old_str = str;
+		str = ft_substr(" ", 0, 1);
+		free (old_str);
+	}
+	else if (ft_strchr(str, SPACE) || ft_strchr(str, PIPE))
 	{
 		old_str = str;
 		str = ft_strtrim(str, " |");
 		free (old_str);
 	}
 	return (str);
-}
-
-char	*substr_strjoin (char *str, char *dst, int start, int len)
-{
-	char	*head;
-	char	*s2;
-
-	head = dst;
-	s2 = ft_substr(str, start, len);
-	dst = ft_strjoin(dst, s2);
-	free(s2);
-	free(head);
-	return (dst);
 }
 
 char *trim_quote(char *str)
@@ -293,29 +315,40 @@ char *trim_quote(char *str)
 	new_str = NULL;
 	while (str && *str)
 	{
-		char *next = find_wordend(str, 0, 0) + 1;
-		// printf("next: %s\n", next);
-		if (next)
+		len = wordlen(str, SPACE);
+		// printf("trimlen: %d\n", len);
+		if ((*str == SGL_QUOTE || *str == DBL_QUOTE))
 		{
-			len = next - str;
-			// printf("len2: %d\n", len);
-			if ((*str == SGL_QUOTE || *str == DBL_QUOTE))
-				new_str = substr_strjoin(str + 1, new_str, 0, len - 2);
-			else 
-				new_str = substr_strjoin(str, new_str, 0, len--);
+			new_str = ft_substr(str + 1, 0, len - 2);
+			free(old_str);
+			break;
 		}
 		else 
 		{
-			len = ft_strlen(str);
-			// printf("len3: %d\n", len);
-			new_str = substr_strjoin(str, new_str, 0, len);
+			// new_str = ft_substr(str, 0, len);
+			new_str = old_str;
+			break;
 		}
 		str += len;
 	}
-	free(old_str);
 	return (new_str);
 }
 
+/* read */
+int read_redirect_typeno(char *str)
+{
+	if (*str == LESS && *(str + 1) == LESS)
+		return(T_DLESS);
+	else if (*str == GREAT && *(str + 1) == GREAT)
+		return(T_DGREAT);
+	else if (*str == LESS)
+		return(T_LESS);
+	else if (*str == GREAT)
+		return(T_GREAT);
+	return (EXIT_SUCCESS);
+}
+
+/* replace.c */
 char *replace_envp2(t_deques *deqs, char **str, char *dst)
 {
 	char	*old_dst;
@@ -366,12 +399,12 @@ char *replace_envp(t_deques *deqs, char *str)
 			if (ft_strchr(str, DOLLAR))
 			{
 				len = ft_strchr(str, DOLLAR) - str - 1;
-				dst = substr_strjoin(str, dst, 0, len + 1);
+				dst = ft_substrjoin(str, 0, len + 1, dst);
 			}
 			else
 			{
 				len = ft_strlen(str);
-				dst = substr_strjoin(str, dst, 0, len);
+				dst = ft_substrjoin(str, 0, len, dst);
 			}
 			str += len;
 		}
@@ -388,16 +421,16 @@ char *replace_word(t_deques *deqs, char *str)
 	(void) str;
 	char *new_str;
 
-	new_str = get_token_trim(str);
-	// printf("new_str: %s\n", new_str);
+	new_str = trim_space(str);
+	// printf("new_str1: %s#\n", new_str);
 	new_str = replace_envp(deqs, new_str);
-	// printf("new_str2: %s\n", new_str);
+	// printf("new_str2: %s#\n", new_str);
 	new_str = trim_quote(new_str);
-	// printf("new_str3: %s\n", new_str);
+	// printf("new_str3: %s#\n", new_str);
 	return (new_str);
 }
 
-char *get_filename(char *str, int typeno)
+char *replace_filename(char *str, int typeno)
 {
 	char	*filename;
 	int		filenamelen;
@@ -405,7 +438,7 @@ char *get_filename(char *str, int typeno)
 	filename = NULL;
 	if (typeno >= T_DLESS && typeno <= T_GREAT)
 	{	
-		filenamelen = find_wordend(str, SPACE, 1) - str + 1;
+		filenamelen = wordlen(str, SPACE);
 		filename = ft_substr(str, 0, filenamelen);
 		if (!filename) // ft_substr d
 		{
@@ -422,15 +455,7 @@ char *get_filename(char *str, int typeno)
 	return (filename);
 }
 
-int wordlen(char *str, int space_opt)
-{
-	return (find_wordend(str, space_opt, 1) - str + 1);
-}
-
-
-
-
-char *get_words(char *dst_words, char *str, int len)
+char *replace_words(char *dst_words, char *str, int len)
 {
 	char *src_words;
 	char *head_words;
@@ -446,66 +471,46 @@ char *get_words(char *dst_words, char *str, int len)
 	return (dst_words);
 }
 
-
+/* argv.c */
 int	count_argv(char *argv)
 {
 	int n;
-	size_t	size;
-	size_t	index;
 
-	size = ft_strlen(argv);
-	n = 1;
-	index = 0;
+	n = 0;
 	while (argv && *argv)
 	{
 		n++;
-		argv = find_wordend(argv, SPACE, 0);
-		if (argv)
-			argv++;
+		argv += wordlen(argv, SPACE);
 	}
-	return (n);
-}
+	return (++n);
+}	
+char *find_spacend(char *str);
 
-
-char **get_argvs(char *word, char *argv)
-{
+char **get_argvs(char *word, char *argv, t_deques *envps)
+{ 
 	char	**argvs;
-	// char 	*next;
+	char	*new; 
 	int		n; 
 	int		i;
 	int		len;
 
+	argv = ft_ltrim(argv);
 	n = count_argv(argv);
-	argvs = ft_calloc(++n, sizeof(char *));
+	argvs = ft_calloc(n + 1, sizeof(char *));
 	argvs[0] = ft_strdup(word);
-	// printf("argvs[0]: %s\n", argvs[0]);
-	// argvs[1] = 0;
 	i = 1;
-	while (i < n && argv)
+	while (i < n && argv && *argv)
 	{
-		// printf("argvs[0]: %s\n", argvs[0]);
-
-		// printf("argv: %s\n", argv);
 		len = wordlen(argv, SPACE);
-		// printf("len: %d\n", len);
-		if (len > 0)
-			argvs[i++] = ft_substr(argv, 0, len);
-		else 
-			break;
+		new = ft_substr(argv, 0, len);
+		argvs[i++] = replace_word(envps, new);
 		argv += len;
-		// printf("argvs: %s\n", argvs[i]);
 	}
-	// printf("i: %d\n", i);
-	// // if (i != 1)
-	// printf("n: %d\n", n);
-
-	// // argvs[i] = "\0";
-	// printf("argvs[0]: %s\n", argvs[0]);
-	
 	return (argvs);
 }
 
-int token_redirect(t_shell *shell, char *str)
+/* tokenizer */
+int token_redirect(t_token **token, t_deques *envps, char *str)
 {
 	int		typeno;
 	char	*filename;
@@ -516,14 +521,14 @@ int token_redirect(t_shell *shell, char *str)
 		str = find_redirect_start(str);	// printf("redirect start: %s\n", str);
 		typeno = read_redirect_typeno(str);
 		str = find_filename_start(str);
-		filename = get_filename(str, typeno);
+		filename = replace_filename(str, typeno);
 		if (!filename)
 			return (status);
 		if (typeno >= T_DLESS && typeno <= T_GREAT)
 		{
 			filenamelen = wordlen(str, SPACE);
-			filename = replace_word(shell->data.envps, filename);
-			add_token(shell, typeno, filename, NULL);
+			filename = replace_word(envps, filename);
+			add_token(*token, typeno, filename, NULL);
 			str += filenamelen;
 		}
 		else
@@ -532,103 +537,102 @@ int token_redirect(t_shell *shell, char *str)
 	return (EXIT_SUCCESS);
 }
 
-void token_word(t_shell *shell, char *str)
+void token_word(t_token **token, t_deques *envps, char *str)
 {
 	char	*words;
 	char	*word;
 	char	*argv;
 	int		len;
-	(void) shell;
-	(void) argv;
-	(void) word;
+	char	**argvs; 
 
 	argv = NULL;
 	words = NULL;
+	word = NULL;
+	argvs = NULL;
 	while (*str)
 	{
 		len = find_redirect_start(str) - str;
 		if (len > 0)
-			words = get_words(words, str, len);
+			words = replace_words(words, str, len);
 		str += len;
-		// printf("get_words len:%d\n", len);
 		if (*str)
 		{
 			str = find_filename_start(str);
-			len = find_wordend(str, SPACE, 0) + 1 - str;
-			// printf("get_word len2: %d\n", len);
+			len = wordlen(str, SPACE);
 			str += len;
 		}
 	}
-	if (words)
+	if (words && *words)
 	{
-		len = 0;
-		// printf("words: %s\n", words);
-		// printf("len: %d\n", len);
-		// printf ("next: %p\n",find_wordend(words, SPACE, 1));
-		char *next = find_wordend(words, SPACE, 1) + 1;
-		if (next)
-			len = next - words;
-		// printf("len: %d\n", len);
-		// printf("next: %s\n ", next);
-		// if (len <= 0)
-		// 	len = ft_strlen(words);
-		// printf("len: %d\n", len);
+		words = ft_ltrim(words);
+		len = wordlen(words, SPACE);
 		word = ft_substr(words, 0, len);
+		word = replace_word(envps, word);
 		argv = ft_substr(words + len, 0, ft_strlen(words + len));
-		// printf("words + len = %s\n", argv);
-		word = replace_word(shell->data.envps, word);
-		argv = replace_word(shell->data.envps, argv);
-		// printf("word: %s\n", word);
-		// printf("argv: %s\n", argv);
-		char **argvs = get_argvs(word, argv);
-		// free(words);
-		add_token(shell, T_CMD_WORD, word, argvs);
+		argvs = get_argvs(word, argv, envps);
+		free(words);
+		free(argv);
 	}
+	else
+		word = ft_calloc(1, sizeof(char));
+	add_token(*token, T_CMD_WORD, word, argvs);
+
 }
 
-void token_pipe(t_shell *shell)
+void token_pipe(t_token **token)
 {
-	add_token(shell, T_PIPE, NULL, NULL);
+	add_token(*token, T_PIPE, NULL, NULL);
 }
 
-int tokenizer(t_shell *shell, char **strs)
+t_token *tokenizer(t_deques *envps, char **strs)
 {
+	t_token *token;
+	(void) envps;
 	//예외처리
 	if (handle_empty_redirects(strs) == EXIT_FAILURE)
-		return (EXIT_FAILURE);
+		return (NULL);
 	//token
 	while (strs && *strs)
 	{	
-		token_pipe(shell);
-		if (token_redirect(shell, *strs) == SYNTAX_ERROR)
-			return (status);
-		token_word(shell, *strs);
+		token_pipe(&token);
+		if (token_redirect(&token, envps, *strs) == SYNTAX_ERROR)
+			return (NULL);
+		token_word(&token, envps, *strs);
 		strs++;
 	}
-	/*토큰 출력*/
-	// debug_token(shell->t);
-	return (0);
+	/*token 출력*/
+	// debug_token(token);
+	return (token);
 }
 
-void	lexer(t_shell *shell, char *buffer)
+/* lexer */
+void	lexer(t_shell *shell, char *vbuffer)
 {
-	char	**buffers;
+	(void) shell;
+	char	**vbuffers;
 
-	buffers = split_pipe(buffer);
-	if (!buffers)
+	vbuffers = split_pipe(vbuffer);
+	free(vbuffer);
+	if (!vbuffers)
 		return ;
-	free(buffer);
-	// debug_buffers(buffers);
-	tokenizer(shell, buffers);
-	free_strs(buffers);
+	/*buffers 출력*/
+	// debug_buffers(vbuffers);
+	shell->t = ft_calloc(1, sizeof(t_token));
+	shell->t = tokenizer(shell->data.envps, vbuffers); //leaks
+	free_strs(vbuffers);
+	if (!shell->t)
+		return ;
 }
 
+/* parslines.c */
 void	parselines(t_shell *shell, char *buffer)
 {
-	buffer = get_valid_buffer(buffer);
-	if (!buffer)
+	char *vbuffer;
+
+	vbuffer = get_valid_buffer(buffer);
+	free (buffer);
+	if (!vbuffer)
 		return ;
-	lexer(shell, buffer);
+	lexer(shell, vbuffer);
 	parser(&shell->t);
 }
-

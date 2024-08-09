@@ -16,8 +16,8 @@ void debug_token(t_token *token)
 	{
 		printf("type: %d#\n", token->type);
 		printf("word: %s#\n", token->word);
-		while (token->argv && token->argv[i])
-			printf("argv: %s#\n", token->argv[i++]);
+		while (token->argvs && token->argvs[i])
+			printf("argv: %s#\n", token->argvs[i++]);
 		token = token->right;
 	}
 }
@@ -36,9 +36,13 @@ void debug_tree(t_token *dsttoken, int leftright, int i)
 	else if (leftright == 2)
 		printf("---- node %d----\n", i);
 
-	// printf("type: %d#\n", dsttoken->type);
-	// printf("word: %s#\n", dsttoken->word);
-	// printf("argv: %s#\n\n", dsttoken->argv);
+	printf("type: %d#\n", dsttoken->type);
+	printf("word: %s#\n", dsttoken->word);
+
+	int j = 0;
+	while (dsttoken->argvs && dsttoken->argvs[j])
+		printf("argv: %s#\n", dsttoken->argvs[j++]);
+
 
 	printf("now: %p#\n", dsttoken);
 	printf("left: %p#\n", dsttoken->left);

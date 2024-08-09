@@ -7,6 +7,7 @@
 # define LESS '>'
 # define GREAT '<'
 # define DOLLAR '$'
+# define SIGTERM_NULL 0
 
 typedef enum e_typeno
 {
@@ -27,7 +28,7 @@ typedef struct s_token
 {
 	t_typeno		type;
 	char			*word; //cmd, filename, hereend 
-	char			**argv;
+	char			**argvs;
 	struct s_token	*left;
 	struct s_token	*right;
 }	t_token;
@@ -44,7 +45,7 @@ void tlst_addleft(t_token **t, t_token *newtoken);
 char *ft_ltrim(char *str);
 int issgldbl(char chr);
 char *find_quotend(char *str, int flag);
-char *find_wordend(char *str, int space_opt, int ltrim_opt);
+char *find_wordend(char *str, int spacepipe_opt);
 
 
 t_token	*parser(t_token **token);

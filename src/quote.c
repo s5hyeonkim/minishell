@@ -1,11 +1,20 @@
 #include "../minishell.h"
 
-// char *ft_ltrim(char *str)
-// {
-// 	while(str && *str && ft_isspace(*str))
-// 		str++;
-// 	return (str);
-// }
+/* utils */
+char *ft_ltrim(char *str)
+{
+	while(str && *str && ft_isspace(*str))
+		str++;
+	return (str);
+}
+
+/* quote_utils */
+char *find_spacend(char *str)
+{
+	while(str && *str && ft_isspace(*str) && ft_isspace(*(str + 1)))
+		str++;
+	return (str);
+}
 
 int issgldbl(char chr)
 {
@@ -16,6 +25,7 @@ int issgldbl(char chr)
 	return (0);
 }
 
+/* quote */
 char *find_quotend(char *str, int flag)
 {
 	int sgl_open;
@@ -42,35 +52,30 @@ char *find_quotend(char *str, int flag)
 	return (str );
 }
 
-char *find_wordend(char *str, int space_opt, int ltrim_opt)
+char *find_wordend(char *str, int spacepipe_opt)
 {
-	(void) ltrim_opt;
-	// if (ltrim_opt)
-		// str = ft_ltrim(str);
+	if (spacepipe_opt == SPACE && ft_isspace(*str) == TRUE)
+	{
+		str = find_spacend(str);
+		return (str);
+	}
 	if (*str == SGL_QUOTE || *str == DBL_QUOTE)
 	{
 		str = find_quotend(str, issgldbl(*str));
-		// if (ltrim_opt)
-			// return (ft_ltrim(str));
 		return (str);
 	}
-	while (*str)
+	while (str && *str)
 	{
-		// str = ft_ltrim(str);
-		if (*(str + 1) == SGL_QUOTE || *(str + 1) == DBL_QUOTE)
+		if (spacepipe_opt == SPACE && ft_isspace(*(str + 1)) == TRUE)
 			break ;
-		else if (space_opt == SPACE && ft_isspace(*str))
-		{
-			// printf("*str is space\n");
+		else if (spacepipe_opt == PIPE && *(str + 1) == PIPE)
 			break ;
-		}
+		else if (*(str + 1) == SGL_QUOTE || *(str + 1) == DBL_QUOTE)
+			break ;
 		str++;
 	}
-	// if (ltrim_opt)
-		// return (ft_ltrim(str));
 	return (str);
 }
-
 
 // int main(int argc, char **argv)
 // {

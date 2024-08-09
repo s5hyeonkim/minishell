@@ -32,16 +32,6 @@ void	clean_cmds(t_shell *shell)
 	free_cmds(&shell->t, &shell->p, &shell->p_size);
 }
 
-/* parsing and set tokens 수정 필요 */
-void	tokenization(t_shell *shell, t_token *t)
-{
-	printf("origin cmd: %s\n", t->word);
-	t->type = T_SIMPLE_CMD;
-	(void) shell;
-	//tokenization(shell, t->left);
-	//tokenization(shell, t->right);
-}
-
 /* token lst */
 int set_token(t_token **t)
 {
@@ -50,15 +40,6 @@ int set_token(t_token **t)
 		return (EXTRA_ERROR);
 	return (EXIT_SUCCESS);
 }
-
-void	set_tokens(t_shell *shell, char *buffer)
-{
-	if (set_token(&(shell->t)))
-		exit_process(shell, NULL, EXTRA_ERROR);
-	shell->t->word = buffer;
-	tokenization(shell, shell->t);
-}
-
 
 /* exit */
 void	exit_process(t_shell *shell, char *obj, int errcode)
@@ -76,7 +57,6 @@ void	exit_process(t_shell *shell, char *obj, int errcode)
 	free_shell(*shell);
 	exit(errcode);
 }
-
 
 /* set */
 char	**get_env_paths(char *envp[])
@@ -131,6 +111,25 @@ void	set_status(t_shell *shell)
 	status = 0;
 }
 
+
+void free_tokens(t_token *tokens)
+{
+	t_token *left;
+	t_token *right;
+	
+	if (!tokens)
+		return ;
+	if (tokens->word)
+		free(tokens->word);
+	if (tokens->argvs)
+		free_strs(tokens->argvs);
+	left = tokens->left;
+	right = tokens->right;
+	free(tokens);
+	free_tokens(left);
+	free_tokens(right);
+}
+
 void	loop(t_shell *shell)
 {
 	char	*buffer;
@@ -141,13 +140,12 @@ void	loop(t_shell *shell)
 		readlines(shell, &buffer);
 		// printf("buffer: %s\n", buffer);
 		set_status(shell);
-		// set_tokens(shell, buffer); //make
 		parselines(shell, buffer); // parseline에서 malloc실패 등 에러나면 continue 분기문 만들어주기
 		// printf("==loop==\n");
 		// print_tree(shell->t, 2, 0);
 		// printf("========\n");
-
 		exec_cmds(shell);
+		free_tokens(shell->t);
 		clean_cmds(shell);
 	}
 }
