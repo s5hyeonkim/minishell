@@ -53,9 +53,6 @@ void	inprocess(t_shell *shell)
 	long	status;
 
 	printf("execute in current process\n");
-	// printf("%s\n", shell->p[0].path);
-	// for (int i = 0; shell->p[0].args[i]; i++)
-		// printf("%s\n", shell->p[0].args[i]);
 	set_fd_builtin(shell->p);
 	status = exec_builtin(shell->p[0], &shell->data);
 	if (!ft_memcmp(shell->p[0].args[0], "exit", 5) && !status)
@@ -100,10 +97,6 @@ int	token_to_word(t_shell *shell, t_token *t, size_t index)
 	p = &shell->p[index];
 	p->args = get_cmdargs(t->argv);
     p->path = get_cmdpath(shell->data.paths, t->word);
-		// p->args = debug(t->right->word, p->args);
-		// for (int i = 0; shell->p[*index].args[i] != 0; i++)
-			// printf("i: %d args %s\n", i, shell->p[*index].args[i]);
-		// printf("path %s\n", shell->p[*index].path);
     if (!p->args || !p->path)
         return (EXTRA_ERROR);
     return (EXIT_SUCCESS);
@@ -116,11 +109,8 @@ int   token_to_process(t_shell *shell, t_token *t, size_t *index)
     status = EXIT_SUCCESS;
     if (t->type == T_SIMPLE_CMD)
     {
-		printf("word is %s\n", t->right->word);
 		if (token_to_word(shell, t->right, *index) || open_redirect(&shell->p[*index], t->left) == -1)
             return (EXTRA_ERROR);
-		printf("id: %zu\n", *index);
-		printf("%s \n", shell->p[*index].path);
 		*index += 1;
         return (EXIT_SUCCESS);
     }
@@ -128,11 +118,8 @@ int   token_to_process(t_shell *shell, t_token *t, size_t *index)
         status = token_to_process(shell, t->left, index);
     else if (!status && t->right)
         status = token_to_process(shell, t->right, index);
-	printf("ok ttop %d\n", status);
     return (status);
 }
-
-void	print_process(t_process *p);
 
 void    exec_cmds(t_shell *shell)
 {
@@ -140,9 +127,7 @@ void    exec_cmds(t_shell *shell)
 
     index = 0;
     shell->p_size = find_pipe(shell->t);
-	printf("sizeL %zu\n", shell->p_size);
     shell->p = ft_calloc(shell->p_size + 1, sizeof(t_process));
-	// print_process(shell->p);
     if (!shell->p || token_to_process(shell, shell->t, &index))
     {
         shell->data.status = EXIT_FAILURE;
