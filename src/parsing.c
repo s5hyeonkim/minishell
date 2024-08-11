@@ -53,7 +53,7 @@ int	add_token(t_token *token, int type, char *word, char **argvs)
 {
 	t_token *newtoken;
 
-	if (set_token(&newtoken))
+	if (set_token(&newtoken) == EXTRA_ERROR)
 	{	
 		free(word);
 		free(argvs);
@@ -67,14 +67,14 @@ int	add_token(t_token *token, int type, char *word, char **argvs)
 }
 
 /* pipe.c */
-int count_pipe(char *buffer)
+int	count_pipe(char *buffer)
 {
 	int	n;
 
 	n = 1; //buffer가 비어있어도 pipe는 무조건 1개 생성
-	while (buffer && *buffer)
+	while (*buffer)
 	{	
-		buffer += wordlen(buffer, PIPE);
+		buffer += wordlen(buffer, PIPE); // |의 개수 
 		if (*buffer == PIPE)
 			n++;
 		buffer++;
@@ -123,30 +123,32 @@ int ispipeopen(char *buffer)
 	return (FALSE);
 }
 
-char *get_pipeline(char *dst_buffer)
+char *get_pipeline(char *buffer)
 {
-	char *src_buffer;
+	char *dstbuffer;
+	char *srcbuffer;
 
-	src_buffer = readline(">");
-	if (!src_buffer)
-		dst_buffer = NULL;
+	srcbuffer = readline(">");
+	if (!srcbuffer)
+		dstbuffer = NULL;
 	else
 	{
-		dst_buffer = ft_strjoin(dst_buffer, src_buffer);
-		free(src_buffer);
+		dstbuffer = ft_strjoin(buffer, srcbuffer);
+		free(srcbuffer);
+		if (!dstbuffer)
+			dstbuffer = NULL;
 	}
-	return (dst_buffer);
+	free(buffer);
+	return (dstbuffer);
 }
 
 char **split_pipe(char *buffer)
 {
 	char	**strs;
 	int		pipe_num;
-	int		index;
 	int		strlen;
+	int		index;
 
-	if (!buffer)
-		return (NULL);
 	pipe_num = count_pipe(buffer);
 	strs = ft_calloc(pipe_num + 1, sizeof(char *));
 	if (!strs)
@@ -157,35 +159,34 @@ char **split_pipe(char *buffer)
 		while (ft_isspace(*buffer))
 			buffer++;
 		strlen = find_pipeend(buffer) - buffer + 1;
-		if (strlen)
+		strs[index] = ft_substr(buffer, 0, strlen);
+		if (!strs[index])
 		{
-			strs[index] = ft_substr(buffer, 0, strlen);
-			if (!strs[index])
-			{
-				free_strs(strs);
-				return (NULL);
-			}
-			index++;
+			free_strs(strs);
+			return (NULL);
 		}
+		index++;
 		buffer += strlen;
 	}
 	return (strs);
 }
 
 /* valid_buffer */
-char *get_valid_buffer(char *buffer)
+char *get_valid_buffer(char *headbuffer)
 {
 	char *vbuffer;
 
+	vbuffer = ft_strdup(headbuffer);
 	while(1)
 	{
-		if (handle_empty_pipe(buffer) == SYNTAX_ERROR) //비어있는 pipe 에러처리
+		if (handle_empty_pipe(vbuffer) == SYNTAX_ERROR) //비어있는 pipe 에러처리
 			return (NULL);
-		else if (ispipeopen(buffer) == TRUE) //열린 pipe 확인
+		else if (ispipeopen(vbuffer) == TRUE) //열린 pipe 확인
 		{
-			vbuffer = get_pipeline(buffer); //추가입력 받기 
+			vbuffer = get_pipeline(vbuffer); //추가입력 받기 
 			if (!vbuffer) //입력 term 종료 했을 때, 메모리 부족할 때
 			{
+				free(headbuffer);
 				status = handle_error(NULL, NULL, SYN_TERM);
 				return (NULL);
 			}
@@ -193,7 +194,7 @@ char *get_valid_buffer(char *buffer)
 		else
 			break;
 	}
-	vbuffer = ft_strdup(buffer);
+	free(headbuffer);
 	return (vbuffer);
 }
 
@@ -211,7 +212,6 @@ int ft_ispipe(char chr)
 		return (TRUE);
 	return (FALSE);
 }
-
 
 int ft_isresword(char chr)
 {
@@ -284,7 +284,6 @@ int handle_empty_redirects(char **strs)
 	return (EXIT_SUCCESS);
 }
 
-
 /* trim.c */
 char *trim_space(char *str)
 {
@@ -295,12 +294,16 @@ char *trim_space(char *str)
 		old_str = str;
 		str = ft_substr(" ", 0, 1);
 		free (old_str);
+		if (!str)
+			return (NULL);
 	}
 	else if (ft_strchr(str, SPACE) || ft_strchr(str, PIPE))
 	{
 		old_str = str;
 		str = ft_strtrim(str, " |");
 		free (old_str);
+		if (!str)
+			return (NULL);
 	}
 	return (str);
 }
@@ -313,19 +316,19 @@ char *trim_quote(char *str)
 
 	old_str = str;
 	new_str = NULL;
-	while (str && *str)
+	while (*str)
 	{
 		len = wordlen(str, SPACE);
-		// printf("trimlen: %d\n", len);
 		if ((*str == SGL_QUOTE || *str == DBL_QUOTE))
 		{
 			new_str = ft_substr(str + 1, 0, len - 2);
 			free(old_str);
+			if (!new_str)
+				return (NULL);
 			break;
 		}
 		else 
 		{
-			// new_str = ft_substr(str, 0, len);
 			new_str = old_str;
 			break;
 		}
@@ -349,76 +352,104 @@ int read_redirect_typeno(char *str)
 }
 
 /* replace.c */
-char *replace_envp2(t_deques *deqs, char **str, char *dst)
-{
-	char	*old_dst;
-	char	*envp;
-	char	*key; 
 
+int replace_pcode(char **str, char **envp)
+{
 	if (**str && **str == DOLLAR)
 	{
 		(*str)++;
 		if (**str && **str == '?')
 		{
-			envp = ft_itoa(status);
+			*envp = ft_itoa(status);
+			if (!*envp)
+				return (EXTRA_ERROR);
 			(*str)++;
+			return (TRUE);
 		}
-		else
-		{
-			key = ft_substr(*str, 0, ft_strchr(*str, ' ') - *str);
-			envp = get_val_deq(deqs, key);
-			(*str) += (ft_strlen(key) - 1);
-			free(key);
-		}
-		old_dst = dst;
-		dst = ft_strjoin(dst, envp);
-		free(old_dst);
-		free(envp);
-		return (dst);
 	}
+	return (FALSE);
+}
+
+int replace_val_env(char **str, char **envp, t_deques *deqs)
+{
+	char	*key; 
+
+	key = ft_substr(*str, 0, ft_strchr(*str, ' ') - *str);
+	if (!key)
+		return (EXTRA_ERROR);
+	*envp = get_val_deq(deqs, key);
+	if (!envp)
+	{
+		free(key);
+		return (EXTRA_ERROR);
+	}
+	(*str) += (ft_strlen(key) - 1);
+	free(key);
+	return (EXIT_SUCCESS);
+}
+
+char *replace_dollar(t_deques *deqs, char **str, char *dst)
+{
+	char	*old_dst;
+	char	*envp;
+
+	int		errno;
+
+	errno = replace_pcode(str, &envp);
+	if (errno == EXTRA_ERROR)
+		return (NULL);
+	else if (errno == TRUE)
+		return (envp);
+	if (replace_val_env(str, &envp, deqs) == EXTRA_ERROR)
+		return (NULL);
+	old_dst = dst;
+	dst = ft_strjoin(dst, envp);
+	free(old_dst);
+	free(envp);
 	return (dst);
 }
 
+// char *find_dollar_end()
+// {
+// 	if (ft_strchr(str, DOLLAR))
+// 		len = ft_strchr(str, DOLLAR) - str;
+// 	else 
+// 		len = ft_strlen(str);
+// }
+
 char *replace_envp(t_deques *deqs, char *str)
 {
-	char	*head;
+	char	*headstr;
 	char	*dst;
 	int		len;
 	
 	dst = ft_calloc(1, sizeof(char));
 	if (!ft_strchr(str, DOLLAR))
 		return (str);
-	head = str;
+	headstr = str;
 	while (str && *str)
 	{
 		len = 0;
-		if (*str && *str == DOLLAR)
-			dst = replace_envp2(deqs, &str, dst);
+		if (*str == DOLLAR)
+			dst = replace_dollar(deqs, &str, dst);
 		else
 		{
 			if (ft_strchr(str, DOLLAR))
-			{
-				len = ft_strchr(str, DOLLAR) - str - 1;
-				dst = ft_substrjoin(str, 0, len + 1, dst);
-			}
-			else
-			{
+				len = ft_strchr(str, DOLLAR) - str;
+			else 
 				len = ft_strlen(str);
-				dst = ft_substrjoin(str, 0, len, dst);
-			}
+			dst = ft_substrjoin(str, 0, len, dst);
 			str += len;
 		}
 		str++;
 	}
-	free(head);
+	free(headstr);
 	return (dst);
 }
 
 
 char *replace_word(t_deques *deqs, char *str)
 {
-	(void) deqs;
-	(void) str;
 	char *new_str;
 
 	new_str = trim_space(str);
@@ -549,6 +580,7 @@ void token_word(t_token **token, t_deques *envps, char *str)
 	words = NULL;
 	word = NULL;
 	argvs = NULL;
+
 	while (*str)
 	{
 		len = find_redirect_start(str) - str;
@@ -562,19 +594,25 @@ void token_word(t_token **token, t_deques *envps, char *str)
 			str += len;
 		}
 	}
-	if (words && *words)
+
+	if (*words)
 	{
+		char *head = words;
 		words = ft_ltrim(words);
 		len = wordlen(words, SPACE);
 		word = ft_substr(words, 0, len);
 		word = replace_word(envps, word);
 		argv = ft_substr(words + len, 0, ft_strlen(words + len));
 		argvs = get_argvs(word, argv, envps);
-		free(words);
+		free(head);
 		free(argv);
 	}
 	else
+	{
 		word = ft_calloc(1, sizeof(char));
+		argv = ft_calloc(1, sizeof(char));
+	}
+
 	add_token(*token, T_CMD_WORD, word, argvs);
 
 }
@@ -598,7 +636,9 @@ t_token *tokenizer(t_deques *envps, char **strs)
 		if (token_redirect(&token, envps, *strs) == SYNTAX_ERROR)
 			return (NULL);
 		token_word(&token, envps, *strs);
+		
 		strs++;
+
 	}
 	/*token 출력*/
 	// debug_token(token);
@@ -615,11 +655,15 @@ void	lexer(t_shell *shell, char *vbuffer)
 	free(vbuffer);
 	if (!vbuffers)
 		return ;
-	/*buffers 출력*/
+	// /*buffers 출력*/
 	// debug_buffers(vbuffers);
+
 	shell->t = ft_calloc(1, sizeof(t_token));
+
 	shell->t = tokenizer(shell->data.envps, vbuffers); //leaks
+
 	free_strs(vbuffers);
+
 	if (!shell->t)
 		return ;
 }
@@ -629,10 +673,14 @@ void	parselines(t_shell *shell, char *buffer)
 {
 	char *vbuffer;
 
+	// printf("buffer: %s\n", buffer);
 	vbuffer = get_valid_buffer(buffer);
-	free (buffer);
+	// printf("vbuffer: %s\n", buffer);
+	// free (buffer);
 	if (!vbuffer)
 		return ;
 	lexer(shell, vbuffer);
+	
 	parser(&shell->t);
+
 }
