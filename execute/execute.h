@@ -33,7 +33,7 @@ typedef struct s_process
 	pid_t	pid;
 	char	*path;
 	char	**args;
-	char	*flag;
+	int		index;
 	int		pipe_fd[2];
 	int		redirect_fd[2];
 }	t_process;

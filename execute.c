@@ -23,7 +23,7 @@ int	here_doc(char **buffer, char *limiter, int fd)
 	while (true)
 	{
 		//개행까지 들어가는지 확인 필요
-		*buffer = readline(PROMPT_MSG);
+		*buffer = readline("heredoc>");
 		if (*buffer == NULL)
 			return (EXTRA_ERROR);
 		if (!ft_memcmp(*buffer, limiter, ft_strlen(limiter) + 1))
@@ -33,26 +33,31 @@ int	here_doc(char **buffer, char *limiter, int fd)
 	return (EXIT_SUCCESS);
 }
 
-int	open_token(t_token *t)
+int	open_token(t_token *t, int num)
 {
-	int		fd;
-	char	*buffer;
+	int			fd;
+	const char	*heredoc = "here_doc";
+	char		*buffer;
+	char		*s;
 
 	fd = 0;
+	s = ft_strjoin(heredoc, ft_itoa(num));
+	if (!s)
+		fd = -1;
 	if (t->type == T_GREAT)
 		fd = open(t->word, O_RDONLY);
-	if (t->type == T_LESS || t->type == T_DGREAT)
+	if (t->type == T_LESS)
 		fd = open(t->word, O_CREAT | O_TRUNC | O_WRONLY, 0666);
+	if (t->type == T_DGREAT)
+		fd = open(s, O_CREAT | O_TRUNC | O_WRONLY, 0666);
 	if (t->type == T_DLESS)
 		fd = open(t->word, O_CREAT | O_APPEND | O_WRONLY, 0666);
 	if (fd != -1 && t->type == T_DGREAT)
-	{
-		here_doc(&buffer);
-	}
-	printf("t->word: %s %d\n", t->word, fd);
+		here_doc(&buffer, t->word, fd);
+	free(s);
 	return (fd);
 }
-
+// free 및 close 함수에 unlink 추가 필요
 //close_fd print_error 뒤에
 int	open_redirect(t_process *p, t_token *t)
 {
@@ -62,18 +67,11 @@ int	open_redirect(t_process *p, t_token *t)
 	{
 		if (p->redirect_fd[t->type % 2] > 2)
 			close(p->redirect_fd[t->type % 2]);
-		if (p->flag)
-		{
-			// free 및 close 함수에 unlink 추가 필요
-			unlink(p->flag);
-			free(p->flag);
-			p->flag = NULL;
-		}	
-		p->redirect_fd[t->type % 2] = open_token(t);
+		p->redirect_fd[t->type % 2] = open_token(t, p->index);
 		return (p->redirect_fd[t->type % 2]);
 	}
 	if (t->left && open_redirect(p, t->left))
-		return (EXIT_FAILURE);=
+		return (EXIT_FAILURE);
 	if (t->right && open_redirect(p, t->right))
 		return (EXIT_FAILURE);
 	return (EXIT_SUCCESS);
@@ -90,7 +88,7 @@ void	dup_fd(int *fd, int std)
 
 void	set_fd(t_shell *shell, size_t index)
 {
-	printf("red: input %d output %d\n", shell->p[index].redirect_fd[0], shell->p[index].redirect_fd[1]);
+	// printf("red: input %d output %d\n", shell->p[index].redirect_fd[0], shell->p[index].redirect_fd[1]);
 	if (shell->p[index].redirect_fd[STDIN_FILENO] > STDERR_FILENO)
 		dup_fd(&shell->p[index].redirect_fd[STDIN_FILENO], STDIN_FILENO);
 	else if (index && shell->p[index - 1].pipe_fd[STDIN_FILENO])

@@ -111,6 +111,10 @@ int   token_to_process(t_shell *shell, t_token *t, size_t *index)
     {
 		if (token_to_word(shell, t->right, *index) || open_redirect(&shell->p[*index], t->left) == -1)
             return (EXTRA_ERROR);
+		// printf("%s\n", shell->p[*index].path);
+		// printf("%s\n", shell->p[*index].args[0]);
+		// printf("%s\n", shell->p[*index].args[1]);
+		shell->p[*index].index = *index;
 		*index += 1;
         return (EXIT_SUCCESS);
     }
@@ -126,7 +130,7 @@ void    exec_cmds(t_shell *shell)
     size_t  index;
 
     index = 0;
-    shell->p_size = find_pipe(shell->t);
+    shell->p_size = find_pipe(shell->t) - 1;
     shell->p = ft_calloc(shell->p_size + 1, sizeof(t_process));
     if (!shell->p || token_to_process(shell, shell->t, &index))
     {

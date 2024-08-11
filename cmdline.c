@@ -82,6 +82,16 @@ int	set_parsing_deques(t_deques *deqs, char *cmd)
 
 	len = ft_strlen(cmd);
 	ft_memset(fb, 0, sizeof(size_t) * 2);
+	str = NULL;
+	if (!ft_strchr(cmd, '\'') && !ft_strchr(cmd, '\"'))
+	{
+		if (set_keyval(&keyval, cmd, 0, "") || push_back(deqs, keyval))
+		{
+			free_map(&keyval);
+			return (EXTRA_ERROR);
+		}
+		return (EXIT_SUCCESS);
+	}
 	while (fb[0] < len)
 	{
 		parsing_cmd(cmd, &fb[0], &fb[1]);
@@ -113,8 +123,7 @@ char	**get_cmdargs(char **cmds)
 		return (NULL);
 	while (cmds[index])
 	{
-		if ((ft_strchr(cmds[index], '\'') || ft_strchr(cmds[index], '\"')) \
-		&& set_parsing_deques(deqs, cmds[index]))
+		if (set_parsing_deques(deqs, cmds[index]))
 		{
 			free_deques(&deqs);
 			return (NULL);
