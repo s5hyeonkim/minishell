@@ -3,17 +3,19 @@
 void	free_token(t_token *t)
 {
 	(void) t;
-	// if (t)
-	// {
-	// 	// printf("here\n");
-	// 	free_token(t->left);
-	// 	t->left = NULL;
-	// 	free_token(t->right);
-	// 	t->right = NULL;
-	// 	free(t->word);
-	// 	t->word = NULL;
-	// }
-	// free(t);
+	if (t)
+	{
+		// printf("here\n");
+		free_token(t->left);
+		t->left = NULL;
+		free_token(t->right);
+		t->right = NULL;
+		free(t->word);
+		t->word = NULL;
+		free_strs(t->argvs);
+		t->argvs = NULL;
+	}
+	free(t);
 }
 
 void	free_data(t_data d)

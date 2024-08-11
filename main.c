@@ -145,7 +145,6 @@ void	loop(t_shell *shell)
 		// print_tree(shell->t, 2, 0);
 		// printf("========\n");
 		exec_cmds(shell);
-		free_tokens(shell->t);
 		clean_cmds(shell);
 	}
 }
