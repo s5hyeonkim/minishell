@@ -7,22 +7,22 @@ void	clean_cmds(t_shell *shell)
 	index = 0;
 	while (index < shell->p_size)
 	{
-		if (shell->p[index].redirect_fd[0] > 0)
+		if (shell->p[index].redirect_fd[0] > 2)
 		{
 			close(shell->p[index].redirect_fd[0]);
 			shell->p[index].redirect_fd[0] = 0;
 		}
-		if (shell->p[index].redirect_fd[1] > 0)
+		if (shell->p[index].redirect_fd[1] > 2)
 		{
 			close(shell->p[index].redirect_fd[1]);
 			shell->p[index].redirect_fd[1] = 0;
 		}
-		if (shell->p[index].pipe_fd[0] > 0)
+		if (shell->p[index].pipe_fd[0] > 2)
 		{
 			close(shell->p[index].pipe_fd[0]);
 			shell->p[index].pipe_fd[0] = 0;
 		}
-		if (shell->p[index].pipe_fd[1] > 0)
+		if (shell->p[index].pipe_fd[1] > 2)
 		{
 			close(shell->p[index].pipe_fd[1]);
 			shell->p[index].pipe_fd[1] = 0;

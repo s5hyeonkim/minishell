@@ -20,7 +20,7 @@ void	subprocess(t_shell *shell)
 	size_t	index;
 
 	index = 0;
-	// printf("execute in child process\n");
+	printf("execute in child process\n");
 	set_signal_sub(shell, handler_sub); 
 	while (index < shell->p_size)
 	{
@@ -38,8 +38,8 @@ void	set_fd_builtin(t_process *p)
 	int	fd_in;
 	int	fd_out;
 
-	fd_in = dup(STDOUT_FILENO);
-	fd_out = dup(STDIN_FILENO);
+	fd_in = dup(STDIN_FILENO);
+	fd_out = dup(STDOUT_FILENO);
 	if (p->redirect_fd[0] > 0)
 		dup_fd(&p->redirect_fd[0], fd_in);
 	if (p->redirect_fd[1] > 0)
@@ -53,9 +53,6 @@ void	inprocess(t_shell *shell)
 	long	status;
 
 	printf("execute in current process\n");
-	// printf("%s\n", shell->p[0].path);
-	// for (int i = 0; shell->p[0].args[i]; i++)
-		// printf("%s\n", shell->p[0].args[i]);
 	set_fd_builtin(shell->p);
 	status = exec_builtin(shell->p[0], &shell->data);
 	if (!ft_memcmp(shell->p[0].args[0], "exit", 5) && !status)
@@ -91,33 +88,40 @@ char	**debug(char *path, char **args)
 	return debug;
 }
 
+int	token_to_word(t_shell *shell, t_token *t, size_t index)
+{
+	t_process	*p;
+
+	if (!t || t->type != T_CMD_WORD)
+		return (EXIT_SUCCESS);
+	p = &shell->p[index];
+	p->args = get_cmdargs(t->argv);
+    p->path = get_cmdpath(shell->data.paths, t->word);
+    if (!p->args || !p->path)
+        return (EXTRA_ERROR);
+    return (EXIT_SUCCESS);
+}
 
 int   token_to_process(t_shell *shell, t_token *t, size_t *index)
 {
     int         status;
-    t_process   *p;
 
-    p = &shell->p[*index];
     status = EXIT_SUCCESS;
     if (t->type == T_SIMPLE_CMD)
     {
-		
-        p->args = get_cmdargs(t->right->argv);
-        if (p->args)
-            p->path = get_cmdpath(shell->data.paths, t->right->word);
-		// p->args = debug(t->right->word, p->args);
-		// for (int i = 0; shell->p[*index].args[i] != 0; i++)
-			// printf("i: %d args %s\n", i, shell->p[*index].args[i]);
-		// printf("path %s\n", shell->p[*index].path);
-        if (!p->args || !p->path || open_redirect(p, t->left) == -1)
+		if (token_to_word(shell, t->right, *index) || open_redirect(&shell->p[*index], t->left) == -1)
             return (EXTRA_ERROR);
+		// printf("%s\n", shell->p[*index].path);
+		// printf("%s\n", shell->p[*index].args[0]);
+		// printf("%s\n", shell->p[*index].args[1]);
+		shell->p[*index].index = *index;
+		*index += 1;
         return (EXIT_SUCCESS);
     }
     if (t->left)
         status = token_to_process(shell, t->left, index);
-    if (!status && t->right)
+    else if (!status && t->right)
         status = token_to_process(shell, t->right, index);
-	// printf("ok ttop %d\n", status);
     return (status);
 }
 
@@ -126,7 +130,7 @@ void    exec_cmds(t_shell *shell)
     size_t  index;
 
     index = 0;
-    shell->p_size = find_pipe(shell->t) + 1;
+    shell->p_size = find_pipe(shell->t) - 1;
     shell->p = ft_calloc(shell->p_size + 1, sizeof(t_process));
     if (!shell->p || token_to_process(shell, shell->t, &index))
     {
@@ -138,3 +142,18 @@ void    exec_cmds(t_shell *shell)
 	else
 		subprocess(shell);
 }
+
+
+// void print_token(t_token *t)
+// {
+// 	const char *d[] = {"", "|", "simple cmd", "cmd word", "redirects", ">>", "<<", ">", "<"};
+// 	if (!t)
+// 		return;
+// 	printf("type is %s\n", d[t->type]);
+// 	if (t->word)
+// 		printf("token word: %s\n", t->word);
+// 	print_token(t->left);
+// 	if (t->right && t->right->type == T_SIMPLE_CMD)
+// 		printf("\n\n\n");
+// 	print_token(t->right);	
+// }

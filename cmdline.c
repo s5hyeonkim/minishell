@@ -82,6 +82,16 @@ int	set_parsing_deques(t_deques *deqs, char *cmd)
 
 	len = ft_strlen(cmd);
 	ft_memset(fb, 0, sizeof(size_t) * 2);
+	str = NULL;
+	if (!ft_strchr(cmd, '\'') && !ft_strchr(cmd, '\"'))
+	{
+		if (set_keyval(&keyval, cmd, 0, "") || push_back(deqs, keyval))
+		{
+			free_map(&keyval);
+			return (EXTRA_ERROR);
+		}
+		return (EXIT_SUCCESS);
+	}
 	while (fb[0] < len)
 	{
 		parsing_cmd(cmd, &fb[0], &fb[1]);
@@ -99,6 +109,7 @@ int	set_parsing_deques(t_deques *deqs, char *cmd)
 	}
 	return (EXIT_SUCCESS);
 }
+// argv 파싱할때 가공하는거에서 quotation 없으면 가공안하는 걸로 바꿔주기
 
 char	**get_cmdargs(char **cmds)
 {

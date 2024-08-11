@@ -25,6 +25,6 @@ int	ft_pwd(t_process p, t_data *d)
 {
 	if (!is_valid_option(p.args[1]))
 		return (handle_error(p.args[0], p.args[1], INVALID_OPT));
-	printf("%s\n", d->lcwd);
+	// printf("%s\n", d->lcwd);
 	return (EXIT_SUCCESS);
 }

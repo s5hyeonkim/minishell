@@ -18,41 +18,63 @@ void	exec_program(t_shell *shell, t_process p)
 		exit_process(shell, p.args[0], CMD_NOT_FOUND);
 }
 
-int	open_token(t_token *t)
+int	here_doc(char **buffer, char *limiter, int fd)
 {
-	int	fd;
+	while (true)
+	{
+		//개행까지 들어가는지 확인 필요
+		*buffer = readline("heredoc>");
+		if (*buffer == NULL)
+			return (EXTRA_ERROR);
+		if (!ft_memcmp(*buffer, limiter, ft_strlen(limiter) + 1))
+			break ;
+		write(fd, *buffer, ft_strlen(*buffer));
+	}
+	return (EXIT_SUCCESS);
+}
+
+int	open_token(t_token *t, int num)
+{
+	int			fd;
+	const char	*heredoc = "here_doc";
+	char		*buffer;
+	char		*s;
 
 	fd = 0;
-	if (t->type == T_GREAT || t->type == T_DGREAT)
+	s = ft_strjoin(heredoc, ft_itoa(num));
+	if (!s)
+		fd = -1;
+	if (t->type == T_GREAT)
 		fd = open(t->word, O_RDONLY);
 	if (t->type == T_LESS)
 		fd = open(t->word, O_CREAT | O_TRUNC | O_WRONLY, 0666);
+	if (t->type == T_DGREAT)
+		fd = open(s, O_CREAT | O_TRUNC | O_WRONLY, 0666);
 	if (t->type == T_DLESS)
 		fd = open(t->word, O_CREAT | O_APPEND | O_WRONLY, 0666);
+	if (fd != -1 && t->type == T_DGREAT)
+		here_doc(&buffer, t->word, fd);
+	free(s);
 	return (fd);
 }
-
+// free 및 close 함수에 unlink 추가 필요
 //close_fd print_error 뒤에
 int	open_redirect(t_process *p, t_token *t)
 {
-	int	status;
-
-	status = EXIT_SUCCESS;
 	if (!t)
 		return (EXIT_SUCCESS);
-	if (t->type == T_GREAT || t->type == T_DGREAT || \
-	t->type == T_DLESS ||	t->type == T_LESS)
+	if (t->type == T_GREAT || t->type == T_DLESS ||	t->type == T_LESS)
 	{
-		if (p->redirect_fd[t->type % 2])
+		if (p->redirect_fd[t->type % 2] > 2)
 			close(p->redirect_fd[t->type % 2]);
-		p->redirect_fd[t->type % 2] = open_token(t);
+		p->redirect_fd[t->type % 2] = open_token(t, p->index);
 		return (p->redirect_fd[t->type % 2]);
 	}
-	if (t->left)
-		status = open_redirect(p, t->left);
-	if (status >= 0 && t->right)
-		status = open_redirect(p, t->right);
-	return (status);
+	if (t->left && open_redirect(p, t->left))
+		return (EXIT_FAILURE);
+	if (t->right && open_redirect(p, t->right))
+		return (EXIT_FAILURE);
+	return (EXIT_SUCCESS);
 }
 
 void	dup_fd(int *fd, int std)
@@ -66,15 +88,15 @@ void	dup_fd(int *fd, int std)
 
 void	set_fd(t_shell *shell, size_t index)
 {
-	printf("red: input %d output %d\n", shell->p[index].redirect_fd[0], shell->p[index].redirect_fd[1]);
-	if (shell->p[index].redirect_fd[0] > 0)
-		dup_fd(&shell->p[index].redirect_fd[0], 0);
-	else if (index)
-		dup_fd(&shell->p[index - 1].pipe_fd[0], 0);
-	if (shell->p[index].redirect_fd[1] > 0)
-		dup_fd(&shell->p[index].redirect_fd[1], 1);
-	else if (index != shell->p_size - 1)
-		dup_fd(&shell->p[index].pipe_fd[1], 1);
+	// printf("red: input %d output %d\n", shell->p[index].redirect_fd[0], shell->p[index].redirect_fd[1]);
+	if (shell->p[index].redirect_fd[STDIN_FILENO] > STDERR_FILENO)
+		dup_fd(&shell->p[index].redirect_fd[STDIN_FILENO], STDIN_FILENO);
+	else if (index && shell->p[index - 1].pipe_fd[STDIN_FILENO])
+		dup_fd(&shell->p[index - 1].pipe_fd[STDIN_FILENO], STDIN_FILENO);
+	if (shell->p[index].redirect_fd[STDOUT_FILENO] > STDERR_FILENO)
+		dup_fd(&shell->p[index].redirect_fd[STDOUT_FILENO], STDOUT_FILENO);
+	else if (index != shell->p_size - 1 && shell->p[index].pipe_fd[STDOUT_FILENO])
+		dup_fd(&shell->p[index].pipe_fd[STDOUT_FILENO], STDOUT_FILENO);
 }
 
 void	child(t_shell *shell, size_t index)
@@ -88,7 +110,6 @@ void	child(t_shell *shell, size_t index)
 		close(shell->p[index].pipe_fd[0]);
 		shell->p[index].pipe_fd[0] = 0;
 	}
-	// printf("pindex: %zu %zu\n", index, shell->p_size);
 	set_fd(shell, index);
 	if (is_builtin(shell->p[index].path))
 	{
@@ -105,7 +126,7 @@ void	parent(t_shell *shell, size_t index)
 {
 	if (!shell->p[index].pid)
 		return ;
-	if (index != shell->p_size - 1)
+	if (index && index != shell->p_size - 1)
 	{
 		close(shell->p[index].pipe_fd[1]);
 		shell->p[index].pipe_fd[1] = 0;
