@@ -95,7 +95,7 @@ int	token_to_word(t_shell *shell, t_token *t, size_t index)
 	if (!t || t->type != T_CMD_WORD)
 		return (EXIT_SUCCESS);
 	p = &shell->p[index];
-	p->args = get_cmdargs(t->argv);
+	p->args = get_cmdargs(t->argvs);
     p->path = get_cmdpath(shell->data.paths, t->word);
     if (!p->args || !p->path)
         return (EXTRA_ERROR);
