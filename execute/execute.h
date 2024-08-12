@@ -34,6 +34,7 @@ typedef struct s_process
 	char	*path;
 	char	**args;
 	int		index;
+	int		flag;
 	int		pipe_fd[2];
 	int		redirect_fd[2];
 }	t_process;

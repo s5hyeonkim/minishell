@@ -26,7 +26,7 @@
 # include "./execute/execute.h"
 # include "./src/parsing.h"
 # define PATH_MAX 1024
-
+# define WAIT_TIMEOUT 258
 // # define PROMPT_MSG "minishell$ "
 # define PROMPT_MSG "\033[36mminishell ❯\033[0m "
 

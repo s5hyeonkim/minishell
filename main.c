@@ -54,6 +54,7 @@ void	exit_process(t_shell *shell, char *obj, int errcode)
 		handle_error(obj, NULL, errcode);
 	if (errcode == SIGEXIT + SIGTERM)
 		errcode = EXIT_SUCCESS;
+	clean_cmds(shell);
 	free_shell(*shell);
 	exit(errcode);
 }
@@ -138,12 +139,12 @@ void	loop(t_shell *shell)
 	while(1)
 	{
 		readlines(shell, &buffer);
-		// printf("buffer: %s\n", buffer);
+		printf("buffer: %s\n", buffer);
 		set_status(shell);
 		parselines(shell, buffer); // parseline에서 malloc실패 등 에러나면 continue 분기문 만들어주기
 		// printf("==loop==\n");
 		// print_tree(shell->t, 2, 0);
-		// printf("========\n");
+		printf("========\n");
 		exec_cmds(shell);
 		clean_cmds(shell);
 	}

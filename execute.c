@@ -33,43 +33,56 @@ int	here_doc(char **buffer, char *limiter, int fd)
 	return (EXIT_SUCCESS);
 }
 
-int	open_token(t_token *t, int num)
+int	open_token(t_token *t, char *link)
 {
 	int			fd;
-	const char	*heredoc = "here_doc";
 	char		*buffer;
-	char		*s;
 
 	fd = 0;
-	s = ft_strjoin(heredoc, ft_itoa(num));
-	if (!s)
-		fd = -1;
 	if (t->type == T_GREAT)
 		fd = open(t->word, O_RDONLY);
 	if (t->type == T_LESS)
 		fd = open(t->word, O_CREAT | O_TRUNC | O_WRONLY, 0666);
 	if (t->type == T_DGREAT)
-		fd = open(s, O_CREAT | O_TRUNC | O_WRONLY, 0666);
+		fd = open(link, O_CREAT | O_TRUNC | O_WRONLY, 0666);
 	if (t->type == T_DLESS)
 		fd = open(t->word, O_CREAT | O_APPEND | O_WRONLY, 0666);
 	if (fd != -1 && t->type == T_DGREAT)
 		here_doc(&buffer, t->word, fd);
-	free(s);
+	printf("open %d\n", t->type);
 	return (fd);
 }
+// 쓰는것
 // free 및 close 함수에 unlink 추가 필요
 //close_fd print_error 뒤에
 int	open_redirect(t_process *p, t_token *t)
 {
+	char	*num;
+	char	*link;
+
 	if (!t)
 		return (EXIT_SUCCESS);
-	if (t->type == T_GREAT || t->type == T_DLESS ||	t->type == T_LESS)
+	num = ft_itoa(p->index);
+	if (num)
+		link = ft_strjoin("here_doc", num);
+	if (!num || !link)
+		return (EXIT_FAILURE);
+	if (t->type == T_GREAT || t->type == T_DLESS ||	t->type == T_LESS || t->type == T_DGREAT)
 	{
 		if (p->redirect_fd[t->type % 2] > 2)
 			close(p->redirect_fd[t->type % 2]);
-		p->redirect_fd[t->type % 2] = open_token(t, p->index);
+		if (t->type % 2 == 0)
+		{
+			unlink(link);
+			p->flag = 0;
+		}
+		p->redirect_fd[t->type % 2] = open_token(t, link);
+		if (t->type == T_DGREAT)
+			p->flag = 1;
 		return (p->redirect_fd[t->type % 2]);
 	}
+	free(link);
+	free(num);
 	if (t->left && open_redirect(p, t->left))
 		return (EXIT_FAILURE);
 	if (t->right && open_redirect(p, t->right))
@@ -105,11 +118,6 @@ void	child(t_shell *shell, size_t index)
 
 	if (shell->p[index].pid)
 		return ;
-	if (index != shell->p_size - 1)
-	{
-		close(shell->p[index].pipe_fd[0]);
-		shell->p[index].pipe_fd[0] = 0;
-	}
 	set_fd(shell, index);
 	if (is_builtin(shell->p[index].path))
 	{
@@ -117,6 +125,12 @@ void	child(t_shell *shell, size_t index)
 		if (!ft_memcmp(shell->p[index].path, "exit", 5) && !ret)
 			ret = shell->data.status;
 		exit_process(shell, NULL, ret);
+	}
+	else if (!shell->p[index].args[0][0])
+	{
+		if (shell->p_size != 1)
+			exit_process(shell, NULL, WAIT_TIMEOUT);
+		exit_process(shell, NULL, EXIT_SUCCESS);
 	}
 	else 
 		exec_program(shell, shell->p[index]);

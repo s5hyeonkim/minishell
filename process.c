@@ -21,7 +21,8 @@ void	subprocess(t_shell *shell)
 
 	index = 0;
 	printf("execute in child process\n");
-	set_signal_sub(shell, handler_sub); 
+	set_signal_sub(shell, handler_sub);
+	printf("%zu\n", shell->p_size);
 	while (index < shell->p_size)
 	{
 		open_pipe(shell, index);
@@ -111,9 +112,9 @@ int   token_to_process(t_shell *shell, t_token *t, size_t *index)
     {
 		if (token_to_word(shell, t->right, *index) || open_redirect(&shell->p[*index], t->left) == -1)
             return (EXTRA_ERROR);
-		printf("%s\n", shell->p[*index].path);
-		printf("%s\n", shell->p[*index].args[0]);
-		printf("%s\n", shell->p[*index].args[1]);
+		printf("path: %s\n", shell->p[*index].path);
+		printf("ar0: %s\n", shell->p[*index].args[0]);
+		printf("ar1: %s\n", shell->p[*index].args[1]);
 		shell->p[*index].index = *index;
 		*index += 1;
         return (EXIT_SUCCESS);
