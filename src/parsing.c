@@ -663,50 +663,69 @@ char *get_words(char *str)
 	return (words);
 }
 
-int add_empty_token(t_token **token)
+int add_tokenwords(t_token **token, char *word, char **argvs)
 {
-	char	*word;
-	char	**argvs; 
-
-	word = ft_calloc(1, sizeof(char));
 	if (!word)
-		return (EXTRA_ERROR);
-	argvs = ft_calloc(1, sizeof(char*));
+	{
+		word = ft_calloc(1, sizeof(char));
+		if (!word)
+			return (EXTRA_ERROR);
+	}
 	if (!argvs)
-		return (EXTRA_ERROR);
+	{
+		argvs = ft_calloc(1, sizeof(char*));
+		if (!argvs)
+			return (EXTRA_ERROR);
+	}
 	if (add_token(*token, T_CMD_WORD, word, argvs) == EXTRA_ERROR)
 		return (EXTRA_ERROR);
 	return (EXIT_SUCCESS);
+}
+
+
+char *get_word(t_deques *envps, char *words)
+{
+	char	*word;
+	int		len;
+
+	words = ft_ltrim(words);
+	len = wordlen(words, SPACE);
+	word = ft_substr(words, 0, len);
+	word = replace_word(envps, word);
+	return (word);
+}
+
+char **get_argvs_center(t_deques *envps, char *words, char *word)
+{
+	char	*argv;
+	char	**argvs; 
+	int		len;
+
+	words = ft_ltrim(words);
+	len = wordlen(words, SPACE);
+	argv = ft_substr(words + len, 0, ft_strlen(words + len));
+	argvs = get_argvs(word, argv, envps);
+	free(argv);
+	return (argvs);
 }
 
 int token_word(t_token **token, t_deques *envps, char *str)
 {
 	char	*words;
 	char	*word;
-	char	*argv;
-	int		len;
 	char	**argvs; 
 
-	argv = NULL;
 	word = NULL;
 	argvs = NULL;
-
 	words = get_words(str);
-	if (!words)
-		return (add_empty_token(token)); 
-	else
+	if (words)
 	{
 		char *head = words;
-		words = ft_ltrim(words);
-		len = wordlen(words, SPACE);
-		word = ft_substr(words, 0, len);
-		word = replace_word(envps, word);
-		argv = ft_substr(words + len, 0, ft_strlen(words + len));
-		argvs = get_argvs(word, argv, envps);
+		word = get_word(envps, words);
+		argvs = get_argvs_center(envps, words, word);
 		free(head);
-		free(argv);
-		add_token(*token, T_CMD_WORD, word, argvs);
 	}
+	add_tokenwords(token, word, argvs);
 	return (EXIT_SUCCESS);
 }
 
