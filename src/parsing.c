@@ -487,7 +487,7 @@ char *replace_envp(t_deques *deqs, char *str)
 	headstr = str;
 	while (*str)
 	{
-		printf("str: %s\n", str);
+		// printf("str: %s\n", str);
 		if (*str == DOLLAR)
 			dst = replace_dollar(deqs, &str, dst);
 		else
@@ -509,14 +509,14 @@ char *replace_word(t_deques *deqs, char *str)
 {
 	char *new_str;
 
-	printf("start\n");
+	// printf("start\n");
 	new_str = trim_space(str);
-	printf("new_str1: %s#\n", new_str);
+	// printf("new_str1: %s#\n", new_str);
 	if (ft_strchr(str, DOLLAR))
 		new_str = replace_envp(deqs, new_str);
-	printf("new_str2: %s#\n", new_str);
+	// printf("new_str2: %s#\n", new_str);
 	new_str = trim_quote(new_str);
-	printf("new_str3: %s#\n", new_str);
+	// printf("new_str3: %s#\n", new_str);
 	return (new_str);
 }
 
@@ -598,7 +598,9 @@ char **get_argvs(char *word, char *argv, t_deques *envps)
 	i = 1;
 	while (i < n && argv && *argv)
 	{
-		argv = ft_ltrim(argv);
+		argv = find_spacend(argv);
+		if (*(argv + 1) == PIPE)
+			argv++;
 		len = wordlen(argv, SPACE);
 		// printf("len: %d\n", len);
 		if (!len)
