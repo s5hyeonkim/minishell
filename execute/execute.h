@@ -60,5 +60,6 @@ int			ft_cd(t_process p, t_data *d);
 int			ft_echo(t_process p, t_data *d);
 int			ft_unset(t_process p, t_data *d);
 int			is_valid_option(char *opt);
+void	set_rwfd(t_process p, int *num, int write);
 
 #endif

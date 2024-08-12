@@ -15,7 +15,11 @@ int	ft_env(t_process p, t_data *d)
 {
 	int		index;
 	char	**envs;
+	int		fd_in;
+	int		fd_out;
 
+	set_rwfd(p, &fd_in, 0);
+	set_rwfd(p, &fd_out, 1);
 	if (p.args[1] && (ft_memcmp(p.args[1], "--", 3) || p.args[2]))
 		return (handle_error(p.args[0], NULL, INVALID_OPT));
 	envs = deqtostrs(d->envps);
@@ -25,7 +29,7 @@ int	ft_env(t_process p, t_data *d)
 	while (envs[index])
 	{
 		if (ft_strchr(envs[index], '='))
-			ft_putendl_fd(envs[index], STDOUT_FILENO);
+			ft_putendl_fd(envs[index], fd_out);
 		index++;
 	}
 	free_strs(envs);

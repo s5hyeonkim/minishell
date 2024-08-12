@@ -84,15 +84,17 @@ int	ft_export(t_process p, t_data *d)
 	int		index;
 	int		status;
 	t_map	keyval;
+	int		fd_out;
 
+	set_rwfd(p, &fd_out, 1);
 	status = EXIT_SUCCESS;
-	if (!p.args[1] || !ft_memcmp(p.args[1], "--", 3))
+	if (!p.args[1] || (!p.args[2] && !ft_memcmp(p.args[1], "--", 3)))
 	{
 		envs = deqtostrs(d->envps);
 		if (!envs)
 			return (handle_error(p.args[0], NULL, EXTRA_ERROR));
 		ft_sort(envs);
-		print_export(envs, p.redirect_fd[1]);
+		print_export(envs, fd_out);
 		free_strs(envs);
 		return (status);
 	}

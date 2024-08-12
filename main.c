@@ -112,7 +112,6 @@ void	set_status(t_shell *shell)
 	status = 0;
 }
 
-
 void free_tokens(t_token *tokens)
 {
 	t_token *left;

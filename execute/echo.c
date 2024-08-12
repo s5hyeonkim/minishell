@@ -40,18 +40,32 @@ char	*read_val_strs(char *strs[], char *key)
 	}
 	return (ret);
 }
+void	set_rwfd(t_process p, int *num, int write)
+{
+	if (p.redirect_fd[write] > 2)
+		*num = p.redirect_fd[write];
+	else if (p.pipe_fd[write] > 2)
+		*num = p.pipe_fd[write];
+	else
+		*num = write;
+}
+
 // echo 스페이스바 구분 없애주기
 int	ft_echo(t_process p, t_data *d)
 {
 	int	index;
+	int	fd_in;
+	int	fd_out;
 
 	(void) d;
 	index = 1;
+	set_rwfd(p, &fd_in, 0);
+	set_rwfd(p, &fd_out, 1);
 	if (is_no_nl(p.args[1]))
 		index++;
 	while (p.args[index])
-		ft_putstr_fd(p.args[index++], p.redirect_fd[1]);
+		ft_putstr_fd(p.args[index++], fd_out);
 	if (!is_no_nl(p.args[1]))
-		ft_putchar_fd('\n', p.redirect_fd[1]);
+		ft_putchar_fd('\n', fd_out);
 	return (EXIT_SUCCESS);
 }

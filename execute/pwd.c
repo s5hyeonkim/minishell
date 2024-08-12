@@ -23,9 +23,12 @@ int	is_valid_option(char *opt)
 //PATH_MAX value need to be changed
 int	ft_pwd(t_process p, t_data *d)
 {
+	int	fd_out;
+
 	(void) d;
 	if (!is_valid_option(p.args[1]))
 		return (handle_error(p.args[0], p.args[1], INVALID_OPT));
-	// printf("%s\n", d->lcwd);
+	set_rwfd(p, &fd_out, 1);
+	ft_putendl_fd(d->lcwd, fd_out);
 	return (EXIT_SUCCESS);
 }
