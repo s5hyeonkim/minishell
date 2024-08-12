@@ -694,6 +694,7 @@ char **get_argvs_center(t_deques *envps, char *words, char *word)
 	free(argv);
 	if (!argvs)
 		return (NULL);
+	
 	return (argvs);
 }
 
