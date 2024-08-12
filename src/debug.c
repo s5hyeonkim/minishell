@@ -20,13 +20,12 @@ void debug_token(t_token *token)
 			printf("argv: %s#\n", token->argvs[i++]);
 		token = token->right;
 	}
+    printf("==== debug_token complete====\n");
 }
 
 
 void debug_tree(t_token *dsttoken, int leftright, int i)
 {
-    if (!i)
-		// printf("==== debug_tree ====\n");
 	if(!dsttoken)
 		return ;
 	if (leftright == 0)

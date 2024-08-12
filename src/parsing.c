@@ -357,21 +357,34 @@ int read_redirect_typeno(char *str)
 
 /* replace.c */
 
-int replace_pcode(char **str, char **envp)
+
+// char *replace_pcode(char *str)
+// {
+// 	char *pcode;
+
+// 	pcode = NULL;
+// 	if (*str == DOLLAR && *(str + 1) == '?')
+// 	{
+// 		pcode = ft_itoa(status);
+// 		if (!pcode)
+// 			return (NULL);
+// 	}
+// 	return (pcode);
+// }
+
+char *replace_pcode(char *str)
 {
-	if (**str && **str == DOLLAR)
+	char *envp; 
+
+	envp = NULL;
+	if (*str== '?')
 	{
-		(*str)++;
-		if (**str && **str == '?')
-		{
-			*envp = ft_itoa(status);
-			if (!*envp)
-				return (EXTRA_ERROR);
-			(*str)++;
-			return (TRUE);
-		}
+		envp = ft_itoa(status);
+		if (!envp)
+			return (NULL);
+		(str)++;
 	}
-	return (FALSE);
+	return (envp);
 }
 
 int replace_val_env(char **str, char **envp, t_deques *deqs)
@@ -399,11 +412,10 @@ char *replace_dollar(t_deques *deqs, char **str, char *dst)
 
 	int		errno;
 
-	errno = replace_pcode(str, &envp);
-	if (errno == EXTRA_ERROR)
-		return (NULL);
-	else if (errno == TRUE)
-		return (envp);
+	(*str)++;
+	envp = replace_pcode(++(*str));
+	if (envp)
+		(*str)++;
 	if (replace_val_env(str, &envp, deqs) == EXTRA_ERROR)
 		return (NULL);
 	old_dst = dst;
@@ -413,13 +425,16 @@ char *replace_dollar(t_deques *deqs, char **str, char *dst)
 	return (dst);
 }
 
-// char *find_dollar_end()
-// {
-// 	if (ft_strchr(str, DOLLAR))
-// 		len = ft_strchr(str, DOLLAR) - str;
-// 	else 
-// 		len = ft_strlen(str);
-// }
+int chrendlen(char *str, int chr)
+{
+	int len ;
+
+	if (ft_strchr(str, chr))
+		len = ft_strchr(str, chr) - str;
+	else 
+		len = ft_strlen(str);
+	return (len);
+}
 
 char *replace_envp(t_deques *deqs, char *str)
 {
@@ -428,23 +443,21 @@ char *replace_envp(t_deques *deqs, char *str)
 	int		len;
 	
 	dst = ft_calloc(1, sizeof(char));
-	if (!ft_strchr(str, DOLLAR))
-		return (str);
+	if (!dst)
+		return (NULL);
 	headstr = str;
-	while (str && *str)
+	while (*str)
 	{
-		len = 0;
 		if (*str == DOLLAR)
 			dst = replace_dollar(deqs, &str, dst);
 		else
 		{
-			if (ft_strchr(str, DOLLAR))
-				len = ft_strchr(str, DOLLAR) - str;
-			else 
-				len = ft_strlen(str);
+			len = chrendlen(str, DOLLAR);
 			dst = ft_substrjoin(str, 0, len, dst);
 			str += len;
 		}
+		if (!dst)
+			break ;
 		str++;
 	}
 	free(headstr);
@@ -458,7 +471,8 @@ char *replace_word(t_deques *deqs, char *str)
 
 	new_str = trim_space(str);
 	// printf("new_str1: %s#\n", new_str);
-	new_str = replace_envp(deqs, new_str);
+	if (ft_strchr(str, DOLLAR))
+		new_str = replace_envp(deqs, new_str);
 	// printf("new_str2: %s#\n", new_str);
 	new_str = trim_quote(new_str);
 	// printf("new_str3: %s#\n", new_str);
@@ -532,7 +546,8 @@ char **get_argvs(char *word, char *argv, t_deques *envps)
 	argv = ft_ltrim(argv);
 	n = count_argv(argv);
 	argvs = ft_calloc(n + 1, sizeof(char *));
-	argvs[0] = ft_strdup(word);
+	if (word)
+		argvs[0] = ft_strdup(word);
 	i = 1;
 	while (i < n && argv && *argv)
 	{
@@ -598,7 +613,6 @@ void token_word(t_token **token, t_deques *envps, char *str)
 			str += len;
 		}
 	}
-
 	if (words && *words)
 	{
 		char *head = words;
@@ -664,7 +678,6 @@ void	lexer(t_shell *shell, char *vbuffer)
 	shell->t = ft_calloc(1, sizeof(t_token));
 
 	shell->t = tokenizer(shell->data.envps, vbuffers); //leaks
-
 	free_strs(vbuffers);
 
 	if (!shell->t)
