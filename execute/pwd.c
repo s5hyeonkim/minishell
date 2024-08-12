@@ -23,6 +23,7 @@ int	is_valid_option(char *opt)
 //PATH_MAX value need to be changed
 int	ft_pwd(t_process p, t_data *d)
 {
+	(void) d;
 	if (!is_valid_option(p.args[1]))
 		return (handle_error(p.args[0], p.args[1], INVALID_OPT));
 	// printf("%s\n", d->lcwd);
