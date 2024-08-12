@@ -144,7 +144,7 @@ void	loop(t_shell *shell)
 		parselines(shell, buffer); // parseline에서 malloc실패 등 에러나면 continue 분기문 만들어주기
 		// printf("==loop==\n");
 		// print_tree(shell->t, 2, 0);
-		// printf("==loop complete==\n");
+		printf("==loop complete==\n");
 		exec_cmds(shell);
 		clean_cmds(shell);
 	}
