@@ -382,6 +382,7 @@ char *replace_pcode(char *str)
 		envp = ft_itoa(status);
 		if (!envp)
 			return (NULL);
+		printf("%s\n", envp);
 		(str)++;
 	}
 	return (envp);
@@ -413,10 +414,10 @@ char *replace_dollar(t_deques *deqs, char **str, char *dst)
 	int		errno;
 
 	(*str)++;
-	envp = replace_pcode(++(*str));
+	envp = replace_pcode(*str);
 	if (envp)
 		(*str)++;
-	if (replace_val_env(str, &envp, deqs) == EXTRA_ERROR)
+	else if (replace_val_env(str, &envp, deqs) == EXTRA_ERROR)
 		return (NULL);
 	old_dst = dst;
 	dst = ft_strjoin(dst, envp);
