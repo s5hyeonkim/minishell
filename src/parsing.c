@@ -190,6 +190,10 @@ char *get_valid_buffer(char *headbuffer)
 				status = handle_error(NULL, NULL, SYN_TERM);
 				return (NULL);
 			}
+			else if (!*vbuffer)
+			{
+				return (NULL);
+			}
 		}
 		else
 			break;
@@ -595,7 +599,7 @@ void token_word(t_token **token, t_deques *envps, char *str)
 		}
 	}
 
-	if (*words)
+	if (words && *words)
 	{
 		char *head = words;
 		words = ft_ltrim(words);
@@ -610,9 +614,8 @@ void token_word(t_token **token, t_deques *envps, char *str)
 	else
 	{
 		word = ft_calloc(1, sizeof(char));
-		argv = ft_calloc(1, sizeof(char));
+		argvs = ft_calloc(1, sizeof(char*));
 	}
-
 	add_token(*token, T_CMD_WORD, word, argvs);
 
 }
