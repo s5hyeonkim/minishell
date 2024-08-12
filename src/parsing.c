@@ -213,9 +213,7 @@ char *get_valid_buffer(char *headbuffer)
 				return (NULL);
 			}
 			else if (!*vbuffer)
-			{
 				return (NULL);
-			}
 		}
 		else
 			break;
@@ -380,21 +378,6 @@ int read_redirect_typeno(char *str)
 
 /* replace.c */
 
-
-// char *replace_pcode(char *str)
-// {
-// 	char *pcode;
-
-// 	pcode = NULL;
-// 	if (*str == DOLLAR && *(str + 1) == '?')
-// 	{
-// 		pcode = ft_itoa(status);
-// 		if (!pcode)
-// 			return (NULL);
-// 	}
-// 	return (pcode);
-// }
-
 char *replace_pcode(char *str)
 {
 	char *envp; 
@@ -472,7 +455,6 @@ char *replace_dollar(t_deques *deqs, char **str, char *dst)
 	// printf("dst: %s\n", dst);
 	return (dst);
 }
-
 
 
 char *replace_envp(t_deques *deqs, char *str)
@@ -691,6 +673,8 @@ char *get_word(t_deques *envps, char *words)
 	words = ft_ltrim(words);
 	len = wordlen(words, SPACE);
 	word = ft_substr(words, 0, len);
+	if (!word)
+		return (NULL);
 	word = replace_word(envps, word);
 	return (word);
 }
@@ -704,13 +688,19 @@ char **get_argvs_center(t_deques *envps, char *words, char *word)
 	words = ft_ltrim(words);
 	len = wordlen(words, SPACE);
 	argv = ft_substr(words + len, 0, ft_strlen(words + len));
+	if (!argv)
+		return (NULL);
 	argvs = get_argvs(word, argv, envps);
 	free(argv);
+	if (!argvs)
+		return (NULL);
+	
 	return (argvs);
 }
 
 int token_word(t_token **token, t_deques *envps, char *str)
 {
+	char	*headwords;
 	char	*words;
 	char	*word;
 	char	**argvs; 
@@ -720,62 +710,16 @@ int token_word(t_token **token, t_deques *envps, char *str)
 	words = get_words(str);
 	if (words)
 	{
-		char *head = words;
+		headwords = words;
 		word = get_word(envps, words);
-		argvs = get_argvs_center(envps, words, word);
-		free(head);
+		if (word)
+			argvs = get_argvs_center(envps, words, word);
+		free(headwords);
 	}
-	add_tokenwords(token, word, argvs);
+	if (add_tokenwords(token, word, argvs) == EXTRA_ERROR)
+		return (EXTRA_ERROR);
 	return (EXIT_SUCCESS);
 }
-
-
-// void token_word(t_token **token, t_deques *envps, char *str)
-// {
-// 	char	*words;
-// 	char	*word;
-// 	char	*argv;
-// 	int		len;
-// 	char	**argvs; 
-
-// 	argv = NULL;
-// 	words = NULL;
-// 	word = NULL;
-// 	argvs = NULL;
-
-// 	while (*str)
-// 	{
-// 		len = find_redirect_start(str) - str;
-// 		if (len > 0)
-// 			words = replace_words(words, str, len);
-// 		str += len;
-// 		if (*str)
-// 		{
-// 			str = find_filename_start(str);
-// 			len = wordlen(str, SPACE);
-// 			str += len;
-// 		}
-// 	}
-// 	if (words && *words)
-// 	{
-// 		char *head = words;
-// 		words = ft_ltrim(words);
-// 		len = wordlen(words, SPACE);
-// 		word = ft_substr(words, 0, len);
-// 		word = replace_word(envps, word);
-// 		argv = ft_substr(words + len, 0, ft_strlen(words + len));
-// 		argvs = get_argvs(word, argv, envps);
-// 		free(head);
-// 		free(argv);
-// 	}
-// 	else
-// 	{
-// 		word = ft_calloc(1, sizeof(char));
-// 		argvs = ft_calloc(1, sizeof(char*));
-// 	}
-// 	add_token(*token, T_CMD_WORD, word, argvs);
-
-// }
 
 void token_pipe(t_token **token)
 {
@@ -785,20 +729,16 @@ void token_pipe(t_token **token)
 t_token *tokenizer(t_deques *envps, char **strs)
 {
 	t_token *token;
-	(void) envps;
-	//예외처리
+
 	if (handle_empty_redirects(strs) == EXIT_FAILURE)
 		return (NULL);
-	//token
 	while (strs && *strs)
 	{	
 		token_pipe(&token);
 		if (token_redirect(&token, envps, *strs) == SYNTAX_ERROR)
 			return (NULL);
 		token_word(&token, envps, *strs);
-		
 		strs++;
-
 	}
 	/*token 출력*/
 	// debug_token(token);
@@ -819,7 +759,6 @@ void	lexer(t_shell *shell, char *vbuffer)
 	// debug_buffers(vbuffers);
 
 	shell->t = ft_calloc(1, sizeof(t_token));
-
 	shell->t = tokenizer(shell->data.envps, vbuffers); //leaks
 	free_strs(vbuffers);
 
