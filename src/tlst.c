@@ -22,14 +22,17 @@ void tlst_addright(t_token **t, t_token *newtoken)
 {
 	t_token *lasttoken;
 
+	// printf("%s\n", newtoken->word);
 	if (*t == NULL)
 		*t = newtoken;
-	else if (newtoken != NULL)
+	else
 	{
 		lasttoken= tlst_lastright(*t);
 		lasttoken->right = newtoken; 
 	}
+
 }
+
 
 void tlst_addleft(t_token **t, t_token *newtoken)
 {

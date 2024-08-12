@@ -139,12 +139,11 @@ void	loop(t_shell *shell)
 	while(1)
 	{
 		readlines(shell, &buffer);
-		printf("buffer: %s\n", buffer);
-		set_status(shell);
-		parselines(shell, buffer); // parseline에서 malloc실패 등 에러나면 continue 분기문 만들어주기
+		if (parselines(shell, buffer) == EXIT_FAILURE)
+			continue;; // parseline에서 malloc실패 등 에러나면 continue 분기문 만들어주기
 		// printf("==loop==\n");
 		// print_tree(shell->t, 2, 0);
-		printf("==loop complete==\n");
+		// printf("==loop complete==\n");
 		exec_cmds(shell);
 		clean_cmds(shell);
 	}

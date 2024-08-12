@@ -108,6 +108,6 @@ void	open_pipe(t_shell *shell, size_t index);
 size_t	find_pipe(t_token *t);
 
 /* parsing.c */
-void	parselines(t_shell *shell, char *buffer);
+int	parselines(t_shell *shell, char *buffer);
 
 #endif

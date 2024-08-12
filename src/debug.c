@@ -17,7 +17,10 @@ void debug_token(t_token *token)
 		printf("type: %d#\n", token->type);
 		printf("word: %s#\n", token->word);
 		while (token->argvs && token->argvs[i])
+		{
+			printf("%d\n", i);
 			printf("argv: %s#\n", token->argvs[i++]);
+		}
 		token = token->right;
 	}
     printf("==== debug_token complete====\n");

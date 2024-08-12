@@ -13,27 +13,44 @@ int	ismadeofchr(char *str, char chr)
 	return (TRUE);
 }
 
-char	*ft_substrjoin (char *str, int start, int len, char *dst)
+char *substr_free(char *str, unsigned int start, size_t len)
 {
-	char	*olddst;
+	char *dst;
+
+	dst = ft_substr(str, start, len);
+	if (str)
+		free(str);
+	if (!dst)
+		return (NULL);
+	return (dst);
+}
+
+
+char *strjoin_free(char *str1, char *str2)
+{
+	char *dst;
+
+	dst = ft_strjoin(str1, str2);
+	if (str1)
+		free(str1);
+	if (str2)
+		free(str2);
+	if (!dst)
+		return (NULL);
+	return (dst);
+}
+
+
+char	*substrjoin (char *str, int start, int len, char *dst)
+{
 	char	*src;
 
-	olddst = dst;
-	src = ft_substr(str, start, len);
+	src = substr_free(str, start, len);
 	if (!src)
-	{
-		free(olddst);
 		return (NULL);
-	}
-	dst = ft_strjoin(dst, src);
+	dst = strjoin_free(dst, src);
 	if (!dst)
-	{
-		free(olddst);
-		free(src);
 		return (NULL);
-	}
-	free(olddst);
-	free(src);
 	return (dst);
 }
 
@@ -43,6 +60,8 @@ int	wordlen(char *str, int space_opt)
 	char	*wordend;
 
 	wordend = find_wordend(str, space_opt);
+	if (!wordend)
+		return (0);
 	if (!*wordend)
 		return (wordend - str); //wordend가 널문자 일 때 그대로 반환
 	return (wordend - str + 1);  //아닐 때는 널문자 자리 + 1 해주고 반환 
@@ -130,15 +149,18 @@ char *get_pipeline(char *buffer)
 
 	srcbuffer = readline(">");
 	if (!srcbuffer)
+	{	
+		free(buffer);
 		dstbuffer = NULL;
+	}
 	else
 	{
-		dstbuffer = ft_strjoin(buffer, srcbuffer);
-		free(srcbuffer);
+		dstbuffer = strjoin_free(buffer, srcbuffer);
+		// dstbuffer = ft_strjoin(buffer, srcbuffer);
+		// free(srcbuffer);
 		if (!dstbuffer)
 			dstbuffer = NULL;
 	}
-	free(buffer);
 	return (dstbuffer);
 }
 
@@ -323,8 +345,9 @@ char *trim_quote(char *str)
 	while (*str)
 	{
 		len = wordlen(str, SPACE);
-		if ((*str == SGL_QUOTE || *str == DBL_QUOTE))
+		if ((*str == SGL_QUOTE || *str == DBL_QUOTE) && len)
 		{
+			// new_str = substr_free(str, 1 , len - 2);
 			new_str = ft_substr(str + 1, 0, len - 2);
 			free(old_str);
 			if (!new_str)
@@ -382,51 +405,23 @@ char *replace_pcode(char *str)
 		envp = ft_itoa(status);
 		if (!envp)
 			return (NULL);
-		printf("%s\n", envp);
 		(str)++;
 	}
 	return (envp);
 }
 
-int replace_val_env(char **str, char **envp, t_deques *deqs)
+char *replace_val_env(t_deques *deqs, char *key)
 {
-	char	*key; 
-
-	key = ft_substr(*str, 0, ft_strchr(*str, ' ') - *str);
-	if (!key)
-		return (EXTRA_ERROR);
-	*envp = get_val_deq(deqs, key);
-	if (!envp)
-	{
-		free(key);
-		return (EXTRA_ERROR);
-	}
-	(*str) += (ft_strlen(key) - 1);
-	free(key);
-	return (EXIT_SUCCESS);
-}
-
-char *replace_dollar(t_deques *deqs, char **str, char *dst)
-{
-	char	*old_dst;
 	char	*envp;
 
-	int		errno;
-
-	(*str)++;
-	envp = replace_pcode(*str);
-	if (envp)
-		(*str)++;
-	else if (replace_val_env(str, &envp, deqs) == EXTRA_ERROR)
+	envp = get_val_deq(deqs, key);
+	if (!envp)
 		return (NULL);
-	old_dst = dst;
-	dst = ft_strjoin(dst, envp);
-	free(old_dst);
-	free(envp);
-	return (dst);
+	return (envp);
 }
 
-int chrendlen(char *str, int chr)
+
+int strchrlen(char *str, int chr)
 {
 	int len ;
 
@@ -436,6 +431,49 @@ int chrendlen(char *str, int chr)
 		len = ft_strlen(str);
 	return (len);
 }
+
+char *get_key2(char *str)
+{
+	char	*key; 
+	int 	len;
+
+	len = strchrlen(str, SPACE);
+	key = ft_substr(str, 0, len);
+	if (!key)
+		return (NULL);
+	return (key);
+}
+
+char *replace_dollar(t_deques *deqs, char **str, char *dst)
+{
+	char	*envp;
+	int		len;
+	char 	*key;
+
+	(*str)++;
+	envp = replace_pcode(*str);
+	if (envp)
+		(*str)++;
+	else
+	{
+		key = get_key2(*str);
+		// printf("key: %s\n", key);
+		if (!key)
+			return (NULL);
+		envp = replace_val_env(deqs, key);
+		len = ft_strlen(key) - 1;
+		free(key);
+		(*str) += len;
+	}
+
+	dst = strjoin_free(dst, envp);
+	if (!dst)
+		return (NULL);
+	// printf("dst: %s\n", dst);
+	return (dst);
+}
+
+
 
 char *replace_envp(t_deques *deqs, char *str)
 {
@@ -449,34 +487,36 @@ char *replace_envp(t_deques *deqs, char *str)
 	headstr = str;
 	while (*str)
 	{
+		printf("str: %s\n", str);
 		if (*str == DOLLAR)
 			dst = replace_dollar(deqs, &str, dst);
 		else
 		{
-			len = chrendlen(str, DOLLAR);
-			dst = ft_substrjoin(str, 0, len, dst);
+			len = strchrlen(str, DOLLAR);
+			dst = substrjoin(str, 0, len, dst);
 			str += len;
 		}
-		if (!dst)
+		if (!dst || !*str)
 			break ;
 		str++;
 	}
 	free(headstr);
+	// printf(">dst: %s\n", dst);
 	return (dst);
 }
-
 
 char *replace_word(t_deques *deqs, char *str)
 {
 	char *new_str;
 
+	printf("start\n");
 	new_str = trim_space(str);
-	// printf("new_str1: %s#\n", new_str);
+	printf("new_str1: %s#\n", new_str);
 	if (ft_strchr(str, DOLLAR))
 		new_str = replace_envp(deqs, new_str);
-	// printf("new_str2: %s#\n", new_str);
+	printf("new_str2: %s#\n", new_str);
 	new_str = trim_quote(new_str);
-	// printf("new_str3: %s#\n", new_str);
+	printf("new_str3: %s#\n", new_str);
 	return (new_str);
 }
 
@@ -508,15 +548,15 @@ char *replace_filename(char *str, int typeno)
 char *replace_words(char *dst_words, char *str, int len)
 {
 	char *src_words;
-	char *head_words;
 
 	if (len)
 	{
 		src_words = ft_substr(str, 0, len);
-		head_words = dst_words;
-		dst_words = ft_strjoin(dst_words, src_words);
-		free(src_words);
-		free(head_words);
+		if (!src_words)
+			return (NULL);
+		dst_words = strjoin_free(dst_words, src_words);
+		if (!dst_words)
+			return (NULL);
 	}
 	return (dst_words);
 }
@@ -525,12 +565,17 @@ char *replace_words(char *dst_words, char *str, int len)
 int	count_argv(char *argv)
 {
 	int n;
+	int len;
 
 	n = 0;
 	while (argv && *argv)
 	{
 		n++;
-		argv += wordlen(argv, SPACE);
+		len = wordlen(argv, SPACE);
+		if (len)
+			argv += len;
+		else
+			break ;
 	}
 	return (++n);
 }	
@@ -544,6 +589,7 @@ char **get_argvs(char *word, char *argv, t_deques *envps)
 	int		i;
 	int		len;
 
+
 	argv = ft_ltrim(argv);
 	n = count_argv(argv);
 	argvs = ft_calloc(n + 1, sizeof(char *));
@@ -552,7 +598,11 @@ char **get_argvs(char *word, char *argv, t_deques *envps)
 	i = 1;
 	while (i < n && argv && *argv)
 	{
+		argv = ft_ltrim(argv);
 		len = wordlen(argv, SPACE);
+		// printf("len: %d\n", len);
+		if (!len)
+			len = ft_strlen(argv);
 		new = ft_substr(argv, 0, len);
 		argvs[i++] = replace_word(envps, new);
 		argv += len;
@@ -588,19 +638,13 @@ int token_redirect(t_token **token, t_deques *envps, char *str)
 	return (EXIT_SUCCESS);
 }
 
-void token_word(t_token **token, t_deques *envps, char *str)
+
+char *get_words(char *str)
 {
 	char	*words;
-	char	*word;
-	char	*argv;
 	int		len;
-	char	**argvs; 
 
-	argv = NULL;
 	words = NULL;
-	word = NULL;
-	argvs = NULL;
-
 	while (*str)
 	{
 		len = find_redirect_start(str) - str;
@@ -614,7 +658,41 @@ void token_word(t_token **token, t_deques *envps, char *str)
 			str += len;
 		}
 	}
-	if (words && *words)
+	return (words);
+}
+
+int add_empty_token(t_token **token)
+{
+	char	*word;
+	char	**argvs; 
+
+	word = ft_calloc(1, sizeof(char));
+	if (!word)
+		return (EXTRA_ERROR);
+	argvs = ft_calloc(1, sizeof(char*));
+	if (!argvs)
+		return (EXTRA_ERROR);
+	if (add_token(*token, T_CMD_WORD, word, argvs) == EXTRA_ERROR)
+		return (EXTRA_ERROR);
+	return (EXIT_SUCCESS);
+}
+
+int token_word(t_token **token, t_deques *envps, char *str)
+{
+	char	*words;
+	char	*word;
+	char	*argv;
+	int		len;
+	char	**argvs; 
+
+	argv = NULL;
+	word = NULL;
+	argvs = NULL;
+
+	words = get_words(str);
+	if (!words)
+		return (add_empty_token(token)); 
+	else
 	{
 		char *head = words;
 		words = ft_ltrim(words);
@@ -625,15 +703,58 @@ void token_word(t_token **token, t_deques *envps, char *str)
 		argvs = get_argvs(word, argv, envps);
 		free(head);
 		free(argv);
+		add_token(*token, T_CMD_WORD, word, argvs);
 	}
-	else
-	{
-		word = ft_calloc(1, sizeof(char));
-		argvs = ft_calloc(1, sizeof(char*));
-	}
-	add_token(*token, T_CMD_WORD, word, argvs);
-
+	return (EXIT_SUCCESS);
 }
+
+
+// void token_word(t_token **token, t_deques *envps, char *str)
+// {
+// 	char	*words;
+// 	char	*word;
+// 	char	*argv;
+// 	int		len;
+// 	char	**argvs; 
+
+// 	argv = NULL;
+// 	words = NULL;
+// 	word = NULL;
+// 	argvs = NULL;
+
+// 	while (*str)
+// 	{
+// 		len = find_redirect_start(str) - str;
+// 		if (len > 0)
+// 			words = replace_words(words, str, len);
+// 		str += len;
+// 		if (*str)
+// 		{
+// 			str = find_filename_start(str);
+// 			len = wordlen(str, SPACE);
+// 			str += len;
+// 		}
+// 	}
+// 	if (words && *words)
+// 	{
+// 		char *head = words;
+// 		words = ft_ltrim(words);
+// 		len = wordlen(words, SPACE);
+// 		word = ft_substr(words, 0, len);
+// 		word = replace_word(envps, word);
+// 		argv = ft_substr(words + len, 0, ft_strlen(words + len));
+// 		argvs = get_argvs(word, argv, envps);
+// 		free(head);
+// 		free(argv);
+// 	}
+// 	else
+// 	{
+// 		word = ft_calloc(1, sizeof(char));
+// 		argvs = ft_calloc(1, sizeof(char*));
+// 	}
+// 	add_token(*token, T_CMD_WORD, word, argvs);
+
+// }
 
 void token_pipe(t_token **token)
 {
@@ -686,7 +807,7 @@ void	lexer(t_shell *shell, char *vbuffer)
 }
 
 /* parslines.c */
-void	parselines(t_shell *shell, char *buffer)
+int parselines(t_shell *shell, char *buffer)
 {
 	char *vbuffer;
 
@@ -695,9 +816,9 @@ void	parselines(t_shell *shell, char *buffer)
 	// printf("vbuffer: %s\n", buffer);
 	// free (buffer);
 	if (!vbuffer)
-		return ;
+		return (EXIT_FAILURE);
 	lexer(shell, vbuffer);
 	
 	parser(&shell->t);
-
+	return (EXIT_SUCCESS);
 }

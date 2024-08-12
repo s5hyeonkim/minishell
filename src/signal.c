@@ -8,7 +8,7 @@ void set_signal(t_shell *shell, void(*handler)(int), int signo)
 	sigemptyset(&action.sa_mask);
 	action.sa_flags = 0;
 	if (sigaction(signo, &action, NULL) == (int)SIG_ERR)
-		exit_process(shell, NULL, EXTRA_ERROR);
+		exit_process(shell, NULL, EXTRA_ERROR);	
 }
 
 void set_signal_init(t_shell *shell, void(*handler)(int))
