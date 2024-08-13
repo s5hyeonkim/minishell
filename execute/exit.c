@@ -95,16 +95,17 @@ int	ft_exit(t_process p, t_data *d)
 {
 	int	index;
 
+	(void) d;
 	index = 1;
 	ft_putstr_fd("exit\n", STDERR_FILENO);
 	if (p.args[index] && !ft_memcmp(p.args[index], "--", 3))
 		index++;
 	if (p.args[index])
 	{
-		d->status = ft_atol(p.args[index]);
-		if (!is_equal(d->status, p.args[index]))
+		status = ft_atol(p.args[index]);
+		if (!is_equal(status, p.args[index]))
 		{
-			d->status = 255;
+			status = 255;
 			handle_error(p.args[0], p.args[index], NOT_NUM);
 			return (EXIT_SUCCESS);
 		}

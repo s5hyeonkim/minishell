@@ -6,7 +6,7 @@ void	wait_process(t_shell *shell)
 	int	s;
 
 	index = 0;
-	while (shell->p[index].path)
+	while (shell->p[index].path && shell->p[index].pid)
 	{
 		waitpid(shell->p[index].pid, &s, 0);
 		if (WIFEXITED(s))
@@ -15,33 +15,24 @@ void	wait_process(t_shell *shell)
 	}
 }
 
-void	close_pipe(t_shell *shell, int index)
-{
-	if (index > 1)
-	{
-		close(shell->p[index - 1].pipe_fd[0]);
-		shell->p[index - 1].pipe_fd[0] = 0;
-	}
-}
 
 void	subprocess(t_shell *shell)
 {
 	size_t	index;
 
 	index = 0;
-	// printf("execute in child process\n");
+	printf("execute in child process\n");
 	set_signal_sub(shell, handler_sub);
 	// printf("psize: %zu\n", shell->p_size);
 	while (index < shell->p_size)
 	{
-		open_pipe(shell, index);
+		if (open_pipe(&shell->p[index], shell->p_size) || fork_process(&shell->p[index]))
+			break ;
 		child(shell, index);
 		parent(shell, index);
-		close_pipe(shell, index);
 		index++;
 	}
 	wait_process(shell);
-	// printf("wait complete\n");
 	set_signal_init(shell, handler_init);
 }
 
@@ -62,13 +53,13 @@ void	set_fd_builtin(t_process *p)
 
 void	inprocess(t_shell *shell)
 {
-	long	status;
+	long	e_status;
 
 	printf("execute in current process\n");
-	status = exec_builtin(shell->p[0], &shell->data);
-	if (!ft_memcmp(shell->p[0].args[0], "exit", 5) && !status)
+	e_status = exec_builtin(shell->p[0], &shell->data);
+	if (!ft_memcmp(shell->p[0].args[0], "exit", 5) && !e_status)
 	{
-        clean_cmds(shell);
+		// is need free?
 		exit(status);
 	}
 }
@@ -128,7 +119,7 @@ int   token_to_process(t_shell *shell, t_token *t, size_t *index)
     if (t->type == T_SIMPLE_CMD)
     {
 		// printf("path0: %zu %s\n", *index, t->right->word);
-		if (token_to_word(shell, t->right, *index) || open_redirect(&shell->p[*index], t->left) == -1)
+		if (token_to_word(shell, t->right, *index) || find_redirect(&shell->p[*index], t->left))
             return (EXTRA_ERROR);
 		// printf("path: %zu %s\n", *index, shell->p[*index].path);
 		shell->p[*index].index = *index;
@@ -152,7 +143,7 @@ void    exec_cmds(t_shell *shell)
     if (!shell->p || token_to_process(shell, shell->t, &index))
     {
         status = EXIT_FAILURE;
-        handle_error("", "", EXTRA_ERROR);
+        handle_error(NULL, NULL, EXTRA_ERROR);
     }
     else if (shell->p_size == 1 && is_builtin(shell->p[0].path))
 		inprocess(shell);

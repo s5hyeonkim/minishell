@@ -1,37 +1,5 @@
 #include "minishell.h"
 
-void	clean_cmds(t_shell *shell)
-{
-	size_t	index;
-
-	index = 0;
-	while (index < shell->p_size)
-	{
-		if (shell->p[index].redirect_fd[0] > 2)
-		{
-			close(shell->p[index].redirect_fd[0]);
-			shell->p[index].redirect_fd[0] = 0;
-		}
-		if (shell->p[index].redirect_fd[1] > 2)
-		{
-			close(shell->p[index].redirect_fd[1]);
-			shell->p[index].redirect_fd[1] = 0;
-		}
-		if (shell->p[index].pipe_fd[0] > 2)
-		{
-			close(shell->p[index].pipe_fd[0]);
-			shell->p[index].pipe_fd[0] = 0;
-		}
-		if (shell->p[index].pipe_fd[1] > 2)
-		{
-			close(shell->p[index].pipe_fd[1]);
-			shell->p[index].pipe_fd[1] = 0;
-		}
-		index++;
-	}
-	free_cmds(&shell->t, &shell->p, &shell->p_size);
-}
-
 /* token lst */
 int set_token(t_token **t)
 {
@@ -54,7 +22,6 @@ void	exit_process(t_shell *shell, char *obj, int errcode)
 		handle_error(obj, NULL, errcode);
 	if (errcode == SIGEXIT + SIGTERM)
 		errcode = EXIT_SUCCESS;
-	clean_cmds(shell);
 	free_shell(*shell);
 	exit(errcode);
 }
@@ -144,7 +111,9 @@ void	loop(t_shell *shell)
 		// print_tree(shell->t, 2, 0);
 		// printf("==loop complete==\n");
 		exec_cmds(shell);
-		clean_cmds(shell);
+		clean_process(shell->p, shell->p_size);
+		shell->p = 0;
+		shell->p_size = 0;
 	}
 }
 

@@ -30,7 +30,6 @@
 // # define PROMPT_MSG "minishell$ "
 # define PROMPT_MSG "\033[36mminishell ❯\033[0m "
 
-volatile int	status;
 typedef struct sigaction t_sigaction;
 typedef	struct termios	t_termios;
 
@@ -65,19 +64,19 @@ int		exec_builtin(t_process p, t_data *d);
 void	wait_process(t_shell *shell);
 void	exec_program(t_shell *shell, t_process p);
 void	set_process(t_shell *shell);
-void	close_pipe(t_shell *shell, int index);
+void	close_pipe(t_shell *shell, size_t index);
 void	subprocess(t_shell *shell);
 void	inprocess(t_shell *shell);
 void   	exec_cmds(t_shell *shell);
 void	dup_fd(int *fd, int std);
+void	close_fd(int *num);
 
 /* free.c */
 void		free_token(t_token *t);
 void		free_data(t_data d);
-void		free_tprocess(t_process *p, size_t size);
+void		free_process(t_process *p, size_t size);
 void		free_shell(t_shell shell);
-void 		free_cmds(t_token **t, t_process **p, size_t *psize);
-void		clean_cmds(t_shell *shell);
+void		clean_process(t_process *p, size_t size);
 
 /* signal.c */
 void		set_signal(t_shell *shell, void(*handler)(int), int signo);
@@ -102,9 +101,10 @@ void	tokenization(t_shell *shell, t_token *t);
 void	parent(t_shell *shell, size_t index);
 void	child(t_shell *shell, size_t index);
 char	*get_cmdpath(char **paths, char *cmd);
+int	fork_process(t_process *p);
 char	**get_cmdargs(char **cmd);
-int		open_redirect(t_process *p, t_token *t);
-void	open_pipe(t_shell *shell, size_t index);
+int		find_redirect(t_process *p, t_token *t);
+int	open_pipe(t_process *p, size_t size);
 size_t	find_pipe(t_token *t);
 
 /* parsing.c */

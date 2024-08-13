@@ -40,17 +40,16 @@ char	*read_val_strs(char *strs[], char *key)
 	}
 	return (ret);
 }
-void	set_rwfd(t_process p, int *num, int write)
+void	set_rwfd(t_process p, int *num, int is_write)
 {
-	if (p.redirect_fd[write] > 2)
-		*num = p.redirect_fd[write];
-	else if (p.pipe_fd[write] > 2)
-		*num = p.pipe_fd[write];
+	if (p.redirect_fd[is_write] > 0)
+		*num = p.redirect_fd[is_write];
+	else if (p.pipe_fd[is_write] > 0)
+		*num = p.pipe_fd[is_write];
 	else
-		*num = write;
+		*num = is_write;
 }
 
-// echo 스페이스바 구분 없애주기
 int	ft_echo(t_process p, t_data *d)
 {
 	int	index;

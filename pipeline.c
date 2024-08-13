@@ -14,13 +14,42 @@ size_t	find_pipe(t_token *t)
 	return (pipe_num);
 }
 
-void	open_pipe(t_shell *shell, size_t index)
+int	fork_process(t_process *p)
 {
-	shell->p[index].pid = fork();
-	if (shell->p[index].pid == -1)
-		exit_process(shell, NULL, EXTRA_ERROR);
-	if (index == shell->p_size - 1)
-		return ;
-	if (pipe(shell->p[index].pipe_fd) == -1)
-		exit_process(shell, NULL, EXTRA_ERROR);
+	p->pid = fork();
+	if (p->pid == -1)
+	{
+		handle_error(NULL, NULL, EXTRA_ERROR);
+		return (EXIT_FAILURE);
+	}
+	return (EXIT_SUCCESS);
+}
+
+int	open_pipe(t_process *p, size_t size)
+{
+	if (p->index != size - 1 && pipe(p->pipe_fd) == -1)
+	{
+		handle_error(NULL, NULL, EXTRA_ERROR);
+		return (EXIT_FAILURE);
+	}
+	return (EXIT_SUCCESS);
+}
+
+void	close_pipe(t_shell* shell, size_t index)
+{
+	int	is_child;
+
+	is_child = TRUE;
+	if (shell->p[index].pid)
+		is_child = FALSE;
+	if (index != shell->p_size - 1)
+	{
+		close(shell->p[index].pipe_fd[!is_child]);
+		shell->p[index].pipe_fd[!is_child] = 0;
+	}
+	if (index)
+	{
+		close(shell->p[index - 1].pipe_fd[is_child]);
+		shell->p[index - 1].pipe_fd[is_child] = 0;
+	}
 }
