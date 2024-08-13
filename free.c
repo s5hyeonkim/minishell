@@ -2,19 +2,13 @@
 
 void	free_token(t_token *t)
 {
-	(void) t;
-	if (t)
-	{
-		// printf("here\n");
-		free_token(t->left);
-		t->left = NULL;
-		free_token(t->right);
-		t->right = NULL;
-		free(t->word);
-		t->word = NULL;
-		free_strs(t->argvs);
-		t->argvs = NULL;
-	}
+	if (t == NULL)
+		return ;
+	free_token(t->left);
+	free_token(t->right);
+	free(t->word);
+	free_strs(t->argvs);
+	ft_memset(t, 0, sizeof(t_token));
 	free(t);
 }
 
@@ -26,7 +20,7 @@ void	free_data(t_data d)
 	// add more?
 }
 
-void	free_tprocess(t_process *p, size_t size)
+void	free_process(t_process *p, size_t size)
 {
 	size_t	index;
 
@@ -37,23 +31,47 @@ void	free_tprocess(t_process *p, size_t size)
 	{
 		free_strs(p[index].args);
 		free(p[index].path);
+		free(p->link);
 		index++;
 	}
 	free(p);
 }
-// loop 안 추가 필요
-void free_cmds(t_token **t, t_process **p, size_t *psize)
+
+void	close_fd(int *num)
 {
-	free_token(*t);
-	*t = NULL;
-	free_tprocess(*p, *psize);
-	*p = NULL;
-	*psize = 0;
+	if (*num > 0)
+		close(*num);
+	*num = 0;
+}
+
+void	clean_process(t_process *p, size_t p_size)
+{
+	size_t		index;
+	t_process	*p_id;
+
+	index = 0;
+	if (!p)
+		return ;
+	while (index < p_size)
+	{
+		p_id = &p[index];
+		if (!p_id && ++index)
+			continue ;
+		if (p_id->flag)
+			unlink(p->link);
+		close_fd(&p_id->redirect_fd[0]);
+		close_fd(&p_id->redirect_fd[1]);
+		close_fd(&p_id->pipe_fd[0]);
+		close_fd(&p_id->pipe_fd[1]);
+		index++;
+	}
+	free_process(p, p_size);
 }
 
 void	free_shell(t_shell shell)
 {
 	free_data(shell.data);
-	clean_cmds(&shell);
+	free_token(shell.t);
+	clean_process(shell.p, shell.p_size);
 	ft_memset(&shell, 0, sizeof(t_shell));
 }

@@ -16,6 +16,7 @@
 # include "deque/deque.h"
 # include "../ft_err.h"
 # define PATH_MAX 1024
+volatile long	status;
 
 typedef enum e_builtno
 {
@@ -33,7 +34,8 @@ typedef struct s_process
 	pid_t	pid;
 	char	*path;
 	char	**args;
-	int		index;
+	char	*link;
+	size_t	index;
 	int		flag;
 	int		pipe_fd[2];
 	int		redirect_fd[2];
