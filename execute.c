@@ -1,24 +1,41 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   execute.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/08/14 07:26:26 by sohykim           #+#    #+#             */
+/*   Updated: 2024/08/14 07:28:52 by sohykim          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 #include "minishell.h"
 
-/* execute parsing*/
+void	exit_subprocess(t_shell *shell, char *obj, int errcode)
+{
+	terminal_printon(shell);
+	if (errcode && errcode < CMD_NOT_FOUND)
+	{
+		errcode = EXIT_FAILURE;
+		handle_error(obj, NULL, errcode);
+	}
+	else if (errcode == CMD_NOT_FOUND)
+		handle_error(obj, NULL, errcode);
+	if (errcode == SIGEXIT + SIGTERM)
+		errcode = EXIT_SUCCESS;
+	free_shell(*shell);
+	exit(errcode);
+}
 
-/* program */
-	/* builtin */
-
-	/* external */
 void	exec_program(t_shell *shell, t_process p)
 {
 	char	**envp;
 
-	//printf("external %s %s\n", p.path, p.args[0]);
 	envp = deqtostrs(shell->data.envps);
 	if (!envp)
-		exit_process(shell, NULL, EXTRA_ERROR);
-	// ft_putendl_fd(p.path, 2);
-	// for (int i = 0; p.args[i] != 0; i++)
-	// 	ft_putendl_fd(p.args[i], 2);
+		exit_subprocess(shell, NULL, EXTRA_ERROR);
 	if (execve(p.path, p.args, envp) == -1)
-		exit_process(shell, p.args[0], CMD_NOT_FOUND);
+		exit_subprocess(shell, p.args[0], CMD_NOT_FOUND);
 }
 
 void	handler_heredoc(int signo)
@@ -62,7 +79,7 @@ int	set_signal_heredoc(void(*handler)(int))
 
 int	open_redirect(int redirect, char *word, char *link)
 {
-	int fd;
+	int	fd;
 
 	fd = 0;
 	if (redirect == T_GREAT)
@@ -87,47 +104,54 @@ int	write_files(char *file_name, char *line)
 		return (EXTRA_ERROR);
 	write(fd, line, ft_strlen(line));
 	close(fd);
-	return (EXIT_SUCCESS);	
+	return (EXIT_SUCCESS);
+}
+
+int	heredoc_process(char *link, char *limiter)
+{
+	int		status;
+	char	*buffer;
+	char	line[1024];
+
+	ft_memset(line, 0, sizeof(char) * 1024);
+	status = set_signal_heredoc(handler_heredoc);
+	buffer = readline("> ");
+	while (buffer && ft_memcmp(buffer, limiter, ft_strlen(limiter) + 1))
+	{
+		ft_strlcat(line, buffer, 1024);
+		ft_strlcat(line, "\n", 1024);
+		free(buffer);
+		buffer = readline("> ");
+	}
+	status = write_files(link, line);
+	free(buffer);
+	return (status);
+}
+
+int	wait_heredoc(t_process p)
+{
+	int	status;
+
+	set_signal_heredoc(handler_heredoc_wait);
+	waitpid(p.pid, &status, 0);
+	if (WIFSIGNALED(status))
+		return (EXIT_SUCCESS);
+	if (WIFEXITED(status))
+		return (WEXITSTATUS(status));
+	set_signal_heredoc(handler_init);
+	return (EXIT_FAILURE);
 }
 
 int	here_doc(char *link, char *limiter)
 {
-	t_process 	h;
-	char		a[1024];
-	char		*buffer;
-	int			s;
+	t_process	p;
 
-	ft_memset(a, 0, sizeof(char) * 1024);
-	if (fork_process(&h))
+	if (fork_process(&p))
 		return (EXIT_FAILURE);
-	if (!h.pid)
-	{
-		s = set_signal_heredoc(handler_heredoc);
-		buffer = readline("> ");
-		while (buffer && ft_memcmp(buffer, limiter, ft_strlen(limiter) + 1))
-		{
-			ft_strlcat(a, buffer, 1024);
-			ft_strlcat(a, "\n", 1024);
-			free(buffer);
-			buffer = readline("> ");
-		}
-		s = write_files(link, a);
-		free(buffer);
-		// printf("status: %d\n", s);
-		exit(s);
-	}
+	if (!p.pid)
+		return (heredoc_process(link, limiter));
 	else
-	{
-		set_signal_heredoc(handler_heredoc_wait);
-		waitpid(h.pid, &s, 0);
-		if (WIFSIGNALED(s))
-			return (EXIT_SUCCESS);
-		// printf("estatus: %d\n", WEXITSTATUS(s));
-		if (WIFEXITED(s))
-			return (WEXITSTATUS(s));
-		set_signal_heredoc(handler_init);
-	}
-	return (EXIT_SUCCESS);
+		return (wait_heredoc(p));
 }
 
 // 쓰는것
@@ -203,7 +227,6 @@ void	dup_fd(int *fd, int std)
 		dup2(*fd, std);
 		close_fd(fd);
 	}
-	// printf("dup %d %d\n", *fd, std);
 }
 
 void	set_fd(t_shell *shell, size_t index)
@@ -224,23 +247,22 @@ void	child(t_shell *shell, size_t index)
 
 	if (shell->p[index].pid)
 		return ;
-	// printf("%s#\n%c#\n", shell->p[index].args[0], shell->p[index].args[0][0]);
 	close_pipe(shell, index);
 	set_fd(shell, index);
 	if (is_builtin(shell->p[index].path))
 	{
 		ret = exec_builtin(shell->p[index], &shell->data);
 		if (!ft_memcmp(shell->p[index].path, "exit", 5) && !ret)
-			ret = status;
-		exit_process(shell, NULL, ret);
+			ret = g_status;
+		exit_subprocess(shell, NULL, ret);
 	}
 	else if (!shell->p[index].args[0][0])
 	{
 		if (shell->p_size != 1)
-			exit_process(shell, NULL, WAIT_TIMEOUT);
+			exit_subprocess(shell, NULL, WAIT_TIMEOUT);
 		exit(0);
 	}
-	else 
+	else
 		exec_program(shell, shell->p[index]);
 }
 
@@ -251,4 +273,3 @@ void	parent(t_shell *shell, size_t index)
 	close_pipe(shell, index);
 	waitpid(shell->p[index].pid, 0, WNOHANG);
 }
-

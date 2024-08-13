@@ -1,6 +1,6 @@
 CC = cc
 CFLAGS = -Wall -Wextra -Werror -g
-CPPFLAGS = -I${HOME}/.brew/opt/readline/include -Iminishell.h -Ift_err.h -MMD -MP
+CPPFLAGS = -I${HOME}/.brew/opt/readline/include -Iminishell.h -Ift_err.h -I./execute/execute.h -I./src/parsing.h -MMD -MP
 LDFLAGS = -L${HOME}/.brew/opt/readline/lib -Llibft -Lexecute/deque
 LDLIBS = -lreadline -lft -lftdeque
 EXECDIR = ./execute/
@@ -15,7 +15,9 @@ SRCS = ./main.c \
 		./process.c \
 		./pipeline.c \
 		./print.c \
+		$(EXECDIR)utils.c \
 		$(EXECDIR)cd.c \
+		$(EXECDIR)cd_utils.c \
 		$(EXECDIR)echo.c \
 		$(EXECDIR)env.c \
 		$(EXECDIR)execute.c \

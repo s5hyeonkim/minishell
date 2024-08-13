@@ -29,7 +29,7 @@ void set_signal_sub(t_shell *shell, void(*handler)(int))
 
 void	handler_init(int signo)
 {
-	status = signo + SIGEXIT;
+	g_status = signo + SIGEXIT;
 	// printf("signal receive %d\n", status);
 	if (signo == SIGINT)
 		replace_line(TRUE);
@@ -42,7 +42,7 @@ void	handler_init(int signo)
 
 void	handler_sub(int signo)
 {
-	status = signo + SIGEXIT;
+	g_status = signo + SIGEXIT;
 	// printf("signal receive %d\n", status);
 	if (signo == SIGINT)
 		replace_line(FALSE);

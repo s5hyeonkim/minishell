@@ -16,7 +16,7 @@
 # include "deque/deque.h"
 # include "../ft_err.h"
 # define PATH_MAX 1024
-volatile long	status;
+volatile long	g_status;
 
 typedef enum e_builtno
 {
@@ -63,5 +63,9 @@ int			ft_echo(t_process p, t_data *d);
 int			ft_unset(t_process p, t_data *d);
 int			is_valid_option(char *opt);
 void	set_rwfd(t_process p, int *num, int write);
+int	check_folder(char *to_dir);
+int	set_env_pwd(t_deques *deqs, char *key, char *val);
+void	parsing_dir(char *wd, char *now, size_t len);
+void	ft_sort(char **strs, int(guide)(char *, char *));
 
 #endif

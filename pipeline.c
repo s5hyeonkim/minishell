@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   pipeline.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/08/14 07:25:49 by sohykim           #+#    #+#             */
+/*   Updated: 2024/08/14 07:26:20 by sohykim          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 #include "minishell.h"
 
 size_t	find_pipe(t_token *t)
@@ -35,7 +46,7 @@ int	open_pipe(t_process *p, size_t size)
 	return (EXIT_SUCCESS);
 }
 
-void	close_pipe(t_shell* shell, size_t index)
+void	close_pipe(t_shell *shell, size_t index)
 {
 	int	is_child;
 

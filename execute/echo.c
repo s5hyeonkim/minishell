@@ -18,38 +18,6 @@ int	is_no_nl(char *str)
 	return (FALSE);
 }
 
-char	*read_val_strs(char *strs[], char *key)
-{
-	char	*ret;
-	int		index;
-	size_t	size;
-
-	index = 0;
-	ret = NULL;
-	if (!strs)
-		return (NULL);
-	while (strs[index])
-	{
-		size = ft_strchr(strs[index], '=') - strs[index];
-		if (!ft_memcmp(strs[index], key, size) && ft_strlen(key) == size)
-		{
-			ret = strs[index] + size + 1;
-			break ;
-		}
-		index++;
-	}
-	return (ret);
-}
-void	set_rwfd(t_process p, int *num, int is_write)
-{
-	if (p.redirect_fd[is_write] > 0)
-		*num = p.redirect_fd[is_write];
-	else if (p.pipe_fd[is_write] > 0)
-		*num = p.pipe_fd[is_write];
-	else
-		*num = is_write;
-}
-
 int	ft_echo(t_process p, t_data *d)
 {
 	int	index;

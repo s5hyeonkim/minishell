@@ -9,33 +9,44 @@
 /*   Updated: 2024/07/24 20:34:55 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 #include "ft_err.h"
 
-int	ft_putstr_err(t_err code)
+const char	*err_to_msg(int *code)
 {
-	const char	*msg[] = {"", "", "", MSG_ARGV, MSG_OPT, MSG_IDF, MSG_SET, MSG_NUM}; 
+	if (*code == CMD_NOT_FOUND)
+		return (MSG_CMD);
+	if (*code == SYN_TOK)
+	{
+		*code = SYNTAX_ERROR;
+		return (MSG_SYN_TOK);
+	}
+	if (*code == SYN_TERM)
+	{
+		*code = SYNTAX_ERROR;
+		return (MSG_SYN_TERM);
+	}
+	*code = EXIT_FAILURE;
+	if (*code == INVALID_ARGV)
+		return (MSG_ARGV);
+	if (*code == INVALID_OPT)
+		return (MSG_OPT);
+	if (*code == INVALID_IDF)
+		return (MSG_IDF);
+	if (*code == NOT_SET)
+		return (MSG_SET);
+	if (*code == NOT_NUM)
+		return (MSG_NUM);
+	return (strerror(errno));
+}
 
-	if (code == CMD_NOT_FOUND)
-	{
-		ft_putstr_fd(MSG_CMD, STDERR_FILENO);
-		return (code);
-	}
-	else if (code == SYN_TOK)
-	{
-		ft_putstr_fd(MSG_SYN_TOK, STDERR_FILENO);
-		return (SYNTAX_ERROR);
-	}
-	else if (code == SYN_TERM)
-	{
-		ft_putstr_fd(MSG_SYN_TERM, STDERR_FILENO);
-		return (SYNTAX_ERROR);
-	}
-	if (code == EXTRA_ERROR)
-		perror("");
-	else
-		write(STDERR_FILENO, msg[code], ft_strlen(msg[code]));
-	return (EXIT_FAILURE);
+int	print_error(int code)
+{
+	size_t		size;
+	const char	*msg = err_to_msg(&code);
+
+	size = ft_strlen(msg);
+	write(STDERR_FILENO, msg, size);
+	return (code);
 }
 
 int	handle_error(char *exec, char *obj, int code)
@@ -51,5 +62,5 @@ int	handle_error(char *exec, char *obj, int code)
 		ft_putstr_fd(obj, STDERR_FILENO);
 		ft_putstr_fd(": ", STDERR_FILENO);
 	}
-	return (ft_putstr_err(code));
+	return (print_error(code));
 }

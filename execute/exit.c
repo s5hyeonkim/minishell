@@ -102,10 +102,10 @@ int	ft_exit(t_process p, t_data *d)
 		index++;
 	if (p.args[index])
 	{
-		status = ft_atol(p.args[index]);
-		if (!is_equal(status, p.args[index]))
+		g_status = ft_atol(p.args[index]);
+		if (!is_equal(g_status, p.args[index]))
 		{
-			status = 255;
+			g_status = 255;
 			handle_error(p.args[0], p.args[index], NOT_NUM);
 			return (EXIT_SUCCESS);
 		}

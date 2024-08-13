@@ -1,32 +1,41 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   process.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/08/14 07:02:29 by sohykim           #+#    #+#             */
+/*   Updated: 2024/08/14 07:05:04 by sohykim          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 #include "minishell.h"
 
 void	wait_process(t_shell *shell)
 {
 	int	index;
-	int	s;
+	int	status;
 
 	index = 0;
 	while (shell->p[index].path && shell->p[index].pid)
 	{
-		waitpid(shell->p[index].pid, &s, 0);
-		if (WIFEXITED(s))
-			status = WEXITSTATUS(s);
+		waitpid(shell->p[index].pid, &status, 0);
+		if (WIFEXITED(status))
+			g_status = WEXITSTATUS(status);
 		index++;
 	}
 }
-
 
 void	subprocess(t_shell *shell)
 {
 	size_t	index;
 
 	index = 0;
-	// printf("execute in child process\n");
 	set_signal_sub(shell, handler_sub);
-	// printf("psize: %zu\n", shell->p_size);
 	while (index < shell->p_size)
 	{
-		if (open_pipe(&shell->p[index], shell->p_size) || fork_process(&shell->p[index]))
+		if (open_pipe(&shell->p[index], shell->p_size) \
+				|| fork_process(&shell->p[index]))
 			break ;
 		child(shell, index);
 		parent(shell, index);
@@ -51,41 +60,16 @@ void	set_fd_builtin(t_process *p)
 	p->redirect_fd[1] = fd_out;
 }
 
+//free 추가해주기
 void	inprocess(t_shell *shell)
 {
-	long	e_status;
+	long	status;
 
-	// printf("execute in current process\n");
-	e_status = exec_builtin(shell->p[0], &shell->data);
-	if (!ft_memcmp(shell->p[0].args[0], "exit", 5) && !e_status)
+	status = exec_builtin(shell->p[0], &shell->data);
+	if (!ft_memcmp(shell->p[0].args[0], "exit", 5) && !status)
 	{
-		// is need free?
-		exit(status);
+		exit(g_status);
 	}
-}
-
-char	**debug(char *path, char **args)
-{
-	size_t	index;
-	size_t	size;
-	size_t	add;
-	char	**debug;
-
-	index = 0;
-	size = 0;
-	add = 0;
-	while (args[size])
-		size++;
-	debug = ft_calloc(size + 2 , sizeof(char *));
-	if (ft_memcmp(path, args[0], ft_strlen(path) + 1))
-		debug[add++] = ft_strdup(path);
-	while (index < size)
-	{
-		debug[index + add] = args[index];
-		index++;
-	}
-	debug[++index] = 0;
-	return debug;
 }
 
 int	token_to_word(t_shell *shell, t_token *t, size_t index)
@@ -93,64 +77,53 @@ int	token_to_word(t_shell *shell, t_token *t, size_t index)
 	t_process	*p;
 
 	if (!t || t->type != T_CMD_WORD)
-	{
-		// printf("no word\n");
 		return (EXIT_SUCCESS);
-	}
-	// printf("here??? %d\n", t->type);
 	p = &shell->p[index];
 	p->args = get_cmdargs(t->argvs);
-	// printf("here0?? %s#\n", p->args[0]);
-	// printf("here1?? %s#\n", p->args[1]);
-	// printf("here2?? %s#\n", p->args[2]);
-	// printf("here %s\n", t->word);
-    p->path = get_cmdpath(shell->data.paths, t->word);
-	// printf("here? %skk\n", p->path);
-    if (!p->args || !p->path)
-        return (EXTRA_ERROR);
-    return (EXIT_SUCCESS);
+	p->path = get_cmdpath(shell->data.paths, t->word);
+	if (!p->args || !p->path)
+		return (EXTRA_ERROR);
+	return (EXIT_SUCCESS);
 }
 
-int   token_to_process(t_shell *shell, t_token *t, size_t *index)
+int	token_to_process(t_shell *shell, t_token *t, size_t *index)
 {
-    int         status;
+	int	status;
 
-    status = EXIT_SUCCESS;
-    if (t->type == T_SIMPLE_CMD)
-    {
-		// printf("path0: %zu %s\n", *index, t->right->word);
-		if (token_to_word(shell, t->right, *index) || find_redirect(&shell->p[*index], t->left))
-            return (EXTRA_ERROR);
-		// printf("path: %zu %s\n", *index, shell->p[*index].path);
+	status = EXIT_SUCCESS;
+	if (t->type == T_SIMPLE_CMD)
+	{
+		if (token_to_word(shell, t->right, *index) \
+		|| find_redirect(&shell->p[*index], t->left))
+			return (EXTRA_ERROR);
 		shell->p[*index].index = *index;
 		*index += 1;
-        return (EXIT_SUCCESS);
-    }
-    if (t->left)
-        status = token_to_process(shell, t->left, index);
-    if (!status && t->right)
-        status = token_to_process(shell, t->right, index);
-    return (status);
+		return (EXIT_SUCCESS);
+	}
+	if (t->left)
+		status = token_to_process(shell, t->left, index);
+	if (!status && t->right)
+		status = token_to_process(shell, t->right, index);
+	return (status);
 }
 
-void    exec_cmds(t_shell *shell)
+void	exec_cmds(t_shell *shell)
 {
-    size_t  index;
+	size_t	index;
 
-    index = 0;
-    shell->p_size = find_pipe(shell->t);
-    shell->p = ft_calloc(shell->p_size + 1, sizeof(t_process));
-    if (!shell->p || token_to_process(shell, shell->t, &index))
-    {
-        status = EXIT_FAILURE;
-        handle_error(NULL, NULL, EXTRA_ERROR);
-    }
-    else if (shell->p_size == 1 && is_builtin(shell->p[0].path))
+	index = 0;
+	shell->p_size = find_pipe(shell->t);
+	shell->p = ft_calloc(shell->p_size + 1, sizeof(t_process));
+	if (!shell->p || token_to_process(shell, shell->t, &index))
+	{
+		g_status = EXIT_FAILURE;
+		handle_error(NULL, NULL, EXTRA_ERROR);
+	}
+	else if (shell->p_size == 1 && is_builtin(shell->p[0].path))
 		inprocess(shell);
 	else
 		subprocess(shell);
 }
-
 
 // void print_token(t_token *t)
 // {
@@ -164,4 +137,28 @@ void    exec_cmds(t_shell *shell)
 // 	if (t->right && t->right->type == T_SIMPLE_CMD)
 // 		printf("\n\n\n");
 // 	print_token(t->right);	
+// }
+
+// char	**debug(char *path, char **args)
+// {
+	// size_t	index;
+	// size_t	size;
+	// size_t	add;
+	// char	**debug;
+// 
+	// index = 0;
+	// size = 0;
+	// add = 0;
+	// while (args[size])
+		// size++;
+	// debug = ft_calloc(size + 2, sizeof(char *));
+	// if (ft_memcmp(path, args[0], ft_strlen(path) + 1))
+		// debug[add++] = ft_strdup(path);
+	// while (index < size)
+	// {
+		// debug[index + add] = args[index];
+		// index++;
+	// }
+	// debug[++index] = 0;
+	// return (debug);
 // }

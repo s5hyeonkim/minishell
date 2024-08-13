@@ -54,30 +54,6 @@ static int	ft_keycmp(char *a, char *b)
 	return (a[index] - b[index]);
 }
 
-static void	ft_sort(char **strs)
-{
-	char	*temp;
-	int		index;
-	int		index2;
-
-	index = 0;
-	while (strs[index])
-	{
-		index2 = index + 1;
-		while (strs[index2])
-		{
-			if (ft_keycmp(strs[index], strs[index2]) > 0)
-			{
-				temp = strs[index];
-				strs[index] = strs[index2];
-				strs[index2] = temp;
-			}
-			index2++;
-		}
-		index++;
-	}
-}
-
 int	ft_export(t_process p, t_data *d)
 {
 	char	**envs;
@@ -93,7 +69,7 @@ int	ft_export(t_process p, t_data *d)
 		envs = deqtostrs(d->envps);
 		if (!envs)
 			return (handle_error(p.args[0], NULL, EXTRA_ERROR));
-		ft_sort(envs);
+		ft_sort(envs, ft_keycmp);
 		print_export(envs, fd_out);
 		free_strs(envs);
 		return (status);

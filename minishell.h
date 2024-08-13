@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   minishell.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/08/14 07:22:42 by sohykim           #+#    #+#             */
+/*   Updated: 2024/08/14 07:25:36 by sohykim          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
@@ -30,26 +41,23 @@
 // # define PROMPT_MSG "minishell$ "
 # define PROMPT_MSG "\033[36mminishell ❯\033[0m "
 
-typedef struct sigaction t_sigaction;
-typedef	struct termios	t_termios;
-
-
+typedef struct sigaction	t_sigaction;
+typedef struct termios		t_termios;
 typedef struct s_shell
 {
-	t_token			*t; // tree
+	t_token			*t;
 	t_process		*p;
 	size_t			p_size;
 	t_data			data;
 	t_termios		term;
 }	t_shell;
 
-
 /* main.c */
 void		exit_process(t_shell *shell, char *obj, int errcode);
 // void		child_handler(int signo);
 char		**get_env_paths(char *envp[]);
-void	terminal_printon(t_shell *shell);
-void	terminal_printoff(void);
+void		terminal_printon(t_shell *shell);
+void		terminal_printoff(void);
 
 /* execute dir */
 void		set_cmds(t_shell *shell);
@@ -57,20 +65,19 @@ void		set_process(t_shell *shell);
 t_builtin	find_builtin(int index);
 char		*read_val_strs(char *strs[], char *key);
 int			set_cwd(char **cwd);
-
 /* execute */
-int		is_builtin(char *cmd);
-int		exec_builtin(t_process p, t_data *d);
-void	wait_process(t_shell *shell);
-void	exec_program(t_shell *shell, t_process p);
-void	set_process(t_shell *shell);
-void	close_pipe(t_shell *shell, size_t index);
-void	subprocess(t_shell *shell);
-void	inprocess(t_shell *shell);
-void   	exec_cmds(t_shell *shell);
-void	dup_fd(int *fd, int std);
-void	close_fd(int *num);
-
+int			is_builtin(char *cmd);
+int			exec_builtin(t_process p, t_data *d);
+void		wait_process(t_shell *shell);
+void		exec_program(t_shell *shell, t_process p);
+void		set_process(t_shell *shell);
+void		close_pipe(t_shell *shell, size_t index);
+void		subprocess(t_shell *shell);
+void		inprocess(t_shell *shell);
+void		exec_cmds(t_shell *shell);
+void		dup_fd(int *fd, int std);
+void		close_fd(int *num);
+void		clean_files(t_process *p, size_t p_size);
 /* free.c */
 void		free_token(t_token *t);
 void		free_data(t_data d);
@@ -86,28 +93,27 @@ void		handler_init(int signo);
 void		handler_sub(int signo);
 
 /* signal_utils.c  */
-void	move_cursor(void);
-void	replace_line(int redisplayon);
+void		move_cursor(void);
+void		replace_line(int redisplayon);
 
 /* terminal.c */
-void	init_terminal(t_shell *shell);
-void	terminal_printoff(void);
-void	terminal_printon(t_shell *shell);
-
+void		init_terminal(t_shell *shell);
+void		terminal_printoff(void);
+void		terminal_printon(t_shell *shell);
 /* setting.c */
-void	set_shell(t_shell *shell, char *envp[]);
-int		set_token(t_token **t);
-void	tokenization(t_shell *shell, t_token *t);
-void	parent(t_shell *shell, size_t index);
-void	child(t_shell *shell, size_t index);
-char	*get_cmdpath(char **paths, char *cmd);
-int	fork_process(t_process *p);
-char	**get_cmdargs(char **cmd);
-int		find_redirect(t_process *p, t_token *t);
-int	open_pipe(t_process *p, size_t size);
-size_t	find_pipe(t_token *t);
+void		set_shell(t_shell *shell, char *envp[]);
+int			set_token(t_token **t);
+void		tokenization(t_shell *shell, t_token *t);
+void		parent(t_shell *shell, size_t index);
+void		child(t_shell *shell, size_t index);
+char		*get_cmdpath(char **paths, char *cmd);
+int			fork_process(t_process *p);
+char		**get_cmdargs(char **cmd);
+int			find_redirect(t_process *p, t_token *t);
+int			open_pipe(t_process *p, size_t size);
+size_t		find_pipe(t_token *t);
 
 /* parsing.c */
-int	parselines(t_shell *shell, char *buffer);
+int			parselines(t_shell *shell, char *buffer);
 
 #endif

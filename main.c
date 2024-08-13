@@ -22,6 +22,7 @@ void	exit_process(t_shell *shell, char *obj, int errcode)
 		handle_error(obj, NULL, errcode);
 	if (errcode == SIGEXIT + SIGTERM)
 		errcode = EXIT_SUCCESS;
+	clean_files(shell->p, shell->p_size);
 	free_shell(*shell);
 	exit(errcode);
 }
@@ -66,17 +67,10 @@ void	readlines(t_shell *shell, char **buffer)
 	if (*buffer == 0)
 	{
 		handler_init(SIGTERM);
-		exit_process(shell, NULL, status);
+		exit_process(shell, NULL, g_status);
 	}
 	if (**buffer)
 		add_history(*buffer);
-}
-
-void	set_status(t_shell *shell)
-{
-	if (status)
-		shell->data.status = status;
-	status = 0;
 }
 
 void free_tokens(t_token *tokens)
