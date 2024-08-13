@@ -33,13 +33,16 @@ typedef struct s_token
 	struct s_token	*right;
 }	t_token;
 
+/* sublibft.c */
+int		ismadeofchr(char *str, char chr);
+char	*substr_free(char *str, unsigned int start, size_t len);
+char	*strjoin_free(char *str1, char *str2);
+char	*substrjoin (char *str, int start, int len, char *dst);
 
-/* TLST.C */
-t_token *tlst_lastright(t_token *t);
-t_token *tlst_lastleft(t_token *t);
-void tlst_addright(t_token **t, t_token *newtoken);
-void tlst_addleft(t_token **t, t_token *newtoken);
-
+/* tlst.c */
+t_token	*tlst_lastright(t_token *t);
+void	tlst_addright(t_token **t, t_token *newtoken);
+void	tlst_addleft(t_token **t, t_token *newtoken);
 
 /* QUOTE.C */
 char *ft_ltrim(char *str);

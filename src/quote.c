@@ -54,14 +54,17 @@ char *find_quotend(char *str, int flag)
 
 char *find_wordend(char *str, int spacepipe_opt)
 {
+	// printf("find_wordstart: %s\n", str);
 	if (spacepipe_opt == SPACE && ft_isspace(*str) == TRUE)
 	{
 		str = find_spacend(str);
+		// printf("find_wordend1: %s\n", str);
 		return (str);
 	}
 	if (*str == SGL_QUOTE || *str == DBL_QUOTE)
 	{
 		str = find_quotend(str, issgldbl(*str));
+		// printf("find_wordend2: %s\n", str);
 		return (str);
 	}
 	while (str && *str)
@@ -74,6 +77,10 @@ char *find_wordend(char *str, int spacepipe_opt)
 			break ;
 		str++;
 	}
+	// str = ft_ltrim(str);
+	// str = find_spacend(str); 
+
+	// printf("find_wordend3: %s\n", str);
 	return (str);
 }
 

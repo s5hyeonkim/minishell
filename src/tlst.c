@@ -3,8 +3,8 @@
 t_token *tlst_lastright(t_token *t)
 {
 	if (t == NULL)
-		return (NULL);
-	while (t->right != NULL)
+		return (t);
+	while (t->right)
 		t = t->right;
 	return (t);
 }
