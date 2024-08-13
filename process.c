@@ -21,7 +21,7 @@ void	subprocess(t_shell *shell)
 	size_t	index;
 
 	index = 0;
-	printf("execute in child process\n");
+	// printf("execute in child process\n");
 	set_signal_sub(shell, handler_sub);
 	// printf("psize: %zu\n", shell->p_size);
 	while (index < shell->p_size)
@@ -55,7 +55,7 @@ void	inprocess(t_shell *shell)
 {
 	long	e_status;
 
-	printf("execute in current process\n");
+	// printf("execute in current process\n");
 	e_status = exec_builtin(shell->p[0], &shell->data);
 	if (!ft_memcmp(shell->p[0].args[0], "exit", 5) && !e_status)
 	{

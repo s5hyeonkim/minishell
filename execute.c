@@ -23,9 +23,14 @@ void	exec_program(t_shell *shell, t_process p)
 
 void	handler_heredoc(int signo)
 {
-	status = signo + SIGEXIT;
 	if (signo == SIGINT)
-		exit(1);
+		replace_line(false);
+}
+
+void	handler_heredoc_wait(int signo)
+{
+	if (signo == SIGINT)
+		replace_line(TRUE);
 }
 
 int	set_handler_heredoc(void(*handler)(int), int signo)
@@ -55,39 +60,73 @@ int	set_signal_heredoc(void(*handler)(int))
 	return (status);
 }
 
-int	here_doc(char **buffer, char *limiter, int fd)
+int	open_redirect(int redirect, char *word, char *link)
 {
-	t_process	p;
+	int fd;
+
+	fd = 0;
+	if (redirect == T_GREAT)
+		fd = open(word, O_RDONLY);
+	else if (redirect == T_DGREAT)
+		fd = open(link, O_RDONLY);
+	else if (redirect == T_LESS)
+		fd = open(word, O_CREAT | O_WRONLY | O_TRUNC, 0666);
+	else if (redirect == T_DLESS)
+		fd = open(word, O_CREAT | O_WRONLY | O_APPEND, 0666);
+	return (fd);
+}
+
+int	write_files(char *file_name, char *line)
+{
+	int	fd;
+
+	if (!line[0])
+		return (EXIT_SUCCESS);
+	fd = open(file_name, O_CREAT | O_WRONLY | O_TRUNC, 0666);
+	if (fd == -1)
+		return (EXTRA_ERROR);
+	write(fd, line, ft_strlen(line));
+	close(fd);
+	return (EXIT_SUCCESS);	
+}
+
+int	here_doc(char *link, char *limiter)
+{
+	t_process 	h;
 	char		a[1024];
-	// status = set_signal_heredoc(handler_heredoc);
-	if (fd <= 0)
-		return (EXTRA_ERROR);
+	char		*buffer;
+	int			s;
+
 	ft_memset(a, 0, sizeof(char) * 1024);
-	if (fork_process(&p))
-		return (EXTRA_ERROR);
-	if (!p.pid)
+	if (fork_process(&h))
+		return (EXIT_FAILURE);
+	if (!h.pid)
 	{
-		set_signal_heredoc(handler_heredoc);
-		while (true)
+		s = set_signal_heredoc(handler_heredoc);
+		buffer = readline("> ");
+		while (buffer && ft_memcmp(buffer, limiter, ft_strlen(limiter) + 1))
 		{
-			//개행까지 들어가는지 확인 필요
-			*buffer = readline("> ");
-			if (*buffer == NULL)
-				exit(1);
-			if (!ft_memcmp(*buffer, limiter, ft_strlen(limiter) + 1))
-			{
-				free(*buffer);
-				break ;
-			}
-			ft_strlcat(a, *buffer, 1024);
-			// ft_strlcat(a, "\n", 1024);
-			free(*buffer);
+			ft_strlcat(a, buffer, 1024);
+			ft_strlcat(a, "\n", 1024);
+			free(buffer);
+			buffer = readline("> ");
 		}
-		write(fd, a, ft_strlen(a) - 1);
-		exit(0);
+		s = write_files(link, a);
+		free(buffer);
+		// printf("status: %d\n", s);
+		exit(s);
 	}
 	else
-		waitpid(p.pid, 0, 0);
+	{
+		set_signal_heredoc(handler_heredoc_wait);
+		waitpid(h.pid, &s, 0);
+		if (WIFSIGNALED(s))
+			return (EXIT_SUCCESS);
+		// printf("estatus: %d\n", WEXITSTATUS(s));
+		if (WIFEXITED(s))
+			return (WEXITSTATUS(s));
+		set_signal_heredoc(handler_init);
+	}
 	return (EXIT_SUCCESS);
 }
 
@@ -112,7 +151,7 @@ int	set_filedoc(t_process *p)
 	return (EXIT_SUCCESS);
 }
 
-int	is_heredoc(int type)
+int	is_redirect(int type)
 {
 	if (type == T_GREAT || type == T_LESS || type == T_DGREAT || type == T_DLESS)
 		return (TRUE);
@@ -122,22 +161,15 @@ int	is_heredoc(int type)
 int	open_token(t_token *t, t_process *p)
 {
 	int			*fd;
-	char		*buffer;
 
 	fd = &p->redirect_fd[t->type % 2];
-	if (t->type == T_GREAT)
-		*fd = open(t->word, O_RDONLY);
-	if (t->type == T_LESS)
-		*fd = open(t->word, O_CREAT | O_TRUNC | O_WRONLY, 0666);
 	if (t->type == T_DGREAT)
 	{
 		p->flag = 1;
-		*fd = open(p->link, O_CREAT | O_TRUNC | O_RDWR, 0666);
-		if (here_doc(&buffer, t->word, *fd))
+		if (here_doc(p->link, t->word))
 			return (EXTRA_ERROR);
 	}
-	if (t->type == T_DLESS)
-		*fd = open(t->word, O_CREAT | O_APPEND | O_WRONLY, 0666);
+	*fd = open_redirect(t->type, t->word, p->link);
 	if (*fd == -1)
 		return (EXTRA_ERROR);
 	return (EXIT_SUCCESS);
@@ -151,15 +183,10 @@ int	find_redirect(t_process *p, t_token *t)
 		return (EXIT_SUCCESS);
 	if (set_filedoc(p))
 		return (EXTRA_ERROR);
-	if (is_heredoc(t->type))
+	if (is_redirect(t->type))
 	{
-		if (p->redirect_fd[t->type % 2] > 2)
+		if (p->redirect_fd[t->type % 2] > 0)
 			close_fd(&p->redirect_fd[t->type % 2]);
-		if (t->type % 2 == 0 && p->flag)
-		{
-			unlink(p->link);
-			p->flag = 0;
-		}
 		if (open_token(t, p))
 			return (EXTRA_ERROR);
 	}

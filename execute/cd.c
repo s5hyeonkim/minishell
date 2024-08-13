@@ -102,7 +102,7 @@ int	navigate_targetdir(t_data d, char *to_dir, char **nwd)
 	*nwd = get_nextdir(to_dir, d.lcwd);
 	if (*nwd == NULL)
 		return (handle_error("cd", NULL, EXTRA_ERROR));
-	printf("next dir: %s\n", *nwd);
+	// printf("next dir: %s\n", *nwd);
 	status = navigate_dir(*nwd, to_dir);
 	return (status);
 }
