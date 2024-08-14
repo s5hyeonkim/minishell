@@ -115,6 +115,7 @@ int	wait_reading(t_process p, char **s)
 int	set_next_cmd(char **s)
 {
 	t_process	p;
+	
 	if (pipe(p.pipe_fd) == -1 || fork_process(&p))
 		return (EXIT_FAILURE);
 	if (!p.pid)

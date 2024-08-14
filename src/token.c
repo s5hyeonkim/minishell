@@ -6,7 +6,7 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 10:44:45 by yubshin           #+#    #+#             */
-/*   Updated: 2024/08/14 11:46:54 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/14 16:30:53 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ int set_token(t_token **t)
 	return (EXIT_SUCCESS);
 }
 
-int	add_tokenright(t_token *token, int type, char *word, char **argvs)
+int	add_tokenright(t_token **token, int type, char *word, char **argvs)
 {
 	t_token *newtoken;
 
@@ -34,6 +34,6 @@ int	add_tokenright(t_token *token, int type, char *word, char **argvs)
 	newtoken->type = type;
 	newtoken->word = word;
 	newtoken->argvs = argvs;
-	tlst_addright(&token, newtoken);
-	return (EXIT_SUCCESS);
+    tlst_addright(token, newtoken);
+    return (EXIT_SUCCESS);
 }

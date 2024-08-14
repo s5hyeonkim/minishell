@@ -167,11 +167,6 @@ t_token	*parser(t_token **token)
 	dsttoken = NULL;
 	nowtoken = *token;
 
-	// while (nowtoken)
-	// {
-	// 	printf("%d\n", nowtoken->type);
-	// 	nowtoken = nowtoken->right;
-	// }
 	syntax_pipeline(&dsttoken, nowtoken, 1);
 	free(*token);
 	// print_tree(dsttoken, 2, 0);

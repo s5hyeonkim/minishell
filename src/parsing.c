@@ -4,6 +4,16 @@ char *find_pipeend(char *buffer);
 char *find_spacend(char *str);
 
 
+int strchrlen(char *str, int chr)
+{
+	int len ;
+
+	if (ft_strchr(str, chr))
+		len = ft_strchr(str, chr) - str;
+	else 
+		len = ft_strlen(str);
+	return (len);
+}
 
 /* utils */
 int	wordlen(char *str, int space_opt)
@@ -187,68 +197,6 @@ char *get_valid_buffer(char *headbuffer)
 	return (vbuffer);
 }
 
-/* resword.c */
-int ft_isredirect(char chr)
-{
-	if (chr == LESS || chr == GREAT)
-		return (TRUE);
-	return (FALSE);
-}
-
-int ft_ispipe(char chr)
-{
-	if (chr == PIPE)
-		return (TRUE);
-	return (FALSE);
-}
-
-int ft_isresword(char chr)
-{
-	if (ft_isredirect(chr) || ft_ispipe(chr))
-		return (TRUE);
-	return (FALSE);
-}
-
-/*find.c*/
-char *find_redirect_start(char *str)
-{
-	while (*str && !ft_isredirect(*str))
-		str++;
-	return (str);
-}
-
-char *find_filename_start(char *str)
-{
-	while (ft_isspace(*str))
-		str++;
-	if (*str == LESS && *(str + 1) == LESS)
-		str += 2;
-	else if (*str == GREAT && *(str + 1) == GREAT)
-		str += 2;
-	else if (*str == LESS || *str == GREAT)
-		str++;
-	while (ft_isspace(*str))
-		str++;
-	return (str);
-}
-
-char *find_pipeend(char *buffer)
-{
-	while (buffer && *buffer)
-	{	
-		if (*buffer == SGL_QUOTE || *buffer == DBL_QUOTE)
-		{
-			buffer = find_wordend(buffer, 0);
-			if (!buffer)
-				return (buffer);
-		}
-		else if (*buffer == PIPE)
-			return (buffer);
-		buffer++;
-	}
-	return (NULL);
-}
-
 /* handle empty */
 int handle_empty_redirect(char *str)
 {
@@ -309,7 +257,7 @@ char *trim_quote(char *str)
 	// 	return (str);
 	while (*str)
 	{
-		len = wordlen(str, SPACE);
+		len = wordlen(str, 0);
 		if ((*str == SGL_QUOTE || *str == DBL_QUOTE) && len)
 		{
 			new_str = substr_free(str, 1 , len - 2);
@@ -345,114 +293,307 @@ int read_redirect_typeno(char *str)
 
 /* replace.c */
 
+// char *replace_pcode(char *str)
+// {
+// 	char *envp; 
+
+// 	envp = NULL;
+// 	str++;
+// 	if (*str== '?')
+// 	{
+// 		envp = ft_itoa(g_status);
+// 		if (!envp)
+// 			return (NULL);
+// 		str++;
+// 	}
+// 	return (envp);
+// }
+
+// char *replace_val_env(t_deques *deqs, char *key)
+// {
+// 	char	*envp;
+
+// 	envp = get_val_deq(deqs, key);
+// 	if (!envp)
+// 		return (NULL);
+// 	return (envp);
+// }
+
+
+
+// char *get_key2(char *str)
+// {
+// 	char	*key; 
+// 	int 	len;
+// 	// int 	len2;
+
+// 	len = strchrlen(str, SPACE);
+// 	printf("getkeylen:%d\n", len);
+// 	if (len == (int)ft_strlen(str))
+// 		len = strchrlen(str, DOLLAR);
+// 	key = ft_substr(str, 0, len);
+// 	if (!key)
+// 		return (NULL);
+// 	return (key);
+// }
+
+// char *replace_dollar(t_deques *deqs, char *str, char *dst, int *len)
+// {
+// 	char	*envp;
+// 	int		len;
+// 	char 	*key;
+
+// 	*len = 0;
+// 	(str)++;
+// 	// while (*str)
+// 	// {
+// 		// envp = replace_pcode(*str);
+// 		// if (envp)
+// 			// (*str)++;
+// 		// else
+// 		// {
+// 	key = get_key2(*str);
+// 	printf("key: %s\n", key);
+// 	if (!key)
+// 		return (NULL);
+// 	envp = replace_val_env(deqs, key);
+// 	len = ft_strlen(key) - 1;
+// 	if (len >= 0)
+// 		len = ft_strlen(*str);
+// 	free(key);
+// 	// str += len;
+// 		// }
+// 	dst = strjoin_free(dst, envp);
+// 	printf("dst: %s\n", dst);
+// 	printf("str: %s\n", *str);
+
+
+// 	if (!dst)
+// 		return (NULL);
+// 		// (*str)++;
+// 	// }
+// 	return (dst);
+// }
+
+
+// char *replace_envp(t_deques *deqs, char *str)
+// {
+// 	char	*headstr;
+// 	char	*dst;
+// 	int		len;
+	
+// 	dst = ft_calloc(2, sizeof(char));
+// 	if (!dst)
+// 		return (NULL);
+// 	headstr = str;
+// 	// printf("re_str: %s\n", str);
+// 	while (*str)
+// 	{
+// 		printf("dst: %s\n", dst);
+
+// 		len = strchrlen(str, DOLLAR);
+// 		if (len)
+// 		{
+// 			dst = strjoin_free(dst, ft_substr(str, 0, len));
+// 			// dst = substrjoin(str, 0, len, dst);
+// 			// printf("dst: %s\n", dst);
+// 			str += len;
+// 			if (!str)
+// 				return (dst);
+// 		}
+// 		// printf("%s\n", str);
+// 		// while(*str == DOLLAR)
+// 			// str++;
+// 		if (*str == DOLLAR) 
+// 		{
+// 			char *envp = replace_pcode(str);
+// 			if (envp)
+// 			{
+// 				dst = strjoin_free(dst, envp);
+// 				str++;
+// 				printf("str:: %s\n", str);
+// 			}
+// 			// dst = replace_dollar(deqs, &str, dst, &len);
+	
+
+			
+// 		}
+// 		else
+// 		{
+// 			len = strchrlen(str, DOLLAR);
+// 			dst = substrjoin(str, 0, len, dst);
+// 			str += len;
+// 		}
+
+// 		if (!dst || !*str)
+// 			break ;
+// 		str++;
+// 	}
+// 	free(headstr);
+// 	// printf("re_dst: %s\n", dst);
+// 	return (dst);
+// }
+
+
+
 char *replace_pcode(char *str)
 {
-	char *envp; 
+	char *envp;
 
 	envp = NULL;
-	if (*str== '?')
+	str++;
+	if (*str == '?')
 	{
 		envp = ft_itoa(g_status);
 		if (!envp)
 			return (NULL);
-		(str)++;
 	}
 	return (envp);
 }
+
 
 char *replace_val_env(t_deques *deqs, char *key)
 {
 	char	*envp;
 
 	envp = get_val_deq(deqs, key);
-	if (!envp)
-		return (NULL);
 	return (envp);
-}
-
-
-int strchrlen(char *str, int chr)
-{
-	int len ;
-
-	if (ft_strchr(str, chr))
-		len = ft_strchr(str, chr) - str;
-	else 
-		len = ft_strlen(str);
-	return (len);
 }
 
 char *get_key2(char *str)
 {
 	char	*key; 
 	int 	len;
+	// int 	len2;
 
 	len = strchrlen(str, SPACE);
+	// printf("getkeylen:%d\n", len);
+	if (len == (int)ft_strlen(str))
+		len = strchrlen(str, DOLLAR);
 	key = ft_substr(str, 0, len);
 	if (!key)
 		return (NULL);
 	return (key);
 }
 
-char *replace_dollar(t_deques *deqs, char **str, char *dst)
+// char *replace_dollar(t_deques *deqs, char *str, char *dst, int *len)
+// {
+// 	char	*envp;
+// 	int		len;
+// 	char 	*key;
+
+// 	*len = 0;
+// 	(str)++;
+// 	// while (*str)
+// 	// {
+// 		// envp = replace_pcode(*str);
+// 		// if (envp)
+// 			// (*str)++;
+// 		// else
+// 		// {
+// 	key = get_key2(*str);
+// 	printf("key: %s\n", key);
+// 	if (!key)
+// 		return (NULL);
+// 	envp = replace_val_env(deqs, key);
+// 	len = ft_strlen(key) - 1;
+// 	if (len >= 0)
+// 		len = ft_strlen(*str);
+// 	free(key);
+// 	// str += len;
+// 		// }
+// 	dst = strjoin_free(dst, envp);
+// 	printf("dst: %s\n", dst);
+// 	printf("str: %s\n", *str);
+
+
+// 	if (!dst)
+// 		return (NULL);
+// 		// (*str)++;
+// 	// }
+// 	return (dst);
+// }
+
+char *replace_dollar(t_deques *deqs, char *str, int *len)
 {
-	char	*envp;
-	int		len;
-	char 	*key;
-
-	(*str)++;
-	envp = replace_pcode(*str);
-	if (envp)
-		(*str)++;
-	else
-	{
-		key = get_key2(*str);
-		// printf("key: %s\n", key);
-		if (!key)
-			return (NULL);
-		envp = replace_val_env(deqs, key);
-		len = ft_strlen(key) - 1;
-		free(key);
-		(*str) += len;
-	}
-
-	dst = strjoin_free(dst, envp);
-	if (!dst)
+	char *envp;
+	char *key;
+	
+	envp = NULL;
+	str++;
+	key = get_key2(str);
+	if (!key)
 		return (NULL);
-	// printf("dst: %s\n", dst);
-	return (dst);
+	envp = replace_val_env(deqs, key);
+	*len = ft_strlen(key) + 1;
+	// if (*len <= 0)
+		// *len = ft_strlen(str);
+	printf("keylen: %d\n", *len);
+	printf("envp: %s\n", envp);
+	free(key);
+	return (envp);
 }
 
 
 char *replace_envp(t_deques *deqs, char *str)
 {
+	char	*envp;
 	char	*headstr;
 	char	*dst;
 	int		len;
-	
+	(void) deqs;
+
 	dst = ft_calloc(2, sizeof(char));
 	if (!dst)
 		return (NULL);
 	headstr = str;
-	// printf("re_str: %s\n", str);
 	while (*str)
 	{
-		if (*str == DOLLAR)
-			dst = replace_dollar(deqs, &str, dst);
-		else
+		//환경변수가 아닌 문자열
+		len = strchrlen(str, DOLLAR);
+		// printf(">>%s\n", str + len);
+		if (len)
+			dst = strjoin_free(dst, ft_substr(str, 0, len));
+		else if (*str == DOLLAR) // $문자열
 		{
-			len = strchrlen(str, DOLLAR);
-			dst = substrjoin(str, 0, len, dst);
-			str += len;
+			envp = replace_pcode(str);
+			if (envp)
+			{
+				dst = strjoin_free(dst, envp);
+				len = 2;
+			}
+			else //환경 변수 달려 
+			{
+				envp = replace_dollar(deqs, str, &len);
+				if (envp)
+				{
+					dst = strjoin_free(dst, envp);
+					break ;
+				}
+				break ;
+
+			}
+			if (!envp)
+			{
+				strjoin_free(dst, ft_substr(str, 0, 2));
+				len = 2;
+			}
 		}
-		if (!dst || !*str)
-			break ;
-		str++;
+		break ;
+
+		printf("dst: %s\n", dst);
+		printf ("ok\n");		
+		str += len;
+		printf("str: %s\n", dst);
+		// printf(">str: %s\n", dst);
 	}
 	free(headstr);
-	// printf("re_dst: %s\n", dst);
+	
 	return (dst);
+	
+	
 }
+
 
 char *replace_word(t_deques *deqs, char *str)
 {
@@ -470,6 +611,9 @@ char *replace_word(t_deques *deqs, char *str)
 	}
 	else 
 		new_str = trim_quote(new_str);
+	if (!*new_str)
+		return (NULL);
+		// free(new_str);
 	// printf("new_str3: %s#\n", new_str);
 	return (new_str);
 }
@@ -520,18 +664,21 @@ int	count_argv(char *argv)
 {
 	int n;
 	int len;
+	int flag;
 
-	n = 0;
+	n = 1;
+	flag = 0;
 	while (argv && *argv)
 	{
-		n++;
 		len = wordlen(argv, SPACE);
+		if (*(argv + len) == SPACE || !*(argv + len))
+			n++;		
 		if (len)
 			argv += len;
 		else
 			break ;
 	}
-	return (++n);
+	return (n);
 }	
 char *find_spacend(char *str);
 
@@ -551,6 +698,8 @@ int isemptyenvp(char *str, t_deques *envps)
 }
 
 
+
+
 char **get_argvs(char *word, char *argv, t_deques *envps)
 { 
 	char	**argvs;
@@ -558,37 +707,57 @@ char **get_argvs(char *word, char *argv, t_deques *envps)
 	int		n; 
 	int		i;
 	int		len;
+	int		next;
+	char	*start;
 
-
+	start = argv;
 	n = count_argv(argv);
-	argvs = ft_calloc(n + 1, sizeof(char *));
+	printf("n: %d\n", n);
+	argvs = ft_calloc(n + 2, sizeof(char *));
 	if (word)
 		argvs[0] = ft_strdup(word);
 	i = 1;
+	len = 0;
 	while (i < n && argv)
 	{
-		argv = find_spacend(argv);
+		while (isspace(*argv))
+		{
+			argv++;
+			len++;
+		}
+		// argv = find_spacend(argv);
 		// if (*(argv + 1) == PIPE)
 		// 	argv++;
-		len = wordlen(argv, SPACE);
+		// printf("argv: %s\n", argv);
+		next = wordlen(argv, SPACE);
 		// printf("len: %d\n", len);
-		if (!len)
-			len = ft_strlen(argv);
-		new = ft_substr(argv, 0, len);
-		if (isemptyenvp(new, envps) == TRUE)
+		if (!next)
+			next = ft_strlen(argv);
+		// printf("next: %d\n", next);
+		
+		len += next;
+		if (*(argv + next) == SPACE || !*(argv + next))
 		{
-			argv += len;
-			while (ft_isspace(*argv))
-				argv++;
-			continue;
+			// printf("len: %d\n", len);
+			new = ft_substr(start, 0, len);
+			if (isemptyenvp(new, envps) == TRUE)
+			{
+				argv += next;
+				while (ft_isspace(*argv))
+					argv++;
+				continue;
+			}
+			argvs[i] = replace_word(envps, new);
+			start += len;
+			len = 0;
+			if (argvs[i])
+				i++;
 		}
-		argvs[i] = replace_word(envps, new);
 		// printf("argvs: %s\n", argvs[i]);
 		// printf("argvs[%d]: %s\n", i - 1, argvs[i - 1]);
-		argv += len;
+		argv += next;
 		// if (!argvs[i] && argv)
 			// argvs[i] = ft_substr("", 0, 1);
-		i++;
 	}
 	// int j = 0;
 	// while (argvs[j])
@@ -621,7 +790,7 @@ int token_redirect(t_token **token, t_deques *envps, char *str)
 		{
 			filenamelen = wordlen(str, SPACE);
 			filename = replace_word(envps, filename);
-			add_tokenright(*token, typeno, filename, NULL);
+			add_tokenright(token, typeno, filename, NULL);
 			str += filenamelen;
 		}
 		else
@@ -671,7 +840,7 @@ int add_tokenrightwords(t_token **token, char *word, char **argvs)
 			return (EXTRA_ERROR);
 	}
 
-	if (add_tokenright(*token, T_CMD_WORD, word, argvs) == EXTRA_ERROR)
+	if (add_tokenright(token, T_CMD_WORD, word, argvs) == EXTRA_ERROR)
 		return (EXTRA_ERROR);
 	return (EXIT_SUCCESS);
 }
@@ -746,7 +915,7 @@ int token_word(t_token **token, t_deques *envps, char *str)
 
 void token_pipe(t_token **token)
 {
-	add_tokenright(*token, T_PIPE, NULL, NULL);
+	add_tokenright(token, T_PIPE, NULL, NULL);
 }
 
 t_token *tokenizer(t_deques *envps, char **strs)
@@ -754,6 +923,8 @@ t_token *tokenizer(t_deques *envps, char **strs)
 	(void) envps;
 	t_token *token;
 
+
+	token = ft_calloc(1, sizeof(t_token));
 	if (handle_empty_redirects(strs) == EXIT_FAILURE)
 		return (NULL);
 		// printf("Ok\n");
@@ -788,9 +959,8 @@ int	lexer(t_shell *shell, char *vbuffer)
 		return(EXTRA_ERROR);
 		// return (EXIT_FAILURE);
 	// /*buffers 출력*/
-	// debug_buffers(vbuffers);
+	debug_buffers(vbuffers);
 
-	shell->t = ft_calloc(1, sizeof(t_token));
 	// shell->t 
 	// printf("%p\n", shell->t);
 	// printf("===tokenizer start===\n");

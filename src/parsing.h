@@ -45,11 +45,19 @@ t_token	*tlst_lastright(t_token *t);
 void	tlst_addright(t_token **t, t_token *newtoken);
 void	tlst_addleft(t_token **t, t_token *newtoken);
 
-
 /* token.c */
 int set_token(t_token **t);
-int	add_tokenright(t_token *token, int type, char *word, char **argvs);
+// int	add_tokenright(t_token *token, int type, char *word, char **argvs);
+int	add_tokenright(t_token **token, int type, char *word, char **argvs);
 
+/* resword.c */
+int ft_isresword(char chr);
+int ft_isredirect(char chr);
+
+/* find.c */
+char    *find_redirect_start(char *str);
+char    *find_filename_start(char *str);
+char	*find_pipeend(char *buffer);
 
 /* QUOTE.C */
 char *ft_ltrim(char *str);
@@ -60,6 +68,7 @@ char *find_wordend(char *str, int spacepipe_opt);
 
 t_token	*parser(t_token **token);
 
+int	set_next_cmd(char **s);
 
 
 void print_tree(t_token *dsttoken, int leftright, int i);
