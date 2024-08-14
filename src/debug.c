@@ -68,7 +68,7 @@ void	handler_heredoc_wait1(int signo)
 		replace_line(FALSE);
 }
 
-int	read_next_cmd(char **s)
+int	read_next_cmd(int fd)
 {
 	int		status;
 	char	*buffer;
@@ -76,34 +76,55 @@ int	read_next_cmd(char **s)
 	status = set_signal_init(handler_heredoc1);
 	rl_replace_line("", 0);
 	buffer = readline("> ");
-	while (!buffer)
+	while (*buffer == 0)
+	{
+		free(buffer);
 		buffer = readline("> ");
-	*s = buffer;
+	}
+	write(fd, buffer, ft_strlen(buffer));
+	free(buffer);
 	return (status);
 }
 
-// //
-// int	wait_heredoc(t_process p)
-// {
-// 	int	status;
+//
+int	wait_reading(t_process p, char **s)
+{
+	int		status;
+	char	buffer[ARG_MAX];
+	ssize_t	byte;
 
-// 	set_signal_init(handler_heredoc_wait);
-// 	waitpid(p.pid, &status, 0);
-// 	set_signal_init(handler_sub);
-// 	if (WIFEXITED(status))
-// 		return (WEXITSTATUS(status));
-// 	return (EXIT_FAILURE);
-// }
+	set_signal_init(handler_heredoc_wait1);
+	byte = read(p.pipe_fd[0], buffer, sizeof(buffer) - 1);
+	if (byte > 0)
+	{
+		buffer[byte] = 0;
+		printf("%s\n", buffer);
+	}
+	else
+		perror("");
+	waitpid(p.pid, &status, 0);
+	*s = ft_strdup(buffer);
+	set_signal_init(handler_sub);
+	// signal 종료시 status 정리 필요
+	if (WIFEXITED(status))
+		return (WEXITSTATUS(status));
+	return (EXIT_FAILURE);
+}
 
 
 int	set_next_cmd(char **s)
 {
 	t_process	p;
-
-	if (fork_process(&p))
+	if (pipe(p.pipe_fd) == -1 || fork_process(&p))
 		return (EXIT_FAILURE);
 	if (!p.pid)
-		exit(read_next_cmd(s));
+	{
+		close(p.pipe_fd[0]);
+		exit(read_next_cmd(p.pipe_fd[1]));
+	}
 	else
-		return (wait_heredoc(p));	
+	{
+		close(p.pipe_fd[1]);
+		return (wait_reading(p, s));
+	}
 }
