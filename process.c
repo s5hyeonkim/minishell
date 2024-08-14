@@ -32,13 +32,13 @@ void	subprocess(t_shell *shell)
 
 	index = 0;
 	set_signal_sub(handler_sub);
-	// printf("aaa\n");
 	while (index < shell->p_size)
 	{
 		if (open_pipe(&shell->p[index], shell->p_size) \
 				|| fork_process(&shell->p[index]))
 			break ;
 		// printf("path%s#\nargvs%s#\n%s#\n", shell->p[index].path, shell->p[index].args[0], shell->p[index].args[1]);
+		printf("aa\n");
 		child(shell, index);
 		parent(shell, index);
 		index++;
@@ -121,6 +121,7 @@ void	exec_cmds(t_shell *shell)
 	if (!shell->p || token_to_process(shell, shell->t, &index))
 	{
 		g_status = EXIT_FAILURE;
+		printf("fail\n");
 		handle_error(NULL, NULL, EXTRA_ERROR);
 	}
 	else if (shell->p_size == 1 && is_builtin(shell->p[0].path))

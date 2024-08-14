@@ -51,7 +51,7 @@ void	handler_heredoc(int signo)
 void	handler_heredoc_wait(int signo)
 {
 	if (signo == SIGINT)
-		rl_replace_line("", 0);
+		replace_line(FALSE);
 }
 
 int	open_redirect(int redirect, char *word, char *link)
@@ -74,12 +74,11 @@ int	write_files(char *file_name, char *line)
 {
 	int	fd;
 
-	if (!line[0])
-		return (EXIT_SUCCESS);
 	fd = open(file_name, O_CREAT | O_WRONLY | O_TRUNC, 0666);
 	if (fd == -1)
 		return (EXTRA_ERROR);
-	write(fd, line, ft_strlen(line));
+	if (line[0])
+		write(fd, line, ft_strlen(line));
 	close(fd);
 	return (EXIT_SUCCESS);
 }
@@ -92,6 +91,8 @@ int	heredoc_process(char *link, char *limiter)
 
 	ft_memset(line, 0, sizeof(char) * 1024);
 	status = set_signal_init(handler_heredoc);
+	write_files(link, line);
+	rl_replace_line("", 0);
 	buffer = readline("> ");
 	while (buffer && ft_memcmp(buffer, limiter, ft_strlen(limiter) + 1))
 	{
@@ -106,18 +107,16 @@ int	heredoc_process(char *link, char *limiter)
 	return (status);
 }
 
+//
 int	wait_heredoc(t_process p)
 {
 	int	status;
 
 	set_signal_init(handler_heredoc_wait);
 	waitpid(p.pid, &status, 0);
-	// printf("pp");
-	if (WIFSIGNALED(status))
-		return (EXIT_SUCCESS);
+	set_signal_init(handler_sub);
 	if (WIFEXITED(status))
 		return (WEXITSTATUS(status));
-	set_signal_init(handler_init);
 	return (EXIT_FAILURE);
 }
 
@@ -125,7 +124,6 @@ int	here_doc(char *link, char *limiter)
 {
 	t_process	p;
 
-	// printf("qq\n");
 	if (fork_process(&p))
 		return (EXIT_FAILURE);
 	if (!p.pid)
@@ -175,6 +173,7 @@ int	open_token(t_token *t, t_process *p)
 			return (EXTRA_ERROR);
 	}
 	*fd = open_redirect(t->type, t->word, p->link);
+	
 	if (*fd == -1)
 		return (EXTRA_ERROR);
 	return (EXIT_SUCCESS);
