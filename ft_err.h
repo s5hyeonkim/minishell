@@ -14,7 +14,7 @@
 # include "./libft/libft.h"
 
 # define MSG_ARGV "invalid arguments\n"
-# define MSG_OPT "invalid argument or option\n"
+# define MSG_OPT "invalid options\n"
 # define MSG_IDF "not a valid identifier\n"
 # define MSG_SET "not set\n"
 # define MSG_NUM "numeric argument required\n"

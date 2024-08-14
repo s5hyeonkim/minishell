@@ -42,7 +42,6 @@ char	*get_nextdir(char *path, char *cwd)
 
 int	navigate_dir(char *to_dir, char *origin)
 {
-	// printf("to_dir: %s\n", to_dir);
 	if (check_folder(to_dir) || chdir(to_dir) == -1)
 		return (handle_error("cd", origin, EXTRA_ERROR));
 	return (EXIT_SUCCESS);
@@ -69,11 +68,9 @@ int	navigate_targetdir(t_data d, char *to_dir, char **nwd)
 	*nwd = get_nextdir(to_dir, d.lcwd);
 	if (*nwd == NULL)
 		return (handle_error("cd", NULL, EXTRA_ERROR));
-	// printf("next dir: %s\n", *nwd);
 	status = navigate_dir(*nwd, to_dir);
 	return (status);
 }
-
 
 int	ft_cd(t_process p, t_data *d)
 {
@@ -84,12 +81,14 @@ int	ft_cd(t_process p, t_data *d)
 	index = 1;
 	deqs = d->envps;
 	nwd = NULL;
+	if (p.args[1][0] == '-' && ft_memcmp(p.args[1], "--", 3) && ft_memcmp(p.args[1], "-", 2))
+		return (handle_error(p.args[0], p.args[1], INVALID_OPT));
 	if (p.args[1] && !ft_memcmp(p.args[1], "--", 3) && p.args[2])
 		index = 2;
 	if (navigate_targetdir(*d, p.args[index], &nwd))
 	{
 		free(nwd);
-		return (EXTRA_ERROR);
+		return (EXIT_FAILURE);
 	}
 	if (set_env_pwd(deqs, "OLDPWD", d->lcwd))
 	{

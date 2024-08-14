@@ -20,8 +20,8 @@ int	ft_env(t_process p, t_data *d)
 
 	set_rwfd(p, &fd_in, 0);
 	set_rwfd(p, &fd_out, 1);
-	if (p.args[1] && (ft_memcmp(p.args[1], "--", 3) || p.args[2]))
-		return (handle_error(p.args[0], NULL, INVALID_OPT));
+	if (p.args[1] && p.args[1][0] == '-' && ft_memcmp(p.args[1], "--", 3))
+		return (handle_error(p.args[0], p.args[1], INVALID_OPT));
 	envs = deqtostrs(d->envps);
 	if (!envs)
 		return (handle_error(p.args[0], NULL, EXTRA_ERROR));

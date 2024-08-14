@@ -14,7 +14,6 @@
 void	exit_subprocess(t_shell *shell, char *obj, int errcode)
 {
 	// terminal setting 다시 보기
-	terminal_printon();
 	if (errcode && errcode < CMD_NOT_FOUND)
 	{
 		errcode = EXIT_FAILURE;
@@ -43,6 +42,7 @@ void	handler_heredoc(int signo)
 {
 	if (signo == SIGINT)
 	{
+		g_status = 1;
 		rl_replace_line("", 0);
 		exit(1);
 	}
@@ -51,7 +51,10 @@ void	handler_heredoc(int signo)
 void	handler_heredoc_wait(int signo)
 {
 	if (signo == SIGINT)
+	{
 		replace_line(FALSE);
+		g_status = 1;
+	}
 }
 
 int	open_redirect(int redirect, char *word, char *link)
@@ -89,15 +92,15 @@ int	heredoc_process(char *link, char *limiter)
 	char	*buffer;
 	char	line[ARG_MAX];
 
-	ft_memset(line, 0, sizeof(char) * 1024);
+	line[0] = 0;
 	status = set_signal_init(handler_heredoc);
 	write_files(link, line);
 	rl_replace_line("", 0);
 	buffer = readline("> ");
 	while (buffer && ft_memcmp(buffer, limiter, ft_strlen(limiter) + 1))
 	{
-		ft_strlcat(line, buffer, 1024);
-		ft_strlcat(line, "\n", 1024);
+		ft_strlcat(line, buffer, ARG_MAX);
+		ft_strlcat(line, "\n", ARG_MAX);
 		free(buffer);
 		rl_replace_line("", 0);
 		buffer = readline("> ");
@@ -111,10 +114,16 @@ int	heredoc_process(char *link, char *limiter)
 int	wait_heredoc(t_process p)
 {
 	int	status;
+	int	s;
 
-	set_signal_init(handler_heredoc_wait);
+	s = set_signal_init(handler_heredoc_wait);
 	waitpid(p.pid, &status, 0);
-	set_signal_init(handler_sub);
+	if (!s)
+		s = set_signal_init(handler_sub);
+	if (s)
+		return (EXTRA_ERROR);
+	if (WIFSIGNALED(status))
+		return (EXIT_FAILURE);
 	if (WIFEXITED(status))
 		return (WEXITSTATUS(status));
 	return (EXIT_FAILURE);
@@ -150,7 +159,6 @@ int	set_filedoc(t_process *p)
 			free(itoa);
 			return (EXTRA_ERROR);
 		}
-		printf("p: %p\n", p->link);
 		free(itoa);
 	}
 	return (EXIT_SUCCESS);
@@ -241,9 +249,10 @@ void	child(t_shell *shell, size_t index)
 	}
 	else if (!shell->p[index].args[0][0])
 	{
-		if (shell->p_size != 1)
-			exit_subprocess(shell, NULL, WAIT_TIMEOUT);
-		exit_subprocess(shell, NULL, EXIT_SUCCESS);
+		// if (shell->p_size != 1)
+		// 	exit_subprocess(shell, NULL, WAIT_TIMEOUT);
+		free_shell(*shell);
+		exit(g_status);
 	}
 	else
 	{

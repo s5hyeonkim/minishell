@@ -72,7 +72,7 @@ void	inprocess(t_shell *shell)
 		clean_files(shell->p, shell->p_size);
 		reset_terminal(shell);
 		free_shell(*shell);
-		exit(g_status);
+		exit(g_status);	
 	}
 	g_status = status;
 }
@@ -84,6 +84,10 @@ int	token_to_word(t_shell *shell, t_token *t, size_t index)
 	if (!t || t->type != T_CMD_WORD)
 		return (EXIT_SUCCESS);
 	p = &shell->p[index];
+	// printf("%s#\n", t->word);
+	// for (int i = 0; t->argvs[i] != 0; i++)
+	// 	printf("%s#\n", t->argvs[i]);
+	// printf("complete\n");
 	p->args = get_cmdargs(t->argvs);
 	p->path = get_cmdpath(shell->data.paths, t->word);
 	if (!p->args || !p->path)
@@ -123,7 +127,6 @@ void	exec_cmds(t_shell *shell)
 	if (!shell->p || token_to_process(shell, shell->t, &index))
 	{
 		g_status = EXIT_FAILURE;
-		printf("fail\n");
 		handle_error(NULL, NULL, EXTRA_ERROR);
 	}
 	else if (shell->p_size == 1 && is_builtin(shell->p[0].path))

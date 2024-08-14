@@ -73,19 +73,23 @@ int	export_wt_argv(t_process p, t_data *d)
 	int		index;
 	int		status;
 
-	index = 0;
+	index = 1;
+	if (!ft_memcmp(p.args[1], "--", 3))
+		index++;
 	status = EXIT_SUCCESS;
 	ft_memset(&keyval, 0, sizeof(t_map));
-	while (p.args[++index])
+	while (p.args[index])
 	{
 		if (!is_valid_key(p.args[index]))
-			status = handle_error(p.args[0], p.args[1], INVALID_IDF);
-		else if (set_map(&keyval, p.args[index]) || replace_back(d->envps, keyval.key, keyval.mid, keyval.val))
+			status = handle_error(p.args[0], p.args[index], INVALID_IDF);
+		else if (set_map(&keyval, p.args[index]) \
+		|| replace_back(d->envps, keyval.key, keyval.mid, keyval.val))
 		{
 			free_map(&keyval);
 			return (handle_error(p.args[0], NULL, EXTRA_ERROR));
 		}
 		free_map(&keyval);
+		index++;
 	}
 	return (status);
 }
@@ -96,6 +100,11 @@ int	ft_export(t_process p, t_data *d)
 
 	set_rwfd(p, &fd[1], 1);
 	if (!p.args[1] || (!p.args[2] && !ft_memcmp(p.args[1], "--", 3)))
-		export_wo_argv(d, fd);
+		return (export_wo_argv(d, fd));
+	if (p.args[1][0] == '-' && ft_memcmp(p.args[1], "--", 3) && ft_memcmp(p.args[1], "-", 2))
+	{
+		handle_error(p.args[0], p.args[1], INVALID_OPT);
+		return (BUILTIN_ERROR);
+	}
 	return (export_wt_argv(p, d));
 }

@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 #include "execute.h"
 
-int	is_no_nl(char *str)
+static int	is_no_nl(char *str)
 {
 	if (str && !ft_memcmp(str, "-n", 3))
 		return (TRUE);
@@ -31,7 +31,11 @@ int	ft_echo(t_process p, t_data *d)
 	if (is_no_nl(p.args[1]))
 		index++;
 	while (p.args[index])
+	{
 		ft_putstr_fd(p.args[index++], fd_out);
+		if (p.args[index])
+			ft_putchar_fd(' ', fd_out);
+	}
 	if (!is_no_nl(p.args[1]))
 		ft_putchar_fd('\n', fd_out);
 	return (EXIT_SUCCESS);

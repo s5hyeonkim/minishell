@@ -11,11 +11,11 @@
 /* ************************************************************************** */
 #include "execute.h"
 
-int	is_valid_option(char *opt)
+static int	is_valid_option(char *opt)
 {
 	if (!opt)
 		return (TRUE);
-	if (!ft_memcmp(opt, "--", 3) || !ft_memcmp(opt, "-", 2) || opt[0] != '-')
+	if (!ft_memcmp(opt, "--", 3) || opt[0] != '-' || !ft_memcmp(opt, "-", 2))
 		return (TRUE);
 	return (FALSE);
 }
