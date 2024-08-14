@@ -69,6 +69,9 @@ void	inprocess(t_shell *shell)
 	status = exec_builtin(shell->p[0], &shell->data);
 	if (!ft_memcmp(shell->p[0].args[0], "exit", 5) && !status)
 	{
+		clean_files(shell->p, shell->p_size);
+		reset_terminal(shell);
+		free_shell(*shell);
 		exit(g_status);
 	}
 	g_status = status;

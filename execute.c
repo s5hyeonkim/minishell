@@ -150,6 +150,8 @@ int	set_filedoc(t_process *p)
 			free(itoa);
 			return (EXTRA_ERROR);
 		}
+		printf("p: %p\n", p->link);
+		free(itoa);
 	}
 	return (EXIT_SUCCESS);
 }

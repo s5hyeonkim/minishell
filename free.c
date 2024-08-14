@@ -31,6 +31,7 @@ void	free_process(t_process *p, size_t size)
 	{
 		free_strs(p[index].args);
 		free(p[index].path);
+		printf("free %p\n", p->link);
 		free(p->link);
 		index++;
 	}
@@ -81,6 +82,8 @@ void	clean_files(t_process *p, size_t p_size)
 			continue ;
 		if (p_id->flag) // parent 만
 			unlink(p->link);
+		p_id->flag = 0;
+		printf("%s\n", p->link);
 		index++;
 	}
 }
