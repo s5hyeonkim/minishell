@@ -6,10 +6,11 @@
 /*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 19:32:01 by sohykim           #+#    #+#             */
-/*   Updated: 2024/07/23 19:43:57 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/14 19:19:32 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "execute.h"
+
+#include "../execute.h"
 
 static void	print_export(char *strs[], int write)
 {
@@ -58,7 +59,7 @@ int	export_wo_argv(t_data *d, int fd[2])
 {
 	char	**envs;
 
-	envs = deqtostrs(d->envps);
+	envs = deqtostrs(d->envps->head);
 	if (!envs)
 		return (handle_error("export", NULL, EXTRA_ERROR));
 	ft_sort(envs, ft_keycmp);
@@ -101,7 +102,7 @@ int	ft_export(t_process p, t_data *d)
 	set_rwfd(p, &fd[1], 1);
 	if (!p.args[1] || (!p.args[2] && !ft_memcmp(p.args[1], "--", 3)))
 		return (export_wo_argv(d, fd));
-	if (p.args[1][0] == '-' && ft_memcmp(p.args[1], "--", 3) && ft_memcmp(p.args[1], "-", 2))
+	if (!is_valid_opt(p.args[1]))
 	{
 		handle_error(p.args[0], p.args[1], INVALID_OPT);
 		return (BUILTIN_ERROR);

@@ -1,37 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   env.c                                              :+:      :+:    :+:   */
+/*   pwd.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/07/23 19:31:36 by sohykim           #+#    #+#             */
-/*   Updated: 2024/07/23 19:31:38 by sohykim          ###   ########.fr       */
+/*   Created: 2024/07/23 19:32:07 by sohykim           #+#    #+#             */
+/*   Updated: 2024/08/14 19:19:37 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "execute.h"
 
-int	ft_env(t_process p, t_data *d)
+#include "../execute.h"
+
+static int	is_valid_option(char *opt)
 {
-	int		index;
-	char	**envs;
-	int		fd_in;
-	int		fd_out;
+	if (!opt)
+		return (TRUE);
+	if (!ft_memcmp(opt, "--", 3) || opt[0] != '-' || !ft_memcmp(opt, "-", 2))
+		return (TRUE);
+	return (FALSE);
+}
 
-	set_rwfd(p, &fd_in, 0);
-	set_rwfd(p, &fd_out, 1);
-	if (p.args[1] && p.args[1][0] == '-' && ft_memcmp(p.args[1], "--", 3))
+//PATH_MAX value need to be changed
+int	ft_pwd(t_process p, t_data *d)
+{
+	int	fd_out;
+
+	(void) d;
+	if (!is_valid_option(p.args[1]))
 		return (handle_error(p.args[0], p.args[1], INVALID_OPT));
-	envs = deqtostrs(d->envps);
-	if (!envs)
-		return (handle_error(p.args[0], NULL, EXTRA_ERROR));
-	index = 0;
-	while (envs[index])
-	{
-		if (ft_strchr(envs[index], '='))
-			ft_putendl_fd(envs[index], fd_out);
-		index++;
-	}
-	free_strs(envs);
+	set_rwfd(p, &fd_out, 1);
+	ft_putendl_fd(d->lcwd, fd_out);
 	return (EXIT_SUCCESS);
 }

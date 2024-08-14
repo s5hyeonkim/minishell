@@ -37,9 +37,6 @@
 # include "./execute/deque/deque.h"
 # include "./execute/execute.h"
 # include "./src/parsing.h"
-# define PATH_MAX 1024
-// getconf ARG_MAX
-# define ARG_MAX 262144
 # define WAIT_TIMEOUT 258
 // # define PROMPT_MSG "minishell$ "
 # define PROMPT_MSG "\033[36mminishell ❯\033[0m "
@@ -67,8 +64,6 @@ t_builtin	find_builtin(int index);
 char		*read_val_strs(char *strs[], char *key);
 int			set_cwd(char **cwd);
 /* execute */
-int			is_builtin(char *cmd);
-int			exec_builtin(t_process p, t_data *d);
 void		wait_process(t_shell *shell);
 void		exec_program(t_shell *shell, t_process p);
 void		set_process(t_shell *shell);
@@ -95,7 +90,6 @@ void		handler_sub(int signo);
 
 /* signal_utils.c  */
 void		move_cursor(void);
-void		replace_line(int redisplayon);
 
 /* terminal.c */
 void		get_terminal(t_shell *shell);
@@ -108,13 +102,16 @@ void		set_shell(t_shell *shell, char *envp[]);
 // void		tokenization(t_shell *shell, t_token *t);
 void		parent(t_shell *shell, size_t index);
 void		child(t_shell *shell, size_t index);
-char		*get_cmdpath(char **paths, char *cmd);
 int			fork_process(t_process *p);
-char		**get_cmdargs(char **cmd);
 int			find_redirect(t_process *p, t_token *t);
 int			open_pipe(t_process *p, size_t size);
 size_t		find_pipe(t_token *t);
 int			wait_heredoc(t_process p);
+void		set_fd(t_shell *shell, size_t index);
+void		dup_fd(int *fd, int std);
+int			set_filedoc(t_process *p);
+int			here_doc(char *link, char *limiter);
+int			open_token(t_token *t, t_process *p);
 
 /* parsing.c */
 int			parselines(t_shell *shell, char *buffer);

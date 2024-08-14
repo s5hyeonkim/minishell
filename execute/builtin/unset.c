@@ -6,10 +6,11 @@
 /*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 19:32:13 by sohykim           #+#    #+#             */
-/*   Updated: 2024/07/23 19:44:37 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/14 19:19:41 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "execute.h"
+
+#include "../execute.h"
 
 int	is_valid_name(char *s)
 {
@@ -55,7 +56,7 @@ int	ft_unset(t_process p, t_data *d)
 {
 	if (!p.args[1] || (!p.args[2] && !ft_memcmp(p.args[1], "--", 3)))
 		return (EXIT_SUCCESS);
-	if (p.args[1][0] == '-' && ft_memcmp(p.args[1], "--", 3) && ft_memcmp(p.args[1], "-", 2))
+	if (!is_valid_opt(p.args[1]))
 	{
 		handle_error(p.args[0], p.args[1], INVALID_OPT);
 		return (BUILTIN_ERROR);

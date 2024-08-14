@@ -6,10 +6,10 @@
 /*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 19:31:24 by sohykim           #+#    #+#             */
-/*   Updated: 2024/07/23 19:31:27 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/14 19:18:15 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "execute.h"
+#include "../execute.h"
 
 char	*get_nextdir(char *path, char *cwd)
 {
@@ -57,19 +57,27 @@ int	navigate_var(t_deques *envps, char *var, char **nwd)
 	return (navigate_dir(*nwd, read_val_deq(envps, var)));
 }
 
-int	navigate_targetdir(t_data d, char *to_dir, char **nwd)
+char	*navigate_targetdir(t_data d, char *to_dir)
 {
+	char	*nwd;
 	int		status;
 
+	status = EXIT_SUCCESS;
 	if (!to_dir || !ft_memcmp(to_dir, "--", 3))
-		return (navigate_var(d.envps, "HOME", nwd));
+		status = navigate_var(d.envps, "HOME", &nwd);
 	else if (!ft_memcmp(to_dir, "-", 2))
-		return (navigate_var(d.envps, "OLDPWD", nwd));
-	*nwd = get_nextdir(to_dir, d.lcwd);
-	if (*nwd == NULL)
-		return (handle_error("cd", NULL, EXTRA_ERROR));
-	status = navigate_dir(*nwd, to_dir);
-	return (status);
+		status = navigate_var(d.envps, "OLDPWD", &nwd);
+	if (!status)
+		nwd = get_nextdir(to_dir, d.lcwd);
+	if (!status && !nwd)
+	{
+		handle_error("cd", NULL, EXTRA_ERROR);
+		return (NULL);
+	}
+	if (!status && !navigate_dir(nwd, to_dir))
+		return (nwd);
+	free(nwd);
+	return (NULL);
 }
 
 int	ft_cd(t_process p, t_data *d)
@@ -77,28 +85,21 @@ int	ft_cd(t_process p, t_data *d)
 	char		*nwd;
 	int			index;
 	t_deques	*deqs;
+	int			status;
 
 	index = 1;
 	deqs = d->envps;
-	nwd = NULL;
-	if (p.args[1][0] == '-' && ft_memcmp(p.args[1], "--", 3) && ft_memcmp(p.args[1], "-", 2))
+	if (!is_valid_opt(p.args[1]))
 		return (handle_error(p.args[0], p.args[1], INVALID_OPT));
 	if (p.args[1] && !ft_memcmp(p.args[1], "--", 3) && p.args[2])
-		index = 2;
-	if (navigate_targetdir(*d, p.args[index], &nwd))
-	{
-		free(nwd);
+		index++;
+	nwd = navigate_targetdir(*d, p.args[index]);
+	if (!nwd)
 		return (EXIT_FAILURE);
-	}
-	if (set_env_pwd(deqs, "OLDPWD", d->lcwd))
-	{
-		free(d->lcwd);
-		d->lcwd = nwd;
-		return (handle_error("cd", NULL, EXTRA_ERROR));
-	}
+	status = set_env_pwd(deqs, "OLDPWD", d->lcwd);
 	free(d->lcwd);
 	d->lcwd = nwd;
-	if (set_env_pwd(deqs, "PWD", d->lcwd))
+	if (status || set_env_pwd(deqs, "PWD", d->lcwd))
 		return (handle_error("cd", NULL, EXTRA_ERROR));
 	return (EXIT_SUCCESS);
 }

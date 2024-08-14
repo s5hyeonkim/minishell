@@ -6,11 +6,11 @@
 /*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 16:15:03 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/14 16:15:05 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/14 19:18:22 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "execute.h"
+#include "../execute.h"
 
 int	check_folder(char *to_dir)
 {

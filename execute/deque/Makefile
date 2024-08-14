@@ -7,11 +7,12 @@ CPPFLAGS = -Ideque.h
 LDFLAGS = -L../../libft
 LDLIBS = -lft
 SRCS = utils.c \
-	   creation.c \
+	   deque.c \
 	   free.c \
 	   pop.c \
 	   push.c \
 	   utils.c \
+	   api.c \
 	   map.c
 
 OBJS = $(SRCS:.c=.o)

@@ -74,7 +74,7 @@ int			set_keyval(t_map *keyval, char *key, char mid, char *val);
 // utils
 void		print_deques(t_deques *deqs, t_state state);
 char		*ft_pairjoin(char *key, char mid, char *val);
-char		**deqtostrs(t_deques *deqs);
+char		**deqtostrs(t_deque *deq);
 t_deques	*strstodeq(char **strs);
 void		set_state(t_deque *deq);
 int			is_valid_key(char *s);

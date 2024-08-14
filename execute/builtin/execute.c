@@ -6,11 +6,11 @@
 /*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 19:31:42 by sohykim           #+#    #+#             */
-/*   Updated: 2024/07/23 19:31:44 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/14 19:19:22 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "execute.h"
-// stdout으로 없는 내용 쓰는 것 구현하면 마지막 exit code가 훼손될 수 있음.
+
+#include "../execute.h"
 
 t_builtin	find_builtin(int index)
 {

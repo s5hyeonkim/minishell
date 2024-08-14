@@ -9,7 +9,7 @@
 /*   Updated: 2024/08/14 07:42:51 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "minishell.h"
+#include "../execute.h"
 
 int	is_builtin(char *cmd)
 {

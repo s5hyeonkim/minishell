@@ -1,42 +1,38 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   echo.c                                             :+:      :+:    :+:   */
+/*   env.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/07/23 19:31:30 by sohykim           #+#    #+#             */
-/*   Updated: 2024/07/23 19:31:33 by sohykim          ###   ########.fr       */
+/*   Created: 2024/07/23 19:31:36 by sohykim           #+#    #+#             */
+/*   Updated: 2024/08/14 19:18:43 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "execute.h"
 
-static int	is_no_nl(char *str)
+#include "../execute.h"
+
+int	ft_env(t_process p, t_data *d)
 {
-	if (str && !ft_memcmp(str, "-n", 3))
-		return (TRUE);
-	return (FALSE);
-}
+	int		index;
+	char	**envs;
+	int		fd_in;
+	int		fd_out;
 
-int	ft_echo(t_process p, t_data *d)
-{
-	int	index;
-	int	fd_in;
-	int	fd_out;
-
-	(void) d;
-	index = 1;
 	set_rwfd(p, &fd_in, 0);
 	set_rwfd(p, &fd_out, 1);
-	if (is_no_nl(p.args[1]))
-		index++;
-	while (p.args[index])
+	if (p.args[1] && p.args[1][0] == '-' && ft_memcmp(p.args[1], "--", 3))
+		return (handle_error(p.args[0], p.args[1], INVALID_OPT));
+	envs = deqtostrs(d->envps->head);
+	if (!envs)
+		return (handle_error(p.args[0], NULL, EXTRA_ERROR));
+	index = 0;
+	while (envs[index])
 	{
-		ft_putstr_fd(p.args[index++], fd_out);
-		if (p.args[index])
-			ft_putchar_fd(' ', fd_out);
+		if (ft_strchr(envs[index], '='))
+			ft_putendl_fd(envs[index], fd_out);
+		index++;
 	}
-	if (!is_no_nl(p.args[1]))
-		ft_putchar_fd('\n', fd_out);
+	free_strs(envs);
 	return (EXIT_SUCCESS);
 }
