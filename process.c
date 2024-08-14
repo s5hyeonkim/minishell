@@ -38,7 +38,6 @@ void	subprocess(t_shell *shell)
 				|| fork_process(&shell->p[index]))
 			break ;
 		// printf("path%s#\nargvs%s#\n%s#\n", shell->p[index].path, shell->p[index].args[0], shell->p[index].args[1]);
-		printf("aa\n");
 		child(shell, index);
 		parent(shell, index);
 		index++;

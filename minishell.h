@@ -38,6 +38,8 @@
 # include "./execute/execute.h"
 # include "./src/parsing.h"
 # define PATH_MAX 1024
+// getconf ARG_MAX
+# define ARG_MAX 262144
 # define WAIT_TIMEOUT 258
 // # define PROMPT_MSG "minishell$ "
 # define PROMPT_MSG "\033[36mminishell ❯\033[0m "
@@ -112,6 +114,7 @@ char		**get_cmdargs(char **cmd);
 int			find_redirect(t_process *p, t_token *t);
 int			open_pipe(t_process *p, size_t size);
 size_t		find_pipe(t_token *t);
+int			wait_heredoc(t_process p);
 
 /* parsing.c */
 int			parselines(t_shell *shell, char *buffer);

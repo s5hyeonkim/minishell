@@ -87,7 +87,7 @@ int	heredoc_process(char *link, char *limiter)
 {
 	int		status;
 	char	*buffer;
-	char	line[1024];
+	char	line[ARG_MAX];
 
 	ft_memset(line, 0, sizeof(char) * 1024);
 	status = set_signal_init(handler_heredoc);

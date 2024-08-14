@@ -52,3 +52,58 @@ void debug_tree(t_token *dsttoken, int leftright, int i)
 	debug_tree(dsttoken->left, 0, i + 1);
 	debug_tree(dsttoken->right, 1, i + 1);
 }
+
+void	handler_heredoc1(int signo)
+{
+	if (signo == SIGINT)
+	{
+		rl_replace_line("", 0);
+		exit(1);
+	}
+}
+
+void	handler_heredoc_wait1(int signo)
+{
+	if (signo == SIGINT)
+		replace_line(FALSE);
+}
+
+int	read_next_cmd(char **s)
+{
+	int		status;
+	char	*buffer;
+
+	status = set_signal_init(handler_heredoc1);
+	rl_replace_line("", 0);
+	buffer = readline("> ");
+	while (!buffer)
+		buffer = readline("> ");
+	*s = buffer;
+	return (status);
+}
+
+// //
+// int	wait_heredoc(t_process p)
+// {
+// 	int	status;
+
+// 	set_signal_init(handler_heredoc_wait);
+// 	waitpid(p.pid, &status, 0);
+// 	set_signal_init(handler_sub);
+// 	if (WIFEXITED(status))
+// 		return (WEXITSTATUS(status));
+// 	return (EXIT_FAILURE);
+// }
+
+
+int	set_next_cmd(char **s)
+{
+	t_process	p;
+
+	if (fork_process(&p))
+		return (EXIT_FAILURE);
+	if (!p.pid)
+		exit(read_next_cmd(s));
+	else
+		return (wait_heredoc(p));	
+}
