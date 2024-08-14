@@ -3,12 +3,13 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 07:22:42 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/14 07:25:36 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/14 11:22:27 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
@@ -101,8 +102,8 @@ void		terminal_printoff(void);
 void		terminal_printon(void);
 /* setting.c */
 void		set_shell(t_shell *shell, char *envp[]);
-int			set_token(t_token **t);
-void		tokenization(t_shell *shell, t_token *t);
+// int			set_token(t_token **t);
+// void		tokenization(t_shell *shell, t_token *t);
 void		parent(t_shell *shell, size_t index);
 void		child(t_shell *shell, size_t index);
 char		*get_cmdpath(char **paths, char *cmd);

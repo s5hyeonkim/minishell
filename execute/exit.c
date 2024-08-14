@@ -3,13 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   exit.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 19:31:56 by sohykim           #+#    #+#             */
-/*   Updated: 2024/07/23 19:31:58 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/14 11:36:22 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "execute.h"
+
+#include "./execute.h"
 
 // 숫자 아닐때 에러 출력하며 그냥 exit (default = 255)
 static char	*swap_str(char *s1)
@@ -68,7 +69,6 @@ long	ft_atol(const char *str)
 {
 	long	sign;
 	long	result;
-	long	pre;
 
 	result = 0;
 	sign = 1;
@@ -83,7 +83,6 @@ long	ft_atol(const char *str)
 	}
 	while (ft_isdigit(*str))
 	{
-		pre = result;
 		result = result * 10 + *str - '0';
 		str++;
 	}

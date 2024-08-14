@@ -1,13 +1,5 @@
 #include "minishell.h"
 
-/* token lst */
-int set_token(t_token **t)
-{
-	*t = ft_calloc(1, sizeof(t_token));
-	if (*t == NULL)
-		return (EXTRA_ERROR);
-	return (EXIT_SUCCESS);
-}
 
 /* exit */
 void	exit_process(t_shell *shell, char *obj, int errcode)
@@ -33,9 +25,7 @@ char	**get_env_paths(char *envp[])
 {
 	char	**ret;
 	char	*paths;
-	int		size;
 
-	size = 0;
 	paths = read_val_strs(envp, "PATH");
 	if (paths)
 		ret = ft_split(paths, ':');

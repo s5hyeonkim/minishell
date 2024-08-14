@@ -1,72 +1,8 @@
 #include "../minishell.h"
 
 char *find_pipeend(char *buffer);
+char *find_spacend(char *str);
 
-int	ismadeofchr(char *str, char chr)
-{
-	while (str && *str)
-	{
-		if (*str != chr)
-			return (FALSE);
-		str++;
-	}
-	return (TRUE);
-}
-
-//str free
-
-char	*strtrim_free(char *str1, char *set)
-{
-	char	*dst;
-
-	dst = ft_strtrim(str1, set);
-	if (str1)
-		free(str1);
-	// if (!dst)
-	// 	return (NULL);
-	return (dst);
-}
-
-char	*substr_free(char *str, unsigned int start, size_t len)
-{
-	char	*dst;
-
-	dst = ft_substr(str, start, len);
-	if (str)
-		free(str);
-	// if (!dst)
-	// 	return (NULL);
-	return (dst);
-}
-
-//str1, str2 free
-char	*strjoin_free(char *str1, char *str2)
-{
-	char	*dst;
-
-	dst = ft_strjoin(str1, str2);
-	if (str1)
-		free(str1);
-	if (str2)
-		free(str2);
-	// if (!dst)
-	// 	return (NULL);
-	return (dst);
-}
-
-//str, src free
-char	*substrjoin (char *str, int start, int len, char *dst)
-{
-	char	*src;
-
-	src = substr_free(str, start, len);
-	if (!src)
-		return (NULL);
-	dst = strjoin_free(dst, src);
-	// if (!dst)
-	// 	return (NULL);
-	return (dst);
-}
 
 
 /* utils */
@@ -84,22 +20,7 @@ int	wordlen(char *str, int space_opt)
 }
 
 /* token lst */
-int	add_token(t_token *token, int type, char *word, char **argvs)
-{
-	t_token *newtoken;
 
-	if (set_token(&newtoken) == EXTRA_ERROR)
-	{	
-		free(word);
-		free(argvs);
-		return (EXTRA_ERROR);
-	}
-	newtoken->type = type;
-	newtoken->word = word;
-	newtoken->argvs = argvs;
-	tlst_addright(&token, newtoken);
-	return (EXIT_SUCCESS);
-}
 
 /* pipe.c */
 int	count_pipe(char *buffer)
@@ -129,6 +50,15 @@ int handle_empty_pipe(char *buffer)
 	int		pipe_open;
 
 	pipe_open = 0;
+	while (*buffer == SPACE)
+		buffer++;
+	if (*buffer == PIPE)
+	{
+		*(buffer + 1) = '\0';
+		// printf("g_status: %ld", g_status);
+		g_status = handle_error(NULL, buffer, SYN_TOK);
+		return (g_status);
+	}	
 	while(*buffer)
 	{
 		if (*buffer == PIPE)
@@ -144,8 +74,20 @@ int handle_empty_pipe(char *buffer)
 		buffer++;
 	}
 	return (EXIT_SUCCESS);
-
 }
+
+// int is(char *buffer)
+// {
+// 	while(ft_isspace(*buffer))
+// 		buffer++;
+// 	if (*buffer == PIPE)
+// 	{
+// 		*(buffer + 1) = '\0';
+// 		g_status = handle_error(NULL, buffer, SYN_TOK);
+// 		return (TRUE);
+// 	}
+// 	return (FALSE);
+// }
 
 int ispipeopen(char *buffer)
 {
@@ -223,7 +165,9 @@ char *get_valid_buffer(char *headbuffer)
 	while(1)
 	{
 		if (handle_empty_pipe(vbuffer) == SYNTAX_ERROR) //비어있는 pipe 에러처리
+		{
 			return (NULL);
+		}
 		else if (ispipeopen(vbuffer) == TRUE) //열린 pipe 확인
 		{
 			vbuffer = get_pipeline(vbuffer); //추가입력 받기 
@@ -661,28 +605,21 @@ int token_redirect(t_token **token, t_deques *envps, char *str)
 	int		typeno;
 	char	*filename;
 	int		filenamelen;
+	// t_token *newtoken;
 
 	while(*str)
 	{
-		// printf("ok1\n");
 		str = find_redirect_start(str);	// printf("redirect start: %s\n", str);
 		typeno = read_redirect_typeno(str);
 		str = find_filename_start(str);
-		// printf("ok2\n");
-
-
 		filename = replace_filename(str, typeno);
 		if (!filename)
 			return (g_status);
-		// printf ("str: %s\n" ,str);
-		
-				// printf("ok3\n");
 		if (typeno >= T_DLESS && typeno <= T_GREAT)
 		{
-
 			filenamelen = wordlen(str, SPACE);
 			filename = replace_word(envps, filename);
-			add_token(*token, typeno, filename, NULL);
+			add_tokenright(*token, typeno, filename, NULL);
 			str += filenamelen;
 		}
 		else
@@ -714,7 +651,7 @@ char *get_words(char *str)
 	return (words);
 }
 
-int add_tokenwords(t_token **token, char *word, char **argvs)
+int add_tokenrightwords(t_token **token, char *word, char **argvs)
 {
 	if (!word)
 	{
@@ -731,7 +668,7 @@ int add_tokenwords(t_token **token, char *word, char **argvs)
 		if (!*argvs)
 			return (EXTRA_ERROR);
 	}
-	if (add_token(*token, T_CMD_WORD, word, argvs) == EXTRA_ERROR)
+	if (add_tokenright(*token, T_CMD_WORD, word, argvs) == EXTRA_ERROR)
 		return (EXTRA_ERROR);
 	return (EXIT_SUCCESS);
 }
@@ -799,14 +736,14 @@ int token_word(t_token **token, t_deques *envps, char *str)
 	// int i = 0;
 	// while (argvs && argvs[i])
 	// 	printf("a_cent: %s\n",argvs[i++]);
-	if (add_tokenwords(token, word, argvs) == EXTRA_ERROR)
+	if (add_tokenrightwords(token, word, argvs) == EXTRA_ERROR)
 		return (EXTRA_ERROR);
 	return (EXIT_SUCCESS);
 }
 
 void token_pipe(t_token **token)
 {
-	add_token(*token, T_PIPE, NULL, NULL);
+	add_tokenright(*token, T_PIPE, NULL, NULL);
 }
 
 t_token *tokenizer(t_deques *envps, char **strs)
@@ -860,16 +797,16 @@ int parselines(t_shell *shell, char *buffer)
 {
 	char *vbuffer;
 
-	g_status = 0;
+	// g_status = 0;
 	// printf("buffer: %s\n", buffer);
 	vbuffer = get_valid_buffer(buffer);
-	// printf("vbuffer: %s\n", buffer);
+	// printf("vbuffer: %s\n", vbuffer);
 	// free (buffer);
 	if (!vbuffer)
-		return (EXTRA_ERROR);
+		return (EXIT_FAILURE);
 	vbuffer = strtrim_free(vbuffer, " ");
 	if (!vbuffer)
-		return (EXTRA_ERROR);
+		return (EXIT_FAILURE);
 	
 	if (!*vbuffer)
 		return (EXIT_FAILURE);

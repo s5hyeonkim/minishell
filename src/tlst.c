@@ -33,7 +33,6 @@ void tlst_addright(t_token **t, t_token *newtoken)
 
 }
 
-
 void tlst_addleft(t_token **t, t_token *newtoken)
 {
 	t_token *lasttoken;

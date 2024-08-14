@@ -38,11 +38,18 @@ int		ismadeofchr(char *str, char chr);
 char	*substr_free(char *str, unsigned int start, size_t len);
 char	*strjoin_free(char *str1, char *str2);
 char	*substrjoin (char *str, int start, int len, char *dst);
+char	*strtrim_free(char *str1, char *set);
 
 /* tlst.c */
 t_token	*tlst_lastright(t_token *t);
 void	tlst_addright(t_token **t, t_token *newtoken);
 void	tlst_addleft(t_token **t, t_token *newtoken);
+
+
+/* token.c */
+int set_token(t_token **t);
+int	add_tokenright(t_token *token, int type, char *word, char **argvs);
+
 
 /* QUOTE.C */
 char *ft_ltrim(char *str);
@@ -53,7 +60,6 @@ char *find_wordend(char *str, int spacepipe_opt);
 
 t_token	*parser(t_token **token);
 
-int set_token(t_token **t);
 
 
 void print_tree(t_token *dsttoken, int leftright, int i);

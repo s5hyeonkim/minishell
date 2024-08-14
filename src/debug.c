@@ -18,8 +18,8 @@ void debug_token(t_token *token)
 		printf("word: %s#\n", token->word);
 		while (token->argvs && token->argvs[i])
 		{
-			printf("%d\n", i);
-			printf("argv: %s#\n", token->argvs[i++]);
+			printf("argv[%d]: %s#\n", i, token->argvs[i]);
+			i++;
 		}
 		token = token->right;
 	}

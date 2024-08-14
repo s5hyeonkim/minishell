@@ -33,6 +33,8 @@ SRCS = ./main.c \
 		$(SRCDIR)syntax.c \
 		$(SRCDIR)tlst.c \
 		$(SRCDIR)debug.c \
+		$(SRCDIR)sublibft.c \
+		$(SRCDIR)token.c \
 
 OBJS = $(SRCS:.c=.o)
 DEPS = $(SRCS:.c=.d)
