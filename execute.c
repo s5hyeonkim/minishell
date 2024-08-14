@@ -112,6 +112,7 @@ int	wait_heredoc(t_process p)
 
 	set_signal_init(handler_heredoc_wait);
 	waitpid(p.pid, &status, 0);
+	// printf("pp");
 	if (WIFSIGNALED(status))
 		return (EXIT_SUCCESS);
 	if (WIFEXITED(status))
@@ -124,12 +125,14 @@ int	here_doc(char *link, char *limiter)
 {
 	t_process	p;
 
+	// printf("qq\n");
 	if (fork_process(&p))
 		return (EXIT_FAILURE);
 	if (!p.pid)
 		exit(heredoc_process(link, limiter));
 	else
 		return (wait_heredoc(p));
+	
 }
 
 // 쓰는것

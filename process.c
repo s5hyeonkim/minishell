@@ -32,6 +32,7 @@ void	subprocess(t_shell *shell)
 
 	index = 0;
 	set_signal_sub(handler_sub);
+	// printf("aaa\n");
 	while (index < shell->p_size)
 	{
 		if (open_pipe(&shell->p[index], shell->p_size) \
@@ -71,6 +72,7 @@ void	inprocess(t_shell *shell)
 	{
 		exit(g_status);
 	}
+	g_status = status;
 }
 
 int	token_to_word(t_shell *shell, t_token *t, size_t index)
@@ -115,6 +117,7 @@ void	exec_cmds(t_shell *shell)
 	index = 0;
 	shell->p_size = find_pipe(shell->t);
 	shell->p = ft_calloc(shell->p_size + 1, sizeof(t_process));
+	// printf("here\n");
 	if (!shell->p || token_to_process(shell, shell->t, &index))
 	{
 		g_status = EXIT_FAILURE;
