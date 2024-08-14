@@ -430,7 +430,7 @@ char *replace_envp(t_deques *deqs, char *str)
 	char	*dst;
 	int		len;
 	
-	dst = ft_calloc(1, sizeof(char));
+	dst = ft_calloc(2, sizeof(char));
 	if (!dst)
 		return (NULL);
 	headstr = str;
@@ -610,6 +610,8 @@ int token_redirect(t_token **token, t_deques *envps, char *str)
 	while(*str)
 	{
 		str = find_redirect_start(str);	// printf("redirect start: %s\n", str);
+		if (!*str)
+			return (EXIT_SUCCESS);
 		typeno = read_redirect_typeno(str);
 		str = find_filename_start(str);
 		filename = replace_filename(str, typeno);
@@ -655,19 +657,20 @@ int add_tokenrightwords(t_token **token, char *word, char **argvs)
 {
 	if (!word)
 	{
-		word = ft_calloc(1, sizeof(char));
+		word = ft_calloc(2, sizeof(char));
 		if (!word)
 			return (EXTRA_ERROR);
 	}
 	if (!argvs)
 	{
-		argvs = ft_calloc(1, sizeof(char*));
+		argvs = ft_calloc(2, sizeof(char*));
 		if (!argvs)
 			return (EXTRA_ERROR);
-		*argvs = ft_calloc(1, sizeof(char));
+		*argvs = ft_calloc(2, sizeof(char));
 		if (!*argvs)
 			return (EXTRA_ERROR);
 	}
+
 	if (add_tokenright(*token, T_CMD_WORD, word, argvs) == EXTRA_ERROR)
 		return (EXTRA_ERROR);
 	return (EXIT_SUCCESS);
@@ -753,12 +756,19 @@ t_token *tokenizer(t_deques *envps, char **strs)
 
 	if (handle_empty_redirects(strs) == EXIT_FAILURE)
 		return (NULL);
+		// printf("Ok\n");
 	while (strs && *strs)
 	{	
 		token_pipe(&token);
+		// printf("Ok1\n");
+		
 		if (token_redirect(&token, envps, *strs) == SYNTAX_ERROR)
 			return (NULL);
+		// printf("Ok2\n");
+
 		token_word(&token, envps, *strs);
+		// printf("Ok3\n");
+
 		strs++;
 	}
 	/*token 출력*/
@@ -767,7 +777,7 @@ t_token *tokenizer(t_deques *envps, char **strs)
 }
 
 /* lexer */
-void	lexer(t_shell *shell, char *vbuffer)
+int	lexer(t_shell *shell, char *vbuffer)
 {
 	(void) shell;
 	char	**vbuffers;
@@ -775,21 +785,25 @@ void	lexer(t_shell *shell, char *vbuffer)
 	vbuffers = split_pipe(vbuffer);
 	free(vbuffer);
 	if (!vbuffers)
-		return ;
+		return(EXTRA_ERROR);
+		// return (EXIT_FAILURE);
 	// /*buffers 출력*/
 	// debug_buffers(vbuffers);
 
 	shell->t = ft_calloc(1, sizeof(t_token));
 	// shell->t 
 	// printf("%p\n", shell->t);
+	// printf("===tokenizer start===\n");
 
 	shell->t = tokenizer(shell->data.envps, vbuffers); //leaks
 	// printf("%p\n", shell->t);
 
 	free_strs(vbuffers);
-
 	if (!shell->t)
-		return ;
+		return (EXIT_FAILURE);
+	// printf("===tokenizer complete===\n");
+	
+	return(EXIT_SUCCESS);
 }
 
 /* parslines.c */
@@ -808,11 +822,14 @@ int parselines(t_shell *shell, char *buffer)
 	if (!vbuffer)
 		return (EXIT_FAILURE);
 	
-	if (!*vbuffer)
-		return (EXIT_FAILURE);
+	// if (!*vbuffer)
+	// 	return (EXIT_FAILURE);
 
-	lexer(shell, vbuffer);
-	
+	// lexer(shell, vbuffer);
+	// printf("===lexer start===\n");
+	if (lexer(shell, vbuffer) == EXIT_FAILURE)
+		return (EXIT_FAILURE);
+	// printf("===lexer complete===\n");
 	parser(&shell->t);
 	return (EXIT_SUCCESS);
 }

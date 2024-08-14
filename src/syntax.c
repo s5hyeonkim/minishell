@@ -53,6 +53,10 @@ void	syntax_simple_cmd(t_token **dsttoken, t_token *nowtoken)
 	(void) nexttoken;
 	// printf("ok\n");
 
+	// if (nowtoken && nowtoken->type == T_CMD_WORD)
+		// add_tokenright()
+
+
 	if (!*dsttoken)
 	{
 		set_token(&newtoken); // NULL처리

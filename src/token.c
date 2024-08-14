@@ -6,7 +6,7 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 10:44:45 by yubshin           #+#    #+#             */
-/*   Updated: 2024/08/14 11:36:19 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/14 11:46:54 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,3 @@ int	add_tokenright(t_token *token, int type, char *word, char **argvs)
 	tlst_addright(&token, newtoken);
 	return (EXIT_SUCCESS);
 }
-
-// int set_tokenright(t_token *token, int type, char *word, char **argvs)
-// {
-//     t_token *nn 
-// }
