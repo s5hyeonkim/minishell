@@ -56,8 +56,6 @@ typedef struct s_shell
 void		exit_process(t_shell *shell, char *obj, int errcode);
 // void		child_handler(int signo);
 char		**get_env_paths(char *envp[]);
-void		terminal_printon(t_shell *shell);
-void		terminal_printoff(void);
 
 /* execute dir */
 void		set_cmds(t_shell *shell);
@@ -86,9 +84,9 @@ void		free_shell(t_shell shell);
 void		clean_process(t_process *p, size_t size);
 
 /* signal.c */
-void		set_signal(t_shell *shell, void(*handler)(int), int signo);
-void		set_signal_init(t_shell *shell, void(*handler)(int));
-void		set_signal_sub(t_shell *shell, void(*handler)(int));
+int			set_signal(void(*handler)(int), int signo);
+int			set_signal_init(void(*handler)(int));
+int			set_signal_sub(void(*handler)(int));
 void		handler_init(int signo);
 void		handler_sub(int signo);
 
@@ -97,9 +95,10 @@ void		move_cursor(void);
 void		replace_line(int redisplayon);
 
 /* terminal.c */
-void		init_terminal(t_shell *shell);
+void		get_terminal(t_shell *shell);
+void		reset_terminal(t_shell *shell);
 void		terminal_printoff(void);
-void		terminal_printon(t_shell *shell);
+void		terminal_printon(void);
 /* setting.c */
 void		set_shell(t_shell *shell, char *envp[]);
 int			set_token(t_token **t);

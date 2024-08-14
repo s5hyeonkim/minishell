@@ -57,8 +57,6 @@ void	clean_process(t_process *p, size_t p_size)
 		p_id = &p[index];
 		if (!p_id && ++index)
 			continue ;
-		if (p_id->flag) // parent 만
-			unlink(p->link);
 		close_fd(&p_id->redirect_fd[0]);
 		close_fd(&p_id->redirect_fd[1]);
 		close_fd(&p_id->pipe_fd[0]);

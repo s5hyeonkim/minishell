@@ -13,7 +13,8 @@
 
 void	exit_subprocess(t_shell *shell, char *obj, int errcode)
 {
-	terminal_printon(shell);
+	// terminal setting 다시 보기
+	terminal_printon();
 	if (errcode && errcode < CMD_NOT_FOUND)
 	{
 		errcode = EXIT_FAILURE;
@@ -41,40 +42,16 @@ void	exec_program(t_shell *shell, t_process p)
 void	handler_heredoc(int signo)
 {
 	if (signo == SIGINT)
-		replace_line(false);
+	{
+		rl_replace_line("", 0);
+		exit(1);
+	}
 }
 
 void	handler_heredoc_wait(int signo)
 {
 	if (signo == SIGINT)
-		replace_line(TRUE);
-}
-
-int	set_handler_heredoc(void(*handler)(int), int signo)
-{
-	t_sigaction	action;
-
-	action.sa_handler = handler;
-	sigemptyset(&action.sa_mask);
-	action.sa_flags = 0;
-	if (sigaction(signo, &action, NULL) == (int) SIG_ERR)
-		return (EXTRA_ERROR);
-	return (EXIT_SUCCESS);
-}
-
-int	set_signal_heredoc(void(*handler)(int))
-{
-	int	status;
-
-	status = 0;
-	terminal_printoff();
-	if (!status)
-		status = set_handler_heredoc(handler, SIGINT);
-	if (!status)
-		status = set_handler_heredoc(handler, SIGTERM);
-	if (!status)
-		status = set_handler_heredoc(SIG_IGN, SIGQUIT);
-	return (status);
+		rl_replace_line("", 0);
 }
 
 int	open_redirect(int redirect, char *word, char *link)
@@ -114,13 +91,14 @@ int	heredoc_process(char *link, char *limiter)
 	char	line[1024];
 
 	ft_memset(line, 0, sizeof(char) * 1024);
-	status = set_signal_heredoc(handler_heredoc);
+	status = set_signal_init(handler_heredoc);
 	buffer = readline("> ");
 	while (buffer && ft_memcmp(buffer, limiter, ft_strlen(limiter) + 1))
 	{
 		ft_strlcat(line, buffer, 1024);
 		ft_strlcat(line, "\n", 1024);
 		free(buffer);
+		rl_replace_line("", 0);
 		buffer = readline("> ");
 	}
 	status = write_files(link, line);
@@ -132,13 +110,13 @@ int	wait_heredoc(t_process p)
 {
 	int	status;
 
-	set_signal_heredoc(handler_heredoc_wait);
+	set_signal_init(handler_heredoc_wait);
 	waitpid(p.pid, &status, 0);
 	if (WIFSIGNALED(status))
 		return (EXIT_SUCCESS);
 	if (WIFEXITED(status))
 		return (WEXITSTATUS(status));
-	set_signal_heredoc(handler_init);
+	set_signal_init(handler_init);
 	return (EXIT_FAILURE);
 }
 
@@ -241,6 +219,7 @@ void	set_fd(t_shell *shell, size_t index)
 		dup_fd(&shell->p[index].pipe_fd[STDOUT_FILENO], STDOUT_FILENO);
 }
 
+// child free
 void	child(t_shell *shell, size_t index)
 {
 	int	ret;
@@ -260,10 +239,12 @@ void	child(t_shell *shell, size_t index)
 	{
 		if (shell->p_size != 1)
 			exit_subprocess(shell, NULL, WAIT_TIMEOUT);
-		exit(0);
+		exit_subprocess(shell, NULL, EXIT_SUCCESS);
 	}
 	else
+	{
 		exec_program(shell, shell->p[index]);
+	}
 }
 
 void	parent(t_shell *shell, size_t index)

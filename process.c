@@ -31,7 +31,7 @@ void	subprocess(t_shell *shell)
 	size_t	index;
 
 	index = 0;
-	set_signal_sub(shell, handler_sub);
+	set_signal_sub(handler_sub);
 	while (index < shell->p_size)
 	{
 		if (open_pipe(&shell->p[index], shell->p_size) \
@@ -42,7 +42,7 @@ void	subprocess(t_shell *shell)
 		index++;
 	}
 	wait_process(shell);
-	set_signal_init(shell, handler_init);
+	set_signal_init(handler_init);
 }
 
 void	set_fd_builtin(t_process *p)

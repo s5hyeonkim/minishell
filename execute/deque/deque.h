@@ -50,6 +50,7 @@ t_deque		*create_deque(void);
 int			push_back(t_deques *deques, t_map keyval);
 int			push_front(t_deques *deques);
 int			replace_back(t_deques *deqs, char *key, char mid, char *val);
+int			push_keyval(t_deques *deqs, char *key, char mid, char *val);
 
 //free
 void		free_deque(t_deque *deque);

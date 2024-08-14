@@ -12,7 +12,7 @@ int set_token(t_token **t)
 /* exit */
 void	exit_process(t_shell *shell, char *obj, int errcode)
 {
-	terminal_printon(shell);
+	terminal_printon();
 	if (errcode && errcode < CMD_NOT_FOUND)
 	{
 		errcode = EXIT_FAILURE;
@@ -23,6 +23,7 @@ void	exit_process(t_shell *shell, char *obj, int errcode)
 	if (errcode == SIGEXIT + SIGTERM)
 		errcode = EXIT_SUCCESS;
 	clean_files(shell->p, shell->p_size);
+	reset_terminal(shell);
 	free_shell(*shell);
 	exit(errcode);
 }
@@ -56,8 +57,9 @@ void	init(t_shell *shell, int argc, char *envp[])
 {
 	set_shell(shell, envp);
 	check_valid(shell, argc);
-	init_terminal(shell);
-	set_signal_init(shell, handler_init);
+	get_terminal(shell);
+	if (set_signal_init(handler_init))
+		exit_process(shell, NULL, EXTRA_ERROR);
 }
 
 void	readlines(t_shell *shell, char **buffer)
@@ -105,7 +107,9 @@ void	loop(t_shell *shell)
 		// print_tree(shell->t, 2, 0);
 		// printf("==loop complete==\n");
 		exec_cmds(shell);
+		clean_files(shell->p, shell->p_size);
 		clean_process(shell->p, shell->p_size);
+		rl_replace_line("", 0);
 		shell->p = 0;
 		shell->p_size = 0;
 	}

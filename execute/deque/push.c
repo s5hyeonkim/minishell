@@ -48,16 +48,21 @@ int	push_back(t_deques *deques, t_map keyval)
 	return (EXIT_SUCCESS);
 }
 
-int	replace_back(t_deques *deqs, char *key, char mid, char *val)
+int	push_keyval(t_deques *deqs, char *key, char mid, char *val)
 {
 	t_map	keyval;
 
-	if (find_deq(deqs, key))
-		remove_targetdeq(deqs, find_deq(deqs, key));
 	if (set_keyval(&keyval, key, mid, val) || push_back(deqs, keyval))
 	{
 		free_map(&keyval);
 		return (EXTRA_ERROR);
 	}
 	return (EXIT_SUCCESS);
+}
+
+int	replace_back(t_deques *deqs, char *key, char mid, char *val)
+{
+	if (find_deq(deqs, key))
+		remove_targetdeq(deqs, find_deq(deqs, key));
+	return (push_keyval(deqs, key, mid, val));
 }

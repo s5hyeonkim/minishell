@@ -13,28 +13,26 @@
 
 const char	*err_to_msg(int *code)
 {
-	if (*code == CMD_NOT_FOUND)
+	int	err;
+
+	err = *code;
+	if (err == CMD_NOT_FOUND)
 		return (MSG_CMD);
-	if (*code == SYN_TOK)
-	{
-		*code = SYNTAX_ERROR;
+	*code = SYNTAX_ERROR;
+	if (err == SYN_TOK)
 		return (MSG_SYN_TOK);
-	}
-	if (*code == SYN_TERM)
-	{
-		*code = SYNTAX_ERROR;
+	if (err == SYN_TERM)
 		return (MSG_SYN_TERM);
-	}
 	*code = EXIT_FAILURE;
-	if (*code == INVALID_ARGV)
+	if (err == INVALID_ARGV)
 		return (MSG_ARGV);
-	if (*code == INVALID_OPT)
+	if (err == INVALID_OPT)
 		return (MSG_OPT);
-	if (*code == INVALID_IDF)
+	if (err == INVALID_IDF)
 		return (MSG_IDF);
-	if (*code == NOT_SET)
+	if (err == NOT_SET)
 		return (MSG_SET);
-	if (*code == NOT_NUM)
+	if (err == NOT_NUM)
 		return (MSG_NUM);
 	return (strerror(errno));
 }
@@ -46,6 +44,8 @@ int	print_error(int code)
 
 	size = ft_strlen(msg);
 	write(STDERR_FILENO, msg, size);
+	if (size && msg[size - 1] != '\n')
+		write(STDERR_FILENO, "\n", 1);
 	return (code);
 }
 

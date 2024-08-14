@@ -54,27 +54,27 @@ static int	ft_keycmp(char *a, char *b)
 	return (a[index] - b[index]);
 }
 
-int	ft_export(t_process p, t_data *d)
+int	export_wo_argv(t_data *d, int fd[2])
 {
 	char	**envs;
+
+	envs = deqtostrs(d->envps);
+	if (!envs)
+		return (handle_error("export", NULL, EXTRA_ERROR));
+	ft_sort(envs, ft_keycmp);
+	print_export(envs, fd[1]);
+	free_strs(envs);
+	return (EXIT_SUCCESS);
+}
+
+int	export_wt_argv(t_process p, t_data *d)
+{
+	t_map	keyval;
 	int		index;
 	int		status;
-	t_map	keyval;
-	int		fd_out;
 
-	set_rwfd(p, &fd_out, 1);
-	status = EXIT_SUCCESS;
-	if (!p.args[1] || (!p.args[2] && !ft_memcmp(p.args[1], "--", 3)))
-	{
-		envs = deqtostrs(d->envps);
-		if (!envs)
-			return (handle_error(p.args[0], NULL, EXTRA_ERROR));
-		ft_sort(envs, ft_keycmp);
-		print_export(envs, fd_out);
-		free_strs(envs);
-		return (status);
-	}
 	index = 0;
+	status = EXIT_SUCCESS;
 	ft_memset(&keyval, 0, sizeof(t_map));
 	while (p.args[++index])
 	{
@@ -88,4 +88,14 @@ int	ft_export(t_process p, t_data *d)
 		free_map(&keyval);
 	}
 	return (status);
+}
+
+int	ft_export(t_process p, t_data *d)
+{
+	int		fd[2];
+
+	set_rwfd(p, &fd[1], 1);
+	if (!p.args[1] || (!p.args[2] && !ft_memcmp(p.args[1], "--", 3)))
+		export_wo_argv(d, fd);
+	return (export_wt_argv(p, d));
 }

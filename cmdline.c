@@ -19,7 +19,7 @@ char	*get_pathcmd(char **paths, char *cmd)
 	index = 0;
 	while (paths[index])
 	{
-		ret = ft_pairjoin(paths[index++],'/', cmd);
+		ret = ft_pairjoin(paths[index++], '/', cmd);
 		if (!ret || !access(ret, X_OK))
 			return (ret);
 		free(ret);
@@ -89,30 +89,21 @@ int	set_parsing_deques(t_deques *deqs, char *cmd)
 	size_t		fb[2];
 	size_t		len;
 	char		*str;
-	t_map		keyval;
 
 	len = ft_strlen(cmd);
 	ft_memset(fb, 0, sizeof(size_t) * 2);
 	str = NULL;
 	if (!ft_strchr(cmd, '\'') && !ft_strchr(cmd, '\"'))
-	{
-		if (set_keyval(&keyval, cmd, 0, "") || push_back(deqs, keyval))
-		{
-			free_map(&keyval);
-			return (EXTRA_ERROR);
-		}
-		return (EXIT_SUCCESS);
-	}
+		return (push_keyval(deqs, cmd, 0, ""));
 	while (fb[0] < len)
 	{
 		parsing_cmd(cmd, &fb[0], &fb[1]);
 		if (fb[0] >= len)
 			break ;
 		str = ft_substr(cmd, fb[0], fb[1] - fb[0]);
-		if (!str || set_keyval(&keyval, str, 0, "") || push_back(deqs, keyval))
+		if (!str || push_keyval(deqs, str, 0, ""))
 		{
 			free(str);
-			free_map(&keyval);
 			return (EXTRA_ERROR);
 		}
 		free(str);
