@@ -14,9 +14,6 @@ void	terminal_printoff(void)
 	tcgetattr(STDOUT_FILENO, &term);
 	term.c_lflag &= ~(ECHOCTL);
 	tcsetattr(STDOUT_FILENO, TCSANOW, &term);
-	int a = (ICANON | ECHO);
-	printf("a: %d b: %d\n", a, ECHOCTL);
-	// ft_putstr_fd("here\n", 2);
 	// printf("off: %lx\n", term.c_lflag);
 }
 

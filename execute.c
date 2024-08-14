@@ -127,7 +127,7 @@ int	here_doc(char *link, char *limiter)
 	if (fork_process(&p))
 		return (EXIT_FAILURE);
 	if (!p.pid)
-		return (heredoc_process(link, limiter));
+		exit(heredoc_process(link, limiter));
 	else
 		return (wait_heredoc(p));
 }

@@ -37,6 +37,7 @@ void	subprocess(t_shell *shell)
 		if (open_pipe(&shell->p[index], shell->p_size) \
 				|| fork_process(&shell->p[index]))
 			break ;
+		// printf("path%s#\nargvs%s#\n%s#\n", shell->p[index].path, shell->p[index].args[0], shell->p[index].args[1]);
 		child(shell, index);
 		parent(shell, index);
 		index++;
