@@ -21,16 +21,11 @@
 # include <unistd.h>
 # include <fcntl.h>
 # include <sys/wait.h>
-# include <signal.h>
-# include <sys/signal.h>
 # include <sys/types.h>
 # include <sys/stat.h>
 # include <dirent.h>
 # include <string.h>
-# include <sys/ioctl.h>
-# include <termios.h>
 # include <curses.h>
-# include <term.h>
 
 # include "libft/libft.h"
 # include "ft_err.h"
@@ -42,7 +37,6 @@
 # define PROMPT_MSG "\033[36mminishell ❯\033[0m "
 
 typedef struct sigaction	t_sigaction;
-typedef struct termios		t_termios;
 typedef struct s_shell
 {
 	t_token			*t;
@@ -59,10 +53,12 @@ char		**get_env_paths(char *envp[]);
 
 /* execute dir */
 void		set_cmds(t_shell *shell);
+void		get_terminal(t_shell *shell);
+void		reset_terminal(t_shell *shell);
+
 void		set_process(t_shell *shell);
 t_builtin	find_builtin(int index);
 char		*read_val_strs(char *strs[], char *key);
-int			set_cwd(char **cwd);
 /* execute */
 void		wait_process(t_shell *shell);
 void		exec_program(t_shell *shell, t_process p);
@@ -71,8 +67,6 @@ void		close_pipe(t_shell *shell, size_t index);
 void		subprocess(t_shell *shell);
 void		inprocess(t_shell *shell);
 void		exec_cmds(t_shell *shell);
-void		dup_fd(int *fd, int std);
-void		close_fd(int *num);
 void		clean_files(t_process *p, size_t p_size);
 /* free.c */
 void		free_token(t_token *t);
@@ -80,22 +74,14 @@ void		free_data(t_data d);
 void		free_process(t_process *p, size_t size);
 void		free_shell(t_shell shell);
 void		clean_process(t_process *p, size_t size);
+void		exit_wo_error(t_shell *shell, int errcode);
 
-/* signal.c */
-int			set_signal(void(*handler)(int), int signo);
-int			set_signal_init(void(*handler)(int));
-int			set_signal_sub(void(*handler)(int));
-void		handler_init(int signo);
-void		handler_sub(int signo);
+
 
 /* signal_utils.c  */
 void		move_cursor(void);
 
-/* terminal.c */
-void		get_terminal(t_shell *shell);
-void		reset_terminal(t_shell *shell);
-void		terminal_printoff(void);
-void		terminal_printon(void);
+
 /* setting.c */
 void		set_shell(t_shell *shell, char *envp[]);
 // int			set_token(t_token **t);
@@ -109,7 +95,6 @@ size_t		find_pipe(t_token *t);
 int			wait_heredoc(t_process p);
 void		set_fd(t_shell *shell, size_t index);
 void		dup_fd(int *fd, int std);
-int			set_filedoc(t_process *p);
 int			here_doc(char *link, char *limiter);
 int			open_token(t_token *t, t_process *p);
 

@@ -1,32 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   heredoc_signal.c                                   :+:      :+:    :+:   */
+/*   execute.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/08/19 15:52:44 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/19 15:52:47 by sohykim          ###   ########.fr       */
+/*   Created: 2024/08/19 16:38:02 by sohykim           #+#    #+#             */
+/*   Updated: 2024/08/19 16:38:04 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "execute.h"
 
-void	handler_heredoc(int signo)
+int	fork_process(t_process *p)
 {
-	if (signo == SIGINT)
+	p->pid = fork();
+	if (p->pid == -1)
 	{
-		g_status = SIGNALED;
-		rl_replace_line("", 0);
-		exit(1);
+		handle_error(NULL, NULL, EXTRA_ERROR);
+		return (EXTRA_ERROR);
 	}
+	return (EXIT_SUCCESS);
 }
 
-void	handler_heredoc_wait(int signo)
+int	token_to_word(t_process *p, t_data d, t_token *t)
 {
-	if (signo == SIGINT)
-	{
-		replace_line(FALSE);
-		g_status = 1;
-	}
+	if (!t || t->type != T_CMD_WORD)
+		return (EXIT_SUCCESS);
+	p->args = get_cmdargs(t->argvs);
+	p->path = get_cmdpath(d.paths, t->word);
+	if (!p->args || !p->path)
+		return (EXTRA_ERROR);
+	return (EXIT_SUCCESS);
 }

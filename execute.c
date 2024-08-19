@@ -6,7 +6,7 @@
 /*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 07:26:26 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/14 19:14:45 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/19 16:42:37 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "minishell.h"
@@ -38,24 +38,6 @@ void	exec_program(t_shell *shell, t_process p)
 		exit_subprocess(shell, p.args[0], CMD_NOT_FOUND);
 }
 
-int	wait_heredoc(t_process p)
-{
-	int	status;
-	int	s;
-
-	s = set_signal_init(handler_heredoc_wait);
-	waitpid(p.pid, &status, 0);
-	if (!s)
-		s = set_signal_init(handler_sub);
-	if (s)
-		return (EXTRA_ERROR);
-	if (WIFSIGNALED(status))
-		return (EXIT_FAILURE);
-	if (WIFEXITED(status))
-		return (WEXITSTATUS(status));
-	return (EXIT_FAILURE);
-}
-
 // child free
 void	child(t_shell *shell, size_t index)
 {
@@ -69,16 +51,11 @@ void	child(t_shell *shell, size_t index)
 	{
 		ret = exec_builtin(shell->p[index], &shell->data);
 		if (!ft_memcmp(shell->p[index].path, "exit", 5) && !ret)
-			ret = g_status;
-		exit_subprocess(shell, NULL, ret);
+			exit_wo_error(shell, g_status);
+		g_status = ret;
 	}
 	else if (!shell->p[index].args[0][0])
-	{
-		// if (shell->p_size != 1)
-		// 	exit_subprocess(shell, NULL, WAIT_TIMEOUT);
-		free_shell(*shell);
-		exit(g_status);
-	}
+		exit_wo_error(shell, g_status);
 	else
 	{
 		exec_program(shell, shell->p[index]);

@@ -6,7 +6,7 @@
 /*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 07:09:55 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/14 07:10:11 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/19 16:51:45 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "minishell.h"
@@ -60,15 +60,6 @@ static void	set_pwd_path(t_shell *shell)
 		exit_process(shell, NULL, EXTRA_ERROR);
 	}
 	free(cwd);
-}
-
-int	set_cwd(char **cwd)
-{
-	*cwd = ft_calloc(PATH_MAX, sizeof(char));
-	if (*cwd == NULL || !getcwd(*cwd, sizeof(char) * PATH_MAX))
-		return (EXIT_FAILURE);
-	printf ("getcwd: %s\n", *cwd);
-	return (EXIT_SUCCESS);
 }
 
 static void	set_data(t_shell *shell, char *envp[])

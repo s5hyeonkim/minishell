@@ -25,23 +25,12 @@ size_t	find_pipe(t_token *t)
 	return (pipe_num);
 }
 
-int	fork_process(t_process *p)
-{
-	p->pid = fork();
-	if (p->pid == -1)
-	{
-		handle_error(NULL, NULL, EXTRA_ERROR);
-		return (EXIT_FAILURE);
-	}
-	return (EXIT_SUCCESS);
-}
-
 int	open_pipe(t_process *p, size_t size)
 {
 	if (p->index != size - 1 && pipe(p->pipe_fd) == -1)
 	{
 		handle_error(NULL, NULL, EXTRA_ERROR);
-		return (EXIT_FAILURE);
+		return (EXTRA_ERROR);
 	}
 	return (EXIT_SUCCESS);
 }

@@ -109,7 +109,11 @@ int	ft_exit(t_process p, t_data *d)
 			return (EXIT_SUCCESS);
 		}
 		else if (p.args[index + 1])
-			return (handle_error(p.args[0], NULL, INVALID_ARGV));
+		{
+			g_status = EXIT_FAILURE;
+			write(STDERR_FILENO, "minishell: exit: too many arguments\n", 36);
+			return (EXIT_FAILURE);
+		}
 	}
 	return (EXIT_SUCCESS);
 }

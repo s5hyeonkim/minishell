@@ -1,5 +1,16 @@
-#include "minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/08/19 16:43:13 by sohykim           #+#    #+#             */
+/*   Updated: 2024/08/19 16:43:34 by sohykim          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
+#include "minishell.h"
 
 /* exit */
 void	exit_process(t_shell *shell, char *obj, int errcode)
@@ -34,7 +45,6 @@ char	**get_env_paths(char *envp[])
 	return (ret);
 }
 
-
 void	check_valid(t_shell *shell, int argc)
 {
 	if (argc != 1)
@@ -48,6 +58,7 @@ void	init(t_shell *shell, int argc, char *envp[])
 	set_shell(shell, envp);
 	check_valid(shell, argc);
 	get_terminal(shell);
+	g_status = 0;
 	if (set_signal_init(handler_init))
 		exit_process(shell, NULL, EXTRA_ERROR);
 }
@@ -55,11 +66,10 @@ void	init(t_shell *shell, int argc, char *envp[])
 void	readlines(t_shell *shell, char **buffer)
 {
 	*buffer = readline(PROMPT_MSG);
-	(void) shell;
 	if (*buffer == 0)
 	{
 		handler_init(SIGTERM);
-		exit_process(shell, NULL, g_status);
+		exit_wo_error(shell, g_status);
 	}
 	if (**buffer)
 		add_history(*buffer);

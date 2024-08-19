@@ -23,7 +23,7 @@ char	*get_nextdir(char *path, char *cwd)
 	now = path;
 	next = ft_strchr(now, '/');
 	if (next != path)
-		ft_memcpy(wd, cwd, sizeof(char) * ft_strlen(cwd));
+		ft_memcpy(wd, cwd, ft_strlen(cwd));
 	else
 		ft_strlcat(wd, "/", PATH_MAX);
 	while (next)
@@ -63,11 +63,12 @@ char	*navigate_targetdir(t_data d, char *to_dir)
 	int		status;
 
 	status = EXIT_SUCCESS;
+	nwd = NULL;
 	if (!to_dir || !ft_memcmp(to_dir, "--", 3))
 		status = navigate_var(d.envps, "HOME", &nwd);
 	else if (!ft_memcmp(to_dir, "-", 2))
 		status = navigate_var(d.envps, "OLDPWD", &nwd);
-	if (!status)
+	else if (!status)
 		nwd = get_nextdir(to_dir, d.lcwd);
 	if (!status && !nwd)
 	{

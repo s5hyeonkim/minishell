@@ -100,15 +100,15 @@ int	wait_reading(t_process p, char **s)
 		buffer[byte] = 0;
 		printf("%s\n", buffer);
 	}
-	else
-		perror("");
+	// else
+	// 	perror("");
 	waitpid(p.pid, &status, 0);
 	*s = ft_strdup(buffer);
 	set_signal_init(handler_sub);
 	// signal 종료시 status 정리 필요
 	if (WIFEXITED(status))
 		return (WEXITSTATUS(status));
-	return (EXIT_FAILURE);
+	return (EXTRA_ERROR);
 }
 
 

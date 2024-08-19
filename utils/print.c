@@ -9,7 +9,7 @@
 /*   Updated: 2024/07/24 20:34:55 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "ft_err.h"
+#include "../ft_err.h"
 
 const char	*err_to_msg(int *code)
 {

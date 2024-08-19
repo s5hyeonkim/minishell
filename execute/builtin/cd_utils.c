@@ -6,7 +6,7 @@
 /*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 16:15:03 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/14 19:18:22 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/19 18:28:10 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ int	check_folder(char *to_dir)
 int	set_env_pwd(t_deques *deqs, char *key, char *val)
 {
 	if (find_deq(deqs, key) && replace_back(deqs, key, '=', val))
-		return (EXIT_FAILURE);
+		return (EXTRA_ERROR);
 	return (EXIT_SUCCESS);
 }
 
@@ -50,4 +50,12 @@ void	parsing_dir(char *wd, char *now, size_t len)
 	if (wd[ft_strlen(wd) - 1] != '/')
 		ft_strlcat(wd, "/", ft_strlen(wd) + 2);
 	ft_strlcat(wd, now, ft_strlen(wd) + len + 1);
+}
+
+int	set_cwd(char **cwd)
+{
+	*cwd = ft_calloc(PATH_MAX, sizeof(char));
+	if (*cwd == NULL || !getcwd(*cwd, sizeof(char) * PATH_MAX))
+		return (EXTRA_ERROR);
+	return (EXIT_SUCCESS);
 }

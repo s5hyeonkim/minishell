@@ -6,21 +6,21 @@
 /*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 07:02:29 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/14 07:05:04 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/19 18:27:46 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "minishell.h"
 
 void	wait_process(t_shell *shell)
 {
-	int	index;
-	int	status;
+	size_t	index;
+	int		status;
 
 	index = 0;
-	while (shell->p[index].path && shell->p[index].pid)
+	while (index < shell->p_size && shell->p[index].pid)
 	{
 		waitpid(shell->p[index].pid, &status, 0);
-		if (WIFEXITED(status))
+		if (!WIFSIGNALED(status) && WIFEXITED(status))
 			g_status = WEXITSTATUS(status);
 		index++;
 	}
@@ -37,28 +37,12 @@ void	subprocess(t_shell *shell)
 		if (open_pipe(&shell->p[index], shell->p_size) \
 				|| fork_process(&shell->p[index]))
 			break ;
-		// printf("path%s#\nargvs%s#\n%s#\n", shell->p[index].path, shell->p[index].args[0], shell->p[index].args[1]);
 		child(shell, index);
 		parent(shell, index);
 		index++;
 	}
 	wait_process(shell);
 	set_signal_init(handler_init);
-}
-
-void	set_fd_builtin(t_process *p)
-{
-	int	fd_in;
-	int	fd_out;
-
-	fd_in = dup(STDIN_FILENO);
-	fd_out = dup(STDOUT_FILENO);
-	if (p->redirect_fd[0] > 0)
-		dup_fd(&p->redirect_fd[0], fd_in);
-	if (p->redirect_fd[1] > 0)
-		dup_fd(&p->redirect_fd[1], fd_out);
-	p->redirect_fd[0] = fd_in;
-	p->redirect_fd[1] = fd_out;
 }
 
 //free 추가해주기
@@ -71,28 +55,9 @@ void	inprocess(t_shell *shell)
 	{
 		clean_files(shell->p, shell->p_size);
 		reset_terminal(shell);
-		free_shell(*shell);
-		exit(g_status);	
+		exit_wo_error(shell, g_status);
 	}
 	g_status = status;
-}
-
-int	token_to_word(t_shell *shell, t_token *t, size_t index)
-{
-	t_process	*p;
-
-	if (!t || t->type != T_CMD_WORD)
-		return (EXIT_SUCCESS);
-	p = &shell->p[index];
-	// printf("%s#\n", t->word);
-	// for (int i = 0; t->argvs[i] != 0; i++)
-	// 	printf("%s#\n", t->argvs[i]);
-	// printf("complete\n");
-	p->args = get_cmdargs(t->argvs);
-	p->path = get_cmdpath(shell->data.paths, t->word);
-	if (!p->args || !p->path)
-		return (EXTRA_ERROR);
-	return (EXIT_SUCCESS);
 }
 
 int	token_to_process(t_shell *shell, t_token *t, size_t *index)
@@ -102,12 +67,12 @@ int	token_to_process(t_shell *shell, t_token *t, size_t *index)
 	status = EXIT_SUCCESS;
 	if (t->type == T_SIMPLE_CMD)
 	{
-		if (token_to_word(shell, t->right, *index) \
-		|| find_redirect(&shell->p[*index], t->left))
+		if (token_to_word(&shell->p[*index], shell->data, t->right))
 			return (EXTRA_ERROR);
+		status = find_redirect(&shell->p[*index], t->left);
 		shell->p[*index].index = *index;
 		*index += 1;
-		return (EXIT_SUCCESS);
+		return (status);
 	}
 	if (t->left)
 		status = token_to_process(shell, t->left, index);
@@ -116,38 +81,48 @@ int	token_to_process(t_shell *shell, t_token *t, size_t *index)
 	return (status);
 }
 
+// void print_token(t_token *t)
+// {
+// 	const char *d[] = {"", "|", "simple cmd",
+// 	"cmd word", "redirects", ">>", "<<", ">", "<"};
+// 	if (!t)
+// 		return;
+// 	printf("type is %s\n", d[t->type]);
+// 	if (t->word)
+// 	{
+// 		printf("token word: %s\n", t->word);
+// 		for (int i = 0; t->argvs[i] != 0; i++)
+// 			printf("args: %s\n", t->argvs[0]);
+// 	}
+// 	print_token(t->left);
+// 	if (t->right && t->right->type == T_SIMPLE_CMD)
+// 		printf("\n\n\n");
+// 	print_token(t->right);	
+// }
+
+// 명령어 없을때 한번더 체크하기
 void	exec_cmds(t_shell *shell)
 {
 	size_t	index;
+	int		status;
 
 	index = 0;
 	shell->p_size = find_pipe(shell->t);
 	shell->p = ft_calloc(shell->p_size + 1, sizeof(t_process));
-	// printf("here\n");
-	if (!shell->p || token_to_process(shell, shell->t, &index))
+	status = 0;
+	if (shell->p)
+		status = token_to_process(shell, shell->t, &index);
+	if (!shell->p || status)
 	{
 		g_status = EXIT_FAILURE;
-		handle_error(NULL, NULL, EXTRA_ERROR);
+		if (status != SIGNALED)
+			handle_error(NULL, NULL, EXTRA_ERROR);
 	}
 	else if (shell->p_size == 1 && is_builtin(shell->p[0].path))
 		inprocess(shell);
 	else
 		subprocess(shell);
 }
-
-// void print_token(t_token *t)
-// {
-// 	const char *d[] = {"", "|", "simple cmd", "cmd word", "redirects", ">>", "<<", ">", "<"};
-// 	if (!t)
-// 		return;
-// 	printf("type is %s\n", d[t->type]);
-// 	if (t->word)
-// 		printf("token word: %s\n", t->word);
-// 	print_token(t->left);
-// 	if (t->right && t->right->type == T_SIMPLE_CMD)
-// 		printf("\n\n\n");
-// 	print_token(t->right);	
-// }
 
 // char	**debug(char *path, char **args)
 // {

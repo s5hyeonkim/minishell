@@ -29,8 +29,12 @@
 # include <termios.h>
 # include <curses.h>
 # include <term.h>
+# include "../src/ft_signal.h"
+# include "../src/parsing.h"
+# include "../utils/terminal.h"
 # include "deque/deque.h"
 # include "../ft_err.h"
+
 // getconf ARG_MAX
 # define ARG_MAX 262144
 # define PATH_MAX 1024
@@ -70,6 +74,9 @@ typedef struct s_data
 
 typedef int		(*t_builtin)(t_process p, t_data *d);
 
+/*cmdline_utils.c*/
+int			set_parsing_deques(t_deques *deqs, char *cmd);
+
 t_builtin	find_builtin(int index);
 char		*read_val_strs(char *strs[], char *key);
 int			set_cwd(char **cwd);
@@ -89,6 +96,8 @@ int			is_valid_opt(char	*opt);
 int			exec_builtin(t_process p, t_data *d);
 int			is_builtin(char *cmd);
 void		replace_line(int redisplayon);
+int			set_filedoc(t_process *p);
+int			here_doc(char *link, char *limiter);
 
 // cmdline_utils.c
 int			set_parsing_deques(t_deques *deqs, char *cmd);
@@ -97,5 +106,14 @@ void		handler_heredoc_wait(int signo);
 char		*get_pathcmd(char **paths, char *cmd);
 char		*get_cmdpath(char **paths, char *cmd);
 char		**get_cmdargs(char **cmds);
+void		dup_fd(int *fd, int std);
+int			is_redirect(int type);
+void		set_fd_builtin(t_process *p);
+int			open_redirect(int redirect, char *word, char *link);
+void		close_fd(int *num);
+int			fork_process(t_process *p);
+int			token_to_word(t_process *p, t_data d, t_token *t);
+int			find_redirect(t_process *p, t_token *t);
+int			set_filedoc(t_process *p);
 
 #endif

@@ -1,21 +1,22 @@
 CC = cc
 CFLAGS = -Wall -Wextra -Werror -g
-CPPFLAGS = -I${HOME}/.brew/opt/readline/include -Iminishell.h -Ift_err.h -I./execute/execute.h -I./src/parsing.h -MMD -MP
+CPPFLAGS = -I${HOME}/.brew/opt/readline/include -Iminishell.h -Ift_err.h -I./execute/execute.h -I./src/parsing.h -I./utils/terminal.h -MMD -MP
 LDFLAGS = -L${HOME}/.brew/opt/readline/lib -Llibft -Lexecute/deque
 LDLIBS = -lreadline -lft -lftdeque
 BUILTINDIR = ./execute/builtin/
 EXECDIR = ./execute/
 SRCDIR = ./src/
 OBJDIR = ./obj/
+UTILSDIR = ./utils/
 SRCS = ./main.c \
 		./execute.c \
 		./free.c \
 		./setting.c \
 		./process.c \
 		./pipeline.c \
-		./print.c \
 		./redirect.c \
-		./heredoc.c \
+		$(UTILSDIR)print.c \
+		$(UTILSDIR)term.c \
 		$(BUILTINDIR)utils.c \
 		$(BUILTINDIR)cd.c \
 		$(BUILTINDIR)cd_utils.c \
@@ -39,9 +40,14 @@ SRCS = ./main.c \
 		$(SRCDIR)token.c \
 		$(SRCDIR)find.c \
 		$(SRCDIR)resword.c \
+		$(EXECDIR)heredoc.c \
 		$(EXECDIR)heredoc_signal.c \
+		$(EXECDIR)execute.c \
 		$(EXECDIR)cmdline.c \
 		$(EXECDIR)cmdline_utils.c \
+		$(EXECDIR)redirect.c \
+		$(EXECDIR)redirect_utils.c \
+		$(EXECDIR)free.c \
 
 OBJS = $(SRCS:.c=.o)
 DEPS = $(SRCS:.c=.d)
@@ -61,6 +67,9 @@ $(EXECDIR)%.o : $(EXECDIR)%.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 $(BUILTINDIR)%.o : $(BUILTINDIR)%.c
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+$(UTILSDIR)%.o : $(UTILSDIR)%.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 %.o : %.c

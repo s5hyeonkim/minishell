@@ -6,7 +6,7 @@
 /*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 07:42:29 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/14 07:42:36 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/19 15:52:26 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "execute.h"
@@ -60,7 +60,6 @@ char	**get_cmdargs(char **cmds)
 		index++;
 	}
 	strs = deqtostrs(deqs->head);
-	// printf("%s\n", strs[0]);
 	free_deques(&deqs);
 	return (strs);
 }

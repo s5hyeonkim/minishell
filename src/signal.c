@@ -39,7 +39,6 @@ int set_signal_sub(void(*handler)(int))
 
 void	handler_init(int signo)
 {
-	g_status = EXIT_SUCCESS;
 	// printf("signal receive %d\n", status);
 	if (signo == SIGINT)
 	{

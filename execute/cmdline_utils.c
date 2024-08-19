@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   cmdline_utils.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/08/19 15:52:32 by sohykim           #+#    #+#             */
+/*   Updated: 2024/08/19 15:52:34 by sohykim          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "execute.h"
 
 int	is_valid_quotation(size_t *start, int *open1, int open2)
@@ -12,7 +24,6 @@ int	is_valid_quotation(size_t *start, int *open1, int open2)
 	return (FALSE);
 }
 
-// redirection 추가 필요
 int	check_quotation_flag(int *flag, int flag2)
 {
 	*flag = !(*flag);
