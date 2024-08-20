@@ -6,7 +6,7 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 21:47:20 by yubin             #+#    #+#             */
-/*   Updated: 2024/08/20 10:53:07 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/20 11:53:10 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@ int token_redirect(t_token **token, t_deques *envps, char *buffer)
 		if (!*buffer)
 			return (EXIT_SUCCESS);
 		filename = ft_substr(buffer, 0, len);
+		// printf("filename:%s\n", filename);
 		if (!filename)
 			return (EXTRA_ERROR);
 		filename = replace_word(envps, filename);
@@ -94,11 +95,12 @@ int token_word(t_token **token, t_deques *envps, char *str)
 		word = substrjoin(word, words, len);
 		word = replace_word(envps, word);
 		// printf("=====word complete=====\n");
-		if (word)
-			argvs = get_argvs(envps, words);
+		// if (word)
+		argvs = get_argvs(envps, words);
 		// printf("=====argvs complete=====\n");
 		free(headwords);
 	}
+	// printf("argvs:%s\n", argvs[0]);
 	if (add_tokenright_words(token, word, argvs) == EXTRA_ERROR)
 		return (EXTRA_ERROR);
 	return (EXIT_SUCCESS);

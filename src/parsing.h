@@ -35,6 +35,10 @@ typedef struct s_token
 	struct s_token	*right;
 }	t_token;
 
+
+/* buffer.c */
+int	get_validbuffer(char *buffer, char **validbuffer);
+
 /* sublibft.c */
 int	strchrlen(char *str, int chr);
 char	*substr_free(char *str, unsigned int start, size_t len);
@@ -57,9 +61,7 @@ int ft_isquote(char chr);
 /* handle_error.c */
 int handle_empty_pipe(char *buffer);
 
-/* buffer.c */
-int	get_validbuffer(char *buffer, char **validbuffer);
-int	get_pipebuffer(char *buffer, char **dstbuffer);
+
 
 /* pipe.c */
 int ft_ispipeopen(char *buffer);

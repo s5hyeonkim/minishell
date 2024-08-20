@@ -6,7 +6,7 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 22:36:14 by yubin             #+#    #+#             */
-/*   Updated: 2024/08/20 10:53:40 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/20 11:49:29 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,6 @@ char **get_argvs(t_deques *envps, char *words)
 	index = 0;
 	while (words && *words)
 	{
-		// printf("%s\n", words);
 		words = find_notspace(words);
 		if (!*words)
 			break ;
@@ -90,10 +89,15 @@ int init_argvs(char ***argvs, char *words)
 {
 	int argvnums;
 
+	*argvs = NULL;
 	argvnums = count_argv(words);
+	// printf("argvnums:%d\n", argvnums);
+	if (argvnums == 0)
+		argvnums = 1;
 	*argvs = ft_calloc(argvnums + 1, sizeof(char *));
 	if (!*argvs)
 		return (EXTRA_ERROR);
+	// printf("argvnums:%d\n", argvnums);
 	return (EXIT_SUCCESS);
 }
 

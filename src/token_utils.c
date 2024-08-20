@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yubin <yubin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 10:44:45 by yubshin           #+#    #+#             */
-/*   Updated: 2024/08/19 22:36:00 by yubin            ###   ########.fr       */
+/*   Updated: 2024/08/20 11:52:58 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,19 +18,24 @@ int	add_tokenright_words(t_token **token, char *word, char **argvs)
 {
 	if (!word)
 	{
-		word = ft_calloc(1, sizeof(char));
+		word = ft_calloc(2, sizeof(char));
 		if (!word)
 			return (EXTRA_ERROR);
 	}
 	if (!argvs)
 	{
-		argvs = ft_calloc(1, sizeof(char*));
+		argvs = ft_calloc(2, sizeof(char *));
 		if (!argvs)
 			return (EXTRA_ERROR);
-		*argvs = ft_calloc(1, sizeof(char));
+	}	
+	if (!*argvs)	
+	{
+		*argvs = ft_calloc(2, sizeof(char));
 		if (!*argvs)
 			return (EXTRA_ERROR);
 	}
+	// printf("argvs[0]:%s\n", argvs[0]);
+	// printf("argvs[1]:%s\n", argvs[1]);
 	if (add_tokenright(token, T_CMD_WORD, word, argvs) == EXTRA_ERROR)
 		return (EXTRA_ERROR);
 	return (EXIT_SUCCESS);

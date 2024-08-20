@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirect.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yubin <yubin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 19:43:55 by yubin             #+#    #+#             */
-/*   Updated: 2024/08/19 22:53:30 by yubin            ###   ########.fr       */
+/*   Updated: 2024/08/20 11:50:22 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@ int handle_empty_redirect(char *buffer)
 			return (EXIT_SUCCESS);
 		len = 0;
 		filename_head = wordlen_filename(buffer, &len);
+		// printf("filename_head:%s\n", filename_head);
 		if (*buffer && !*filename_head)
 			return(handle_error_withstr(NULL, "newline", 7, SYN_TOK));
 		if (ft_isresword(*filename_head) == TRUE)
