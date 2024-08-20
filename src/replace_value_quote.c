@@ -1,16 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   replace_value.c                                    :+:      :+:    :+:   */
+/*   replace.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/08/19 20:33:11 by yubin             #+#    #+#             */
-/*   Updated: 2024/08/20 10:52:35 by yubshin          ###   ########.fr       */
+/*   Created: 2024/08/20 14:24:38 by yubshin           #+#    #+#             */
+/*   Updated: 2024/08/20 16:23:16 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
+
+char	*replace_value(t_deques *envps, char *str);
+char	*replace_quote(char *str);
+
+char	*replace_word(t_deques *envps, char *str)
+{
+	str = replace_value(envps, str);
+	if (!str)
+		return (NULL);
+	str = replace_quote(str);
+	if (!str)
+		return (NULL);
+	return (str);
+}
 
 char	*replace_value(t_deques *envps, char *str)
 {
@@ -21,10 +35,8 @@ char	*replace_value(t_deques *envps, char *str)
 
 	headstr = str;
 	dst = ft_calloc(1, sizeof(char));
-	// ft_memset(&dst, 1, sizeof(char));
 	while (*str)
 	{
-		// printf("str:%s\n", str);
 		envp = NULL;
 		envp = get_novalue(str, &len);
 		if (!envp && *str == DOLLAR)
@@ -33,12 +45,33 @@ char	*replace_value(t_deques *envps, char *str)
 			envp = get_status(str, &len);
 		if (!envp && *str == DOLLAR)
 			envp = get_env(envps, str + 1, &len);
-		// printf("envp:%s\n", envp);
 		if (envp)
 			dst = strjoin_free(dst, envp);
 		str += len;
 	}
-	// printf("dst:%s\n", dst);
 	free(headstr);
+	return (dst);
+}
+
+char	*replace_quote(char *str)
+{
+	char	*headstr;
+	char	*dst;
+	char	*src;
+	int		len;
+
+	headstr = str;
+	dst = ft_calloc(1, sizeof(char));
+	while (*str)
+	{
+		len = wordlen(str);
+		if (ft_isquotend(str, ft_isquote(*str)) == EXIT_SUCCESS)
+			src = ft_substr(str, 1, len - 2);
+		else
+			src = ft_substr(str, 0, len);
+		dst = strjoin_free(dst, src);
+		str += len;
+	}
+	free (headstr);
 	return (dst);
 }

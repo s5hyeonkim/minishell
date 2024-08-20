@@ -1,21 +1,32 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   wordend.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/08/20 16:37:16 by yubshin           #+#    #+#             */
+/*   Updated: 2024/08/20 16:50:05 by yubshin          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../minishell.h"
 
 char	*find_quotend(char *str, int flag);
 int		ft_iswordhead(char chr);
 
-char	*find_wordend(char *str) //word: quote, space(not_quote), pipe, direct 기준
+char	*find_wordend(char *str)
 {
 	str = find_notspace(str);
-	if (*str == SGL_QUOTE || *str == DBL_QUOTE) //quote문 처리
+	if (*str == SGL_QUOTE || *str == DBL_QUOTE)
 		str = find_quotend(str, ft_isquote(*str));
 	else
 		while (str && *str && ft_iswordhead(*str) == FALSE)
 			str++;
-	// printf("find_wordend:%s\n", str);
 	return (str);
 }
 
-int ft_isquotend(char *str, int flag)
+int	ft_isquotend(char *str, int flag)
 {
 	char	*quotend;
 	int		sgl_open;
@@ -25,14 +36,14 @@ int ft_isquotend(char *str, int flag)
 	dbl_open = 0;
 	if (*str != SGL_QUOTE && *str != DBL_QUOTE)
 		return (EXIT_FAILURE);
-	while(*str)
+	while (*str)
 	{
 		if (*str == SGL_QUOTE && !sgl_open && dbl_open && dbl_open--)
 		{
 			quotend = ft_strchr(str, DBL_QUOTE);
 			if (quotend)
 				return (EXIT_SUCCESS);
-			else 
+			else
 				return (EXIT_FAILURE);
 		}
 		else if (*str == SGL_QUOTE && !sgl_open && !dbl_open)
@@ -42,13 +53,13 @@ int ft_isquotend(char *str, int flag)
 			quotend = ft_strchr(str, SGL_QUOTE);
 			if (quotend)
 				return (EXIT_SUCCESS);
-			else 
+			else
 				return (EXIT_FAILURE);
 		}
 		else if (*str == DBL_QUOTE && !dbl_open && !sgl_open)
 			dbl_open = TRUE;
-		else if	((*str == SGL_QUOTE && sgl_open--) || (*str == DBL_QUOTE  && dbl_open-- ))
-			break;
+		else if ((*str == SGL_QUOTE && sgl_open--) || (*str == DBL_QUOTE && dbl_open--))
+			break ;
 		str++;
 	}
 	(void) flag;
@@ -74,7 +85,7 @@ char	*find_quotend(char *str, int flag)
 		{
 			quotend = ft_strchr(str, DBL_QUOTE);
 			if (quotend)
-				return(quotend + 1);
+				return (quotend + 1);
 			// break ;
 			else 
 				return (str + ft_strlen(str));

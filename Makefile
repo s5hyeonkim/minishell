@@ -28,27 +28,26 @@ SRCS = ./main.c \
 		$(BUILTINDIR)pwd.c \
 		$(BUILTINDIR)unset.c \
 		$(BUILTINDIR)builtin.c \
+		$(SRCDIR)parsing.c \
+		$(SRCDIR)get_buffer.c \
+		$(SRCDIR)next_cmd.c \
+		$(SRCDIR)pipe.c \
+		$(SRCDIR)redirect.c \
+		$(SRCDIR)argv.c \
+		$(SRCDIR)wordend.c \
+		$(SRCDIR)wordlen.c \
+		$(SRCDIR)tokenizer.c \
+		$(SRCDIR)token_utils.c \
+		$(SRCDIR)token_lst.c \
+		$(SRCDIR)parser.c \
+		$(SRCDIR)replace_value_quote.c \
+		$(SRCDIR)replace_value_utils.c \
+		$(SRCDIR)resword.c \
+		$(SRCDIR)sublibft.c \
+		$(SRCDIR)utils.c \
 		$(SRCDIR)signal.c \
 		$(SRCDIR)signal_utils.c \
 		$(SRCDIR)terminal.c \
-		$(SRCDIR)parsing.c \
-		$(SRCDIR)wordend.c \
-		$(SRCDIR)syntax.c \
-		$(SRCDIR)tlst.c \
-		$(SRCDIR)token.c \
-		$(SRCDIR)token_utils.c \
-		$(SRCDIR)debug.c \
-		$(SRCDIR)sublibft.c \
-		$(SRCDIR)utils.c \
-		$(SRCDIR)wordend.c \
-		$(SRCDIR)wordlen.c \
-		$(SRCDIR)resword.c \
-		$(SRCDIR)pipe.c \
-		$(SRCDIR)redirect.c \
-		$(SRCDIR)buffer.c \
-		$(SRCDIR)argv.c \
-		$(SRCDIR)replace_value.c \
-		$(SRCDIR)replace_value_utils.c \
 		$(EXECDIR)heredoc.c \
 		$(EXECDIR)heredoc_signal.c \
 		$(EXECDIR)execute.c \
@@ -57,6 +56,7 @@ SRCS = ./main.c \
 		$(EXECDIR)redirect.c \
 		$(EXECDIR)redirect_utils.c \
 		$(EXECDIR)free.c \
+		$(SRCDIR)debug.c  # 제출 전 debug.c 삭제
 
 OBJS = $(SRCS:.c=.o)
 DEPS = $(SRCS:.c=.d)

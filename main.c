@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 16:43:13 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/19 16:43:34 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/20 17:11:29 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,48 +75,32 @@ void	readlines(t_shell *shell, char **buffer)
 		add_history(*buffer);
 }
 
-// void free_tokens(t_token *tokens)
-// {
-// 	t_token *left;
-// 	t_token *right;
-	
-// 	if (!tokens)
-// 		return ;
-// 	if (tokens->word)
-// 		free(tokens->word);
-// 	if (tokens->argvs)
-// 		free_strs(tokens->argvs);
-// 	left = tokens->left;
-// 	right = tokens->right;
-// 	free(tokens);
-// 	free_tokens(left);
-// 	free_tokens(right);
-// }
-
 void	loop(t_shell *shell)
 {
 	char	*buffer;
-
+	int		code;
 	// rl_clear_history();
 	while(1)
 	{
+		shell->t = 0;
 		readlines(shell, &buffer);
-		if (parselines(shell, buffer) == EXIT_FAILURE)
+		code = parselines(shell, buffer);
+		if (code != EXIT_SUCCESS)
 		{
+			if (code == EXTRA_ERROR)
+				handle_error(NULL, NULL, EXTRA_ERROR); //undefined error < 처리 어케 할까 
 			free_token(shell->t);
-			continue; // parseline에서 malloc실패 등 에러나면 continue 분기문 만들어주기
+			continue;
 		}
 		// printf("==loop==\n");
 		// debug_tree(shell->t, 2, 0);
 		// printf("==loop complete==\n");
-		// printf("loop: %p\n", shell->t);
 		exec_cmds(shell);
 		free_token(shell->t);
 		clean_files(shell->p, shell->p_size);
 		clean_process(shell->p, shell->p_size);
 		rl_replace_line("", 0);
 		shell->p = 0;
-		shell->t = 0;
 		shell->p_size = 0;
 	}
 }

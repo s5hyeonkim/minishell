@@ -6,7 +6,7 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 14:39:11 by yubshin           #+#    #+#             */
-/*   Updated: 2024/08/20 12:21:59 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/20 16:45:28 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 char	*find_notspace(char *str)
 {
-	while(str && *str && ft_isspace(*str))
+	while (str && *str && ft_isspace(*str))
 		str++;
 	return (str);
 }

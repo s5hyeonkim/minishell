@@ -1,8 +1,20 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   signal.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/08/20 16:35:46 by yubshin           #+#    #+#             */
+/*   Updated: 2024/08/20 16:43:35 by yubshin          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../minishell.h"
 
-int	set_signal(void(*handler)(int), int signo)
+int	set_signal(void (*handler)(int), int signo)
 {
-	t_sigaction action;
+	t_sigaction	action;
 
 	action.sa_handler = handler;
 	sigemptyset(&action.sa_mask);
@@ -12,7 +24,7 @@ int	set_signal(void(*handler)(int), int signo)
 	return (EXIT_SUCCESS);
 }
 
-int set_signal_init(void(*handler)(int))
+int	set_signal_init(void (*handler)(int))
 {
 	int	status;
 
@@ -26,7 +38,7 @@ int set_signal_init(void(*handler)(int))
 }
 
 //SIG_INT, SIG_QUIT에 handler_sub 적용 
-int set_signal_sub(void(*handler)(int))
+int	set_signal_sub(void (*handler)(int))
 {
 	int	status;
 

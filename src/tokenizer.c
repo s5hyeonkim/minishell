@@ -6,7 +6,7 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 21:47:20 by yubin             #+#    #+#             */
-/*   Updated: 2024/08/20 13:02:07 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/20 16:38:09 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,7 @@ int	token_word(t_token **token, t_deques *envps, char *str);
 
 int	tokenizer(t_token **token, t_deques *envps, char **strs)
 {
-	// t_token	*token;
-
-	*token = ft_calloc(1, sizeof(t_token));
+	*token = ft_calloc(1, sizeof (t_token));
 	if (!*token)
 		return (EXTRA_ERROR);
 	while (*strs)
@@ -45,28 +43,27 @@ int	token_pipe(t_token **token)
 {
 	if (add_tokenright(token, T_PIPE, NULL, NULL) == EXTRA_ERROR)
 		return (EXTRA_ERROR);
-	return (EXIT_SUCCESS); 
+	return (EXIT_SUCCESS);
 }
 
-int token_redirect(t_token **token, t_deques *envps, char *buffer)
+int	token_redirect(t_token **token, t_deques *envps, char *buffer)
 {
 	char	*filename;
 	int		typeno;
-	int		len; 
+	int		len;
 
 	while (*buffer)
 	{
-		buffer = find_redirect_head(buffer); // 
-		if (!*buffer)
+		buffer = find_redirect_head(buffer);
+		if (*buffer == '\0')
 			return (EXIT_SUCCESS);
 		typeno = read_redirect_typeno(buffer);
 		len = 0;
 		buffer = wordlen_filename(buffer, &len);
-		if (!*buffer)
+		if (*buffer == '\0')
 			return (EXIT_SUCCESS);
 		filename = ft_substr(buffer, 0, len);
-		// printf("filename:%s\n", filename);
-		if (!filename)
+		if (filename == NULL)
 			return (EXTRA_ERROR);
 		filename = replace_word(envps, filename);
 		if (add_tokenright(token, typeno, filename, NULL) == EXTRA_ERROR)
@@ -76,32 +73,28 @@ int token_redirect(t_token **token, t_deques *envps, char *buffer)
 	return (EXIT_SUCCESS);
 }
 
-int token_word(t_token **token, t_deques *envps, char *str)
+int	token_word(t_token **token, t_deques *envps, char *str)
 {
-	char	*headwords;
 	char	*words;
 	char	*word;
-	char	**argvs; 
-	int		len;
+	char	**argvs;
+	char	*headwords;
 
+	words = NULL;
 	word = NULL;
 	argvs = NULL;
-	words = get_words(str);
+	if (get_words(&words, str) == EXTRA_ERROR)
+		return (EXTRA_ERROR);
 	if (words)
 	{
 		headwords = words;
-		len = 0;
-		words = wordlen_word(words, &len);
-		word = substrjoin(word, words, len);
-		word = replace_word(envps, word);
-		// printf("=====word complete=====\n");
-		// if (word)
-		argvs = get_argvs(envps, words);
-		// printf("=====argvs complete=====\n");
+		if (get_word(envps, &word, words) == EXTRA_ERROR)
+			return (EXTRA_ERROR);
+		if (get_argvs(envps, &argvs, words) == EXTRA_ERROR)
+			return (EXTRA_ERROR);
 		free(headwords);
 	}
-	// printf("argvs:%s\n", argvs[0]);
-	if (add_tokenright_words(token, word, argvs) == EXTRA_ERROR)
+	if (add_tokenright(token, T_CMD_WORD, word, argvs) == EXTRA_ERROR)
 		return (EXTRA_ERROR);
 	return (EXIT_SUCCESS);
 }

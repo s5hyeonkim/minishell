@@ -6,99 +6,89 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 22:36:14 by yubin             #+#    #+#             */
-/*   Updated: 2024/08/20 14:14:07 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/20 16:31:02 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-int init_argvs(char ***argvs, char *words);
+int	init_argvs(char ***argvs, char *words);
 int	count_argv(char *words);
 
-char *get_words(char *str)
+int	get_words(char **words, char *str)
 {
-	char	*words;
 	int		len;
 
-	words = NULL;
-	if (!*str)
-		words = ft_strdup(str);
+	*words = NULL;
 	while (*str)
 	{
 		len = find_redirect_head(str) - str;
-		if (len < 0)
-		{
-			len = ft_strlen(str);
-			words = substrjoin(words, str, len);
-			if (!words)
-				return (NULL);
-			break ;
-		}
-		if (len > 0)
-		{
-			words = substrjoin(words, str, len); //leaks
-			if (!words)
-				return (NULL);
-		}
+		*words = substrjoin_free(*words, str, len);
+		if (*words == NULL)
+			return (EXTRA_ERROR);
 		str += len;
-		len = 0;
 		str = wordlen_filename(str, &len);
 		str += len;
 	}
-	return (words);
+	if (!*words)
+		*words = ft_strdup(str);
+	return (EXIT_SUCCESS);
 }
 
-char **get_argvs(t_deques *envps, char *words)
+int	get_word(t_deques *envps, char **word, char *words)
 {
-	char	**argvs;
+	int		len;
+
+	words = wordlen_word(words, &len);
+	*word = substrjoin_free(*word, words, len);
+	if (*word == NULL)
+		return (EXTRA_ERROR);
+	*word = replace_word(envps, *word);
+	if (*word == NULL)
+		return (EXTRA_ERROR);
+	return (EXIT_SUCCESS);
+}
+
+int	get_argvs(t_deques *envps, char ***argvs, char *words)
+{
 	char	*argv;
 	int		len;
 	int		index;
 
-	if (init_argvs(&argvs, words) == EXTRA_ERROR)
-		return (NULL);
+	if (init_argvs(argvs, words) == EXTRA_ERROR)
+		return (EXTRA_ERROR);
 	index = 0;
 	while (words && *words)
 	{
 		words = find_notspace(words);
-		if (!*words)
-			break ;
-		len = 0;
 		words = wordlen_word(words, &len);
 		argv = ft_substr(words, 0, len);
-		// printf("argv:%s\n", argv);
 		if (argv)
 			argv = replace_word(envps, argv);
 		if (!argv)
-			return(NULL);
+			return (EXTRA_ERROR);
 		if (*argv)
-			argvs[index++] = argv;
-		else 
+			(*argvs)[index++] = argv;
+		else
 			free(argv);
 		words += len;
 	}
-	// int j = 0;
-	// while (argvs && argvs[j])
-	// {
-	// 	printf(">argvs[%d]%s\n", j, argvs[j]);
-	// 	j++;
-	// }
-	return (argvs);
+	if (!**argvs)
+		**argvs = ft_strdup(words);
+	return (EXIT_SUCCESS);
 }
 
-int init_argvs(char ***argvs, char *words)
+int	init_argvs(char ***argvs, char *words)
 {
-	int argvnums;
+	int	argvnums;
 
 	*argvs = NULL;
 	argvnums = count_argv(words);
-	// printf("argvnums:%d\n", argvnums);
 	if (argvnums == 0)
 		argvnums = 1;
 	*argvs = ft_calloc(argvnums + 1, sizeof(char *));
 	if (!*argvs)
 		return (EXTRA_ERROR);
-	// printf("argvnums:%d\n", argvnums);
 	return (EXIT_SUCCESS);
 }
 
@@ -106,20 +96,15 @@ int	count_argv(char *words)
 {
 	char	*word;
 	int		len;
-	int argvnums;
-	
+	int		argvnums;
+
 	argvnums = 0;
 	while (*words)
 	{
-		len = 0;
 		word = wordlen_word(words, &len);
 		words += len;
 		words = find_notspace(words);
-		// printf("len:%d\n", len);
-		// if (len <= 0)
-			// len = ft_strlen(word);
 		argvnums++;
 	}
-	// printf("argvnums:%d\n", argvnums);
 	return (argvnums);
 }	

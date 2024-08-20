@@ -6,7 +6,7 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 20:34:43 by yubin             #+#    #+#             */
-/*   Updated: 2024/08/20 10:47:06 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/20 16:40:47 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ char	*get_env(t_deques *envps, char *keyhead, int *len)
 	char	*now;
 	char	*envp;
 	char	*key;
-	
+
 	envp = NULL;
 	*len = 0;
 	now = keyhead;
@@ -73,7 +73,6 @@ char	*get_env(t_deques *envps, char *keyhead, int *len)
 		return (NULL);
 	envp = get_val_deq(envps, key);
 	*len = ft_strlen(key) + 1;
-	// printf("envp:%s\n", envp);
 	free(key);
 	return (envp);
 }
