@@ -1,7 +1,7 @@
 #include "../minishell.h"
 
 /* utils */
-char *ft_ltrim(char *str)
+char *find_notspace(char *str)
 {
 	while(str && *str && ft_isspace(*str))
 		str++;
@@ -36,7 +36,7 @@ char *find_quotend(char *str, int flag)
 	while(*str)
 	{
 		if (*str == SGL_QUOTE && !sgl_open && dbl_open && dbl_open--)
-			return(ft_strchr(str, DBL_QUOTE));
+			return(ft_strchr(str, DBL_QUOTE) + 1);
 		else if (*str == SGL_QUOTE && !sgl_open && !dbl_open)
 			sgl_open = TRUE;
 		else if (*str == DBL_QUOTE && !dbl_open && sgl_open && sgl_open--)
@@ -49,41 +49,33 @@ char *find_quotend(char *str, int flag)
 	}
 	if ((flag == T_SINGLE_QUOTES && sgl_open) || (flag == T_DOUBLE_QUOTES && dbl_open))
 		return (NULL);
-	return (str );
+	return (str + 1);
 }
 
-char *find_wordend(char *str, int spacepipe_opt)
-{
-	// printf("find_wordstart: %s\n", str);
-	if (spacepipe_opt == SPACE && ft_isspace(*str) == TRUE)
-	{
-		str = find_spacend(str);
-		// printf("find_wordend1: %s\n", str);
-		return (str);
-	}
-	if (*str == SGL_QUOTE || *str == DBL_QUOTE)
-	{
-		str = find_quotend(str, issgldbl(*str));
-		// printf("find_wordend2: %s\n", str);
-		return (str);
-	}
-	while (str && *str)
-	{
-		if (spacepipe_opt == SPACE && ft_isspace(*(str + 1)) == TRUE)
-			break ;
-		else if (spacepipe_opt == PIPE && *(str + 1) == PIPE)
-			break ;
-		else if (*(str + 1) == SGL_QUOTE || *(str + 1) == DBL_QUOTE)
-			break ;
-		str++;
-	}
-	// str = ft_ltrim(str);
-	// str = find_spacend(str); 
 
-	// printf("find_wordend3: %s\n", str);
+int ft_iswordhead(char chr)
+{
+	if (ft_isspace(chr) == TRUE \
+	|| ft_ispipe(chr) == TRUE \
+	|| ft_isquote(chr) == TRUE \
+	|| ft_isredirect(chr) == TRUE)
+		return (TRUE);
+	return (FALSE);
+}
+
+char *find_wordend(char *str) //word: quote, space(not_quote), pipe, direct 기준
+{
+	str = find_notspace(str);
+	if (*str == SGL_QUOTE || *str == DBL_QUOTE) //quote문 처리
+		str = find_quotend(str, issgldbl(*str));
+	else // quote, space(not_quote), pipe가 오면 반환 
+		while (str && *str && ft_iswordhead(*str) == FALSE)
+			str++;
+	// printf("find_wordend:%s\n", str);
 	return (str);
 }
 
+// char *find_wordend(char *str, i
 // int main(int argc, char **argv)
 // {
 // 	char *buffer;

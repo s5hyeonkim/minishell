@@ -32,14 +32,23 @@ SRCS = ./main.c \
 		$(SRCDIR)signal_utils.c \
 		$(SRCDIR)terminal.c \
 		$(SRCDIR)parsing.c \
-		$(SRCDIR)quote.c \
+		$(SRCDIR)wordend.c \
 		$(SRCDIR)syntax.c \
 		$(SRCDIR)tlst.c \
+		$(SRCDIR)token.c \
+		$(SRCDIR)token_utils.c \
 		$(SRCDIR)debug.c \
 		$(SRCDIR)sublibft.c \
-		$(SRCDIR)token.c \
-		$(SRCDIR)find.c \
+		$(SRCDIR)utils.c \
+		$(SRCDIR)wordend.c \
+		$(SRCDIR)wordlen.c \
 		$(SRCDIR)resword.c \
+		$(SRCDIR)pipe.c \
+		$(SRCDIR)redirect.c \
+		$(SRCDIR)buffer.c \
+		$(SRCDIR)argv.c \
+		$(SRCDIR)replace_value.c \
+		$(SRCDIR)replace_value_utils.c \
 		$(EXECDIR)heredoc.c \
 		$(EXECDIR)heredoc_signal.c \
 		$(EXECDIR)execute.c \

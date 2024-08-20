@@ -34,44 +34,80 @@ typedef struct s_token
 }	t_token;
 
 /* sublibft.c */
-int		ismadeofchr(char *str, char chr);
+int	strchrlen(char *str, int chr);
 char	*substr_free(char *str, unsigned int start, size_t len);
 char	*strjoin_free(char *str1, char *str2);
-char	*substrjoin (char *str, int start, int len, char *dst);
-char	*strtrim_free(char *str1, char *set);
+// char	*substrjoin (char *str, int start, int len, char *dst);
+char	*substrjoin(char *dst, char *str, int len);
 
 /* tlst.c */
+int		set_token(t_token **t);
 t_token	*tlst_lastright(t_token *t);
 void	tlst_addright(t_token **t, t_token *newtoken);
 void	tlst_addleft(t_token **t, t_token *newtoken);
 
-/* token.c */
-int set_token(t_token **t);
-// int	add_tokenright(t_token *token, int type, char *word, char **argvs);
-int	add_tokenright(t_token **token, int type, char *word, char **argvs);
-
 /* resword.c */
 int ft_isresword(char chr);
 int ft_isredirect(char chr);
+int ft_ispipe(char chr);
+int ft_isquote(char chr);
 
-/* find.c */
-char    *find_redirect_start(char *str);
-char    *find_filename_start(char *str);
-char	*find_pipeend(char *buffer);
+/* handle_error.c */
+int handle_empty_pipe(char *buffer);
 
-/* QUOTE.C */
-char *ft_ltrim(char *str);
-int issgldbl(char chr);
-char *find_quotend(char *str, int flag);
-char *find_wordend(char *str, int spacepipe_opt);
+/* buffer.c */
+int	get_validbuffer(char *buffer, char **validbuffer);
+int	get_pipebuffer(char *buffer, char **dstbuffer);
 
+/* pipe.c */
+int ft_ispipeopen(char *buffer);
+int handle_empty_pipe(char *buffer);
+char **split_pipe(char *buffer);
+
+/* redirect.c */
+char	*find_filename_head(char *redirect_head);
+char	*find_redirect_head(char *buffer);
+int		read_redirect_typeno(char *str);
+int		handle_empty_redirect(char *buffer);
+
+/* wordlen.c */
+int		wordlen(char *str);
+char	*wordlen_pipe(char *startstr, int *len);
+char	*wordlen_redirect(char *startstr, int *len);
+char	*wordlen_filename(char *redirect_head, int *len);
+char	*wordlen_word(char *startstr, int *len);
+
+
+
+/* value_utils */
+char	*get_novalue(char *str, int *len);
+char	*get_dollar(char *str, int *len);
+char	*get_status(char *str, int *len);
+// char	*get_env(t_deques *envps, char *keyhead, int *len);
+
+/* utils.c */
+char	*find_notspace(char *str);
+
+/* find_wordend.c */
+char *find_wordend(char *str);
+
+/* argv.c */
+char *get_words(char *str);
+// char **get_argvs(t_deques *envps, char *words);
+
+/* parsing.c */
+int	handle_error_withstr(char *exec, char *str, int len, int code);
+
+/* token.c */
+// int	tokenizer(t_token **token, t_deques *envps, char **strs);
+
+/* token_utils.c */
+int	add_tokenright_words(t_token **token, char *word, char **argvs);
+int	add_tokenright(t_token **token, int type, char *word, char **argvs);
 
 t_token	*parser(t_token **token);
 
 int	set_next_cmd(char **s);
-
-
-void print_tree(t_token *dsttoken, int leftright, int i);
 
 /*DEBUG*/
 void debug_buffers(char **buffers);

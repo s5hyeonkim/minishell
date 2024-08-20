@@ -3,17 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   resword.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
+/*   By: yubin <yubin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 14:36:17 by yubshin           #+#    #+#             */
-/*   Updated: 2024/08/14 14:41:35 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/19 18:36:18 by yubin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
-
-int ft_isredirect(char chr);
-int ft_ispipe(char chr);
 
 int ft_isresword(char chr)
 {
@@ -33,5 +30,14 @@ int ft_ispipe(char chr)
 {
 	if (chr == PIPE)
 		return (TRUE);
+	return (FALSE);
+}
+
+int	ft_isquote(char chr)
+{
+	if (chr == SGL_QUOTE)
+		return(T_SINGLE_QUOTES);
+	else if (chr == DBL_QUOTE) 
+		return(T_DOUBLE_QUOTES);
 	return (FALSE);
 }

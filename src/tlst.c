@@ -1,5 +1,13 @@
 #include "../minishell.h"
 
+int set_token(t_token **t)
+{
+	*t = ft_calloc(1, sizeof(t_token));
+	if (*t == NULL)
+		return (EXTRA_ERROR);
+	return (EXIT_SUCCESS);
+}
+
 t_token *tlst_lastright(t_token *t)
 {
 	if (t == NULL)
@@ -45,4 +53,3 @@ void tlst_addleft(t_token **t, t_token *newtoken)
 		lasttoken->left = newtoken; 
 	}
 }
-
