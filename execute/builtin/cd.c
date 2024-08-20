@@ -49,7 +49,7 @@ int	navigate_dir(char *to_dir, char *origin)
 
 int	navigate_var(t_deques *envps, char *var, char **nwd)
 {
-	if (!read_val_deq(envps, var))
+	if (!ft_strlen(read_val_deq(envps, var)))
 		return (handle_error("cd", var, NOT_SET));
 	*nwd = get_val_deq(envps, var);
 	if (*nwd == NULL)

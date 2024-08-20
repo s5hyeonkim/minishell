@@ -16,10 +16,11 @@ void	set_fd(t_shell *shell, size_t index)
 {
 	if (shell->p[index].redirect_fd[STDIN_FILENO] > STDIN_FILENO)
 		dup_fd(&shell->p[index].redirect_fd[STDIN_FILENO], STDIN_FILENO);
-	else if (index)
+	else if (index && shell->p[index - 1].pipe_fd[STDIN_FILENO] > 0)
 		dup_fd(&shell->p[index - 1].pipe_fd[STDIN_FILENO], STDIN_FILENO);
 	if (shell->p[index].redirect_fd[STDOUT_FILENO] > STDIN_FILENO)
 		dup_fd(&shell->p[index].redirect_fd[STDOUT_FILENO], STDOUT_FILENO);
-	else if (index != shell->p_size - 1)
+	else if (index != shell->p_size - 1 && shell->p[index].pipe_fd[1] > 0)
 		dup_fd(&shell->p[index].pipe_fd[STDOUT_FILENO], STDOUT_FILENO);
+	shell->p[index].fd[1] = 1;
 }

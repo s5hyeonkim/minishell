@@ -19,16 +19,11 @@
 # include <stdlib.h>
 # include <unistd.h>
 # include <fcntl.h>
-# include <sys/wait.h>
-# include <signal.h>
 # include <sys/signal.h>
 # include <sys/stat.h>
 # include <dirent.h>
 # include <string.h>
-# include <sys/ioctl.h>
-# include <termios.h>
 # include <curses.h>
-# include <term.h>
 # include "../src/ft_signal.h"
 # include "../src/parsing.h"
 # include "../utils/terminal.h"
@@ -60,6 +55,7 @@ typedef struct s_process
 	char	*link;
 	size_t	index;
 	int		flag;
+	int		fd[2];
 	int		pipe_fd[2];
 	int		redirect_fd[2];
 }	t_process;
@@ -74,46 +70,75 @@ typedef struct s_data
 
 typedef int		(*t_builtin)(t_process p, t_data *d);
 
-/*cmdline_utils.c*/
-int			set_parsing_deques(t_deques *deqs, char *cmd);
+/*builtin.c*/
+int			is_builtin(char *cmd);
+int			exec_builtin(t_process p, t_data *d);
 
-t_builtin	find_builtin(int index);
-char		*read_val_strs(char *strs[], char *key);
-int			set_cwd(char **cwd);
-int			ft_pwd(t_process p, t_data *d);
-int			ft_env(t_process p, t_data *d);
-int			ft_exit(t_process p, t_data *d);
-int			ft_export(t_process p, t_data *d);
-int			ft_cd(t_process p, t_data *d);
-int			ft_echo(t_process p, t_data *d);
-int			ft_unset(t_process p, t_data *d);
-void		set_rwfd(t_process p, int *num, int write);
+/*cd_utils.c*/
 int			check_folder(char *to_dir);
 int			set_env_pwd(t_deques *deqs, char *key, char *val);
 void		parsing_dir(char *wd, char *now, size_t len);
+int			set_cwd(char **cwd);
+
+// builtin function
+/*cd.c*/
+int			ft_cd(t_process p, t_data *d);
+/*echo.c*/
+int			ft_echo(t_process p, t_data *d);
+/*env.c*/
+int			ft_env(t_process p, t_data *d);
+/*exit.c*/
+int			ft_exit(t_process p, t_data *d);
+/*export.c*/
+int			ft_export(t_process p, t_data *d);
+/*pwd.c*/
+int			ft_pwd(t_process p, t_data *d);
+/*unset.c*/
+int			ft_unset(t_process p, t_data *d);
+/*utils.c*/
+char		*read_val_strs(char *strs[], char *key);
+void		set_fd_builtin(t_process *p);
 void		ft_sort(char **strs, int (*guide)(char *, char *));
 int			is_valid_opt(char	*opt);
-int			exec_builtin(t_process p, t_data *d);
-int			is_builtin(char *cmd);
-void		replace_line(int redisplayon);
-int			set_filedoc(t_process *p);
-int			here_doc(char *link, char *limiter);
+void		set_rwfd(t_process *p);
 
-// cmdline_utils.c
+/*cmdline_utils.c*/
+int			is_valid_quotation(size_t *start, int *open1, int open2);
 int			set_parsing_deques(t_deques *deqs, char *cmd);
-void		handler_heredoc(int signo);
-void		handler_heredoc_wait(int signo);
+
+/*cmdline.c*/
 char		*get_pathcmd(char **paths, char *cmd);
 char		*get_cmdpath(char **paths, char *cmd);
 char		**get_cmdargs(char **cmds);
-void		dup_fd(int *fd, int std);
-int			is_redirect(int type);
-void		set_fd_builtin(t_process *p);
-int			open_redirect(int redirect, char *word, char *link);
-void		close_fd(int *num);
+
+/*execute.c*/
 int			fork_process(t_process *p);
 int			token_to_word(t_process *p, t_data d, t_token *t);
-int			find_redirect(t_process *p, t_token *t);
+t_builtin	find_builtin(int index);
+
+/*free.c*/
+void		free_data(t_data d);
+void		free_process(t_process *p, size_t size);
+void		clean_process(t_process *p, size_t p_size);
+void		clean_files(t_process *p, size_t p_size);
+
+/*herdoc_signal.c*/
+void		handler_heredoc(int signo);
+void		handler_heredoc_wait(int signo);
+
+/*heredoc.c*/
 int			set_filedoc(t_process *p);
+int			here_doc(char *link, char *limiter);
+
+/*redirect_utils.c*/
+void		set_fd_builtin(t_process *p);
+int			is_redirect(int type);
+void		dup_fd(int *fd, int std);
+void		close_fd(int *num);
+
+// redirect.c
+int			open_redirect(int redirect, char *word, char *link);
+int			find_redirect(t_process *p, t_token *t);
+int			open_token(t_token *t, t_process *p);
 
 #endif

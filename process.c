@@ -53,6 +53,7 @@ void	inprocess(t_shell *shell)
 {
 	long	status;
 
+	set_rwfd(shell->p);
 	status = exec_builtin(shell->p[0], &shell->data);
 	if (!ft_memcmp(shell->p[0].args[0], "exit", 5) && !status)
 	{

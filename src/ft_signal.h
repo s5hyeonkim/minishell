@@ -9,5 +9,7 @@ int			set_signal_init(void(*handler)(int));
 int			set_signal_sub(void(*handler)(int));
 void		handler_init(int signo);
 void		handler_sub(int signo);
+void	    replace_line(int redisplayon);
+void	    move_cursor(void);
 
 #endif

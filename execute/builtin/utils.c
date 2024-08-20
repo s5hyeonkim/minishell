@@ -35,14 +35,14 @@ char	*read_val_strs(char *strs[], char *key)
 	return (ret);
 }
 
-void	set_rwfd(t_process p, int *num, int is_write)
+void	set_rwfd(t_process *p)
 {
-	if (p.redirect_fd[is_write] > 0)
-		*num = p.redirect_fd[is_write];
-	else if (p.pipe_fd[is_write] > 0)
-		*num = p.pipe_fd[is_write];
+	if (p->redirect_fd[0] > 0)
+		p->fd[0] = p->redirect_fd[0];
+	if (p->redirect_fd[1] > 0)
+		p->fd[1] = p->redirect_fd[1];
 	else
-		*num = is_write;
+		p->fd[1] = 1;
 }
 
 void	ft_sort(char **strs, int (*guide)(char *, char *))

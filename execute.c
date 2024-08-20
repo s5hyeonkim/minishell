@@ -53,6 +53,7 @@ void	child(t_shell *shell, size_t index)
 		if (!ft_memcmp(shell->p[index].path, "exit", 5) && !ret)
 			exit_wo_error(shell, g_status);
 		g_status = ret;
+		exit_subprocess(shell, shell->p[index].args[0], ret);
 	}
 	else if (!shell->p[index].args[0][0])
 		exit_wo_error(shell, g_status);

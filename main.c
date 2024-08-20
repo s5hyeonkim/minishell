@@ -101,15 +101,14 @@ void	loop(t_shell *shell)
 	while(1)
 	{
 		readlines(shell, &buffer);
-		printf("s1: %ld\n", g_status);
 		if (parselines(shell, buffer) == EXIT_FAILURE)
 		{
 			free_token(shell->t);
 			continue; // parseline에서 malloc실패 등 에러나면 continue 분기문 만들어주기
 		}
-		printf("==loop==\n");
-		debug_tree(shell->t, 2, 0);
-		printf("==loop complete==\n");
+		// printf("==loop==\n");
+		// debug_tree(shell->t, 2, 0);
+		// printf("==loop complete==\n");
 		// printf("loop: %p\n", shell->t);
 		exec_cmds(shell);
 		free_token(shell->t);

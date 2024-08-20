@@ -32,3 +32,19 @@ int	is_valid_key(char *s)
 	}
 	return (TRUE);
 }
+
+t_deque	*find_deq(t_deques *deq, char *key)
+{
+	t_deque	*node;
+
+	node = deq->tail;
+	while (node)
+	{
+		node = node->next;
+		if (!ft_memcmp(node->keyval.key, key, ft_strlen(key) + 1))
+			return (node);
+		if (node == deq->tail)
+			break ;
+	}
+	return (NULL);
+}

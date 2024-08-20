@@ -97,11 +97,13 @@ int	export_wt_argv(t_process p, t_data *d)
 
 int	ft_export(t_process p, t_data *d)
 {
-	int		fd[2];
+	int		status;
 
-	set_rwfd(p, &fd[1], 1);
 	if (!p.args[1] || (!p.args[2] && !ft_memcmp(p.args[1], "--", 3)))
-		return (export_wo_argv(d, fd));
+	{
+		status = export_wo_argv(d, p.fd);
+		return (status);
+	}
 	if (!is_valid_opt(p.args[1]))
 	{
 		handle_error(p.args[0], p.args[1], INVALID_OPT);

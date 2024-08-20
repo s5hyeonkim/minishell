@@ -61,22 +61,6 @@ t_deque	*pop_back(t_deques *deques)
 	return (node);
 }
 
-t_deque	*find_deq(t_deques *deq, char *key)
-{
-	t_deque	*node;
-
-	node = deq->tail;
-	while (node)
-	{
-		node = node->next;
-		if (!ft_memcmp(node->keyval.key, key, ft_strlen(key) + 1))
-			return (node);
-		if (node == deq->tail)
-			break ;
-	}
-	return (NULL);
-}
-
 t_deque	*pop_target(t_deques *deqs, t_deque *target)
 {
 	t_deque	*node;

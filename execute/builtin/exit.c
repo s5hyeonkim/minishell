@@ -32,7 +32,7 @@ static char	*swap_str(char *s1)
 	return (s1);
 }
 
-int	is_equal(long n, char *str)
+static int	is_equal(long n, char *str)
 {
 	char	ch[21];
 	int		index;	
@@ -89,7 +89,6 @@ long	ft_atol(const char *str)
 	return (result * sign);
 }
 
-// --처리 필요
 int	ft_exit(t_process p, t_data *d)
 {
 	int	index;
