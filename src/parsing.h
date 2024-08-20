@@ -9,6 +9,8 @@
 # define DOLLAR '$'
 # define SIGTERM_NULL 0
 
+#include "../execute/deque/deque.h"
+
 typedef enum e_typeno
 {
 	T_NULL,
@@ -78,11 +80,15 @@ char	*wordlen_filename(char *redirect_head, int *len);
 char	*wordlen_word(char *startstr, int *len);
 
 
+/* value.c */
+char	*replace_value(t_deques *envps, char *str);
 
 /* value_utils */
 char	*get_novalue(char *str, int *len);
 char	*get_dollar(char *str, int *len);
 char	*get_status(char *str, int *len);
+char	*get_env(t_deques *envps, char *keyhead, int *len);
+
 // char	*get_env(t_deques *envps, char *keyhead, int *len);
 
 /* utils.c */
@@ -93,13 +99,13 @@ char *find_wordend(char *str);
 
 /* argv.c */
 char *get_words(char *str);
-// char **get_argvs(t_deques *envps, char *words);
+char **get_argvs(t_deques *envps, char *words);
 
 /* parsing.c */
 int	handle_error_withstr(char *exec, char *str, int len, int code);
 
 /* token.c */
-// int	tokenizer(t_token **token, t_deques *envps, char **strs);
+int	tokenizer(t_token **token, t_deques *envps, char **strs);
 
 /* token_utils.c */
 int	add_tokenright_words(t_token **token, char *word, char **argvs);
@@ -109,9 +115,12 @@ t_token	*parser(t_token **token);
 
 int	set_next_cmd(char **s);
 
-/*DEBUG*/
+/* debug.c */
 void debug_buffers(char **buffers);
 void debug_token(t_token *token);
 void debug_tree(t_token *dsttoken, int leftright, int i);
+
+/* parsing.c */
+char *replace_word(t_deques *envps, char *str);
 
 #endif
