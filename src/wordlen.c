@@ -6,7 +6,7 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 20:18:29 by yubin             #+#    #+#             */
-/*   Updated: 2024/08/20 10:38:28 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/20 11:07:27 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ char	*wordlen_filename(char *redirect_head, int *len)
 		next = wordlen(nowstr);
 		*len += next;
 		nowstr += next;
-		if (ft_isspace(*nowstr) == TRUE && ft_isredirect(*nowstr) == TRUE)
+		if (ft_isspace(*nowstr) == TRUE || ft_isredirect(*nowstr) == TRUE)
 			break;
 	}
 	return (filename_head);
