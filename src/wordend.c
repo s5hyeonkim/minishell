@@ -15,29 +15,91 @@ char	*find_wordend(char *str) //word: quote, space(not_quote), pipe, direct ê¸°ì
 	return (str);
 }
 
-char	*find_quotend(char *str, int flag)
+int ft_isquotend(char *str, int flag)
 {
-	int	sgl_open;
-	int	dbl_open;
+	char	*quotend;
+	int		sgl_open;
+	int		dbl_open;
 
 	sgl_open = 0;
 	dbl_open = 0;
+	if (*str != SGL_QUOTE && *str != DBL_QUOTE)
+		return (EXIT_FAILURE);
 	while(*str)
 	{
 		if (*str == SGL_QUOTE && !sgl_open && dbl_open && dbl_open--)
-			return(ft_strchr(str, DBL_QUOTE) + 1);
+		{
+			quotend = ft_strchr(str, DBL_QUOTE);
+			if (quotend)
+				return (EXIT_SUCCESS);
+			else 
+				return (EXIT_FAILURE);
+		}
 		else if (*str == SGL_QUOTE && !sgl_open && !dbl_open)
 			sgl_open = TRUE;
 		else if (*str == DBL_QUOTE && !dbl_open && sgl_open && sgl_open--)
-			return(ft_strchr(str, SGL_QUOTE) + 1);
+		{
+			quotend = ft_strchr(str, SGL_QUOTE);
+			if (quotend)
+				return (EXIT_SUCCESS);
+			else 
+				return (EXIT_FAILURE);
+		}
 		else if (*str == DBL_QUOTE && !dbl_open && !sgl_open)
 			dbl_open = TRUE;
 		else if	((*str == SGL_QUOTE && sgl_open--) || (*str == DBL_QUOTE  && dbl_open-- ))
 			break;
 		str++;
 	}
-	if ((flag == T_SINGLE_QUOTES && sgl_open) || (flag == T_DOUBLE_QUOTES && dbl_open))
-		return (NULL);
+	(void) flag;
+	// if ((flag == T_SINGLE_QUOTES && sgl_open) || (flag == T_DOUBLE_QUOTES && dbl_open))
+	// 	return (NULL);
+	return (EXIT_SUCCESS);
+}
+
+char	*find_quotend(char *str, int flag)
+{
+	char	*quotend;
+	int		sgl_open;
+	int		dbl_open;
+
+	sgl_open = 0;
+	dbl_open = 0;
+	while(*str)
+	{
+		// printf("str:%s\n", str);
+		// printf("sgl:%d\n", sgl_open);
+		// printf("dbl:%d\n", dbl_open);
+		if (*str == SGL_QUOTE && !sgl_open && dbl_open && dbl_open--)
+		{
+			quotend = ft_strchr(str, DBL_QUOTE);
+			if (quotend)
+				return(quotend + 1);
+			// break ;
+			else 
+				return (str + ft_strlen(str));
+		}
+		else if (*str == SGL_QUOTE && !sgl_open && !dbl_open)
+			sgl_open = TRUE;
+		else if (*str == DBL_QUOTE && !dbl_open && sgl_open && sgl_open--)
+		{
+			quotend = ft_strchr(str, SGL_QUOTE);
+			if (quotend)
+				return(quotend + 1);
+			else 
+				return (str + ft_strlen(str));
+			// break ;
+		}
+		else if (*str == DBL_QUOTE && !dbl_open && !sgl_open)
+			dbl_open = TRUE;
+		else if	((*str == SGL_QUOTE && sgl_open--) || (*str == DBL_QUOTE  && dbl_open-- ))
+			break;
+		str++;
+	}
+	(void) flag;
+	// if ((flag == T_SINGLE_QUOTES && sgl_open) || (flag == T_DOUBLE_QUOTES && dbl_open))
+		// return (str + ft_strlen(str));
+		// return (NULL);
 	return (str + 1);
 }
 

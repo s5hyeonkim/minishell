@@ -6,7 +6,7 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 22:36:14 by yubin             #+#    #+#             */
-/*   Updated: 2024/08/20 11:49:29 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/20 14:14:07 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ char *get_words(char *str)
 		}
 		if (len > 0)
 		{
-			words = substrjoin(words, str, len);
+			words = substrjoin(words, str, len); //leaks
 			if (!words)
 				return (NULL);
 		}
@@ -66,6 +66,7 @@ char **get_argvs(t_deques *envps, char *words)
 		len = 0;
 		words = wordlen_word(words, &len);
 		argv = ft_substr(words, 0, len);
+		// printf("argv:%s\n", argv);
 		if (argv)
 			argv = replace_word(envps, argv);
 		if (!argv)

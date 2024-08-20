@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yubin <yubin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 14:39:11 by yubshin           #+#    #+#             */
-/*   Updated: 2024/08/19 22:52:42 by yubin            ###   ########.fr       */
+/*   Updated: 2024/08/20 12:21:59 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ char	*find_notspace(char *str)
 
 int	handle_error_withstr(char *exec, char *str, int len, int code)
 {
-	char *obj;
+	char	*obj;
 
 	obj = ft_substr(str, 0, len);
 	g_status = handle_error(exec, obj, code);

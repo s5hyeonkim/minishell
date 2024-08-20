@@ -35,9 +35,11 @@ typedef struct s_token
 	struct s_token	*right;
 }	t_token;
 
-
-/* buffer.c */
+/* buffer.c */ 
 int	get_validbuffer(char *buffer, char **validbuffer);
+
+
+/*----complete-----*/
 
 /* sublibft.c */
 int	strchrlen(char *str, int chr);
@@ -81,7 +83,6 @@ char	*wordlen_redirect(char *startstr, int *len);
 char	*wordlen_filename(char *redirect_head, int *len);
 char	*wordlen_word(char *startstr, int *len);
 
-
 /* value.c */
 char	*replace_value(t_deques *envps, char *str);
 
@@ -98,6 +99,8 @@ char	*find_notspace(char *str);
 
 /* find_wordend.c */
 char *find_wordend(char *str);
+
+int ft_isquotend(char *str, int flag);
 
 /* argv.c */
 char *get_words(char *str);

@@ -6,7 +6,7 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 13:30:41 by yubin             #+#    #+#             */
-/*   Updated: 2024/08/20 11:50:30 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/20 13:01:54 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,14 +61,18 @@ char *substrjoin(char *dst, char *str, int len)
 	char *src;
 	char *tmp;
 
+	tmp = dst;
 	src = ft_substr(str, 0, len);
 	if (!src)
+	{	
+		free(tmp);
 		return (NULL);
-	tmp = dst;
+	}
 	dst = ft_strjoin(tmp, src);
+	free(tmp);
+	free(src);
 	if (!dst)
 		return (NULL);
-	free(tmp);
 	return (dst);
 }
 

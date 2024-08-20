@@ -11,6 +11,7 @@ char *replace_quote(char *str)
 {
 	char	*headstr;
 	char 	*dst;
+	char 	*tmp;
 	char 	*src;
 	int		len;
 
@@ -19,14 +20,22 @@ char *replace_quote(char *str)
 	while (*str)
 	{
 		len = wordlen(str);
-		if (*str == SGL_QUOTE || *str == DBL_QUOTE)
+		// printf("len:%d\n", len);
+		if (ft_isquotend(str, ft_isquote(*str)) == EXIT_SUCCESS)
+		{
+			// printf("str:%s\n", str);
 			src = ft_substr(str, 1, len - 2);
+		}
 		else
 			src = ft_substr(str, 0, len);
-		dst = strjoin_free(dst, src);
+		tmp = dst;
+		dst = ft_strjoin(tmp, src);
+		free(tmp);
+		// printf("dst:%s\n", dst);
 		str += len;
 	}
 	free (headstr);
+
 	// printf("dst:%s\n", dst);
 	return (dst);
 }
@@ -58,8 +67,8 @@ int	lexer(t_token **token, t_deques *envps, char *buffer)
 	// debug_buffers(buffers); 
 	tokenizer(token, envps, buffers); //leaks
 	free_strs(buffers);
-	if (!*token)
-		return (EXTRA_ERROR);
+	// if (!*token)
+	// 	return (EXTRA_ERROR);
 	// printf("===tokenizer complete===\n");
 	return (EXIT_SUCCESS);
 }
@@ -70,16 +79,14 @@ int	parselines(t_shell *shell, char *buffer)
 	char	*validbuffer;
 	int		code;
 
+	validbuffer = NULL;
+	// printf("buffer:%s\n", buffer);
 	code = get_validbuffer(buffer, &validbuffer);
 	free(buffer);
 	if (code == EXTRA_ERROR || code == SYNTAX_ERROR)
 		return (EXIT_FAILURE);
 	// printf("validbuffer:%s\n", validbuffer);
-	// validbuffer = strtrim_free(validbuffer, " "); //free처리 고민
-	// if (!validbuffer)
-		// return (EXIT_FAILURE); //refatoring complete
 	// printf("===validbuffer complete===\n");
-	// printf("===lexer start===\n");
 	if (lexer(&(shell->t), shell->data.envps, validbuffer) == EXTRA_ERROR)
 		return (EXIT_FAILURE);
 	free(validbuffer);

@@ -6,7 +6,7 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 20:18:29 by yubin             #+#    #+#             */
-/*   Updated: 2024/08/20 11:07:27 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/20 13:43:47 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,10 +35,10 @@ char	*wordlen_pipe(char *startstr, int *len)
 		(ft_isspace(*startstr) == TRUE || ft_ispipe(*startstr) == TRUE))
 		startstr++;
 	pipebuffer_head = startstr;
-	nowstr = pipebuffer_head;
+	nowstr = startstr;
 	while (nowstr && *nowstr)
  	{	
-		next = wordlen(nowstr);
+		next = wordlen(nowstr);	
 		*len += next;
 		nowstr += next;
 		if (*nowstr == '\0' || ft_ispipe(*nowstr) == TRUE)
