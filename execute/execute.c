@@ -16,10 +16,7 @@ int	fork_process(t_process *p)
 {
 	p->pid = fork();
 	if (p->pid == -1)
-	{
-		handle_error(NULL, NULL, EXTRA_ERROR);
 		return (EXTRA_ERROR);
-	}
 	return (EXIT_SUCCESS);
 }
 

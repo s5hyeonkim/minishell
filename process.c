@@ -36,7 +36,10 @@ void	subprocess(t_shell *shell)
 	{
 		if (open_pipe(&shell->p[index], shell->p_size) \
 				|| fork_process(&shell->p[index]))
+		{
+			handle_error(NULL, NULL, EXTRA_ERROR);
 			break ;
+		}
 		child(shell, index);
 		parent(shell, index);
 		index++;
@@ -114,9 +117,9 @@ void	exec_cmds(t_shell *shell)
 		status = token_to_process(shell, shell->t, &index);
 	if (!shell->p || status)
 	{
-		g_status = EXIT_FAILURE;
-		if (status != SIGNALED)
+		if (status == EXTRA_ERROR)
 			handle_error(NULL, NULL, EXTRA_ERROR);
+		g_status = EXIT_FAILURE;
 	}
 	else if (shell->p_size == 1 && is_builtin(shell->p[0].path))
 		inprocess(shell);

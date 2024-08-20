@@ -42,7 +42,7 @@ char	*get_nextdir(char *path, char *cwd)
 
 int	navigate_dir(char *to_dir, char *origin)
 {
-	if (check_folder(to_dir) || chdir(to_dir) == -1)
+	if (check_folder(to_dir) == EXTRA_ERROR || chdir(to_dir) == -1)
 		return (handle_error("cd", origin, EXTRA_ERROR));
 	return (EXIT_SUCCESS);
 }

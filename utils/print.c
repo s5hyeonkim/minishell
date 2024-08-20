@@ -34,7 +34,9 @@ const char	*err_to_msg(int *code)
 		return (MSG_SET);
 	if (err == NOT_NUM)
 		return (MSG_NUM);
-	return (strerror(errno));
+	if (err == EXTRA_ERROR)
+		return (strerror(errno));
+	return ("");
 }
 
 int	print_error(int code)
@@ -43,7 +45,8 @@ int	print_error(int code)
 	const char	*msg = err_to_msg(&code);
 
 	size = ft_strlen(msg);
-	write(STDERR_FILENO, msg, size);
+	if (size)
+		write(STDERR_FILENO, msg, size);
 	if (size && msg[size - 1] != '\n')
 		write(STDERR_FILENO, "\n", 1);
 	return (code);

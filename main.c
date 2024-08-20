@@ -18,8 +18,8 @@ void	exit_process(t_shell *shell, char *obj, int errcode)
 	terminal_printon();
 	if (errcode && errcode < CMD_NOT_FOUND)
 	{
-		errcode = EXIT_FAILURE;
 		handle_error(obj, NULL, errcode);
+		errcode = EXIT_FAILURE;
 	}
 	else if (errcode == CMD_NOT_FOUND)
 		handle_error(obj, NULL, errcode);
@@ -101,6 +101,7 @@ void	loop(t_shell *shell)
 	while(1)
 	{
 		readlines(shell, &buffer);
+		printf("s1: %ld\n", g_status);
 		if (parselines(shell, buffer) == EXIT_FAILURE)
 		{
 			free_token(shell->t);

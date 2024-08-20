@@ -28,10 +28,7 @@ size_t	find_pipe(t_token *t)
 int	open_pipe(t_process *p, size_t size)
 {
 	if (p->index != size - 1 && pipe(p->pipe_fd) == -1)
-	{
-		handle_error(NULL, NULL, EXTRA_ERROR);
-		return (EXTRA_ERROR);
-	}
+		return (handle_error(NULL, NULL, EXTRA_ERROR));
 	return (EXIT_SUCCESS);
 }
 

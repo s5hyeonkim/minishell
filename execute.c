@@ -16,8 +16,8 @@ void	exit_subprocess(t_shell *shell, char *obj, int errcode)
 	terminal_printon();
 	if (errcode && errcode < CMD_NOT_FOUND)
 	{
-		errcode = EXIT_FAILURE;
 		handle_error(obj, NULL, errcode);
+		errcode = EXIT_FAILURE;
 	}
 	else if (errcode == CMD_NOT_FOUND)
 		handle_error(obj, NULL, errcode);

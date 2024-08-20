@@ -43,7 +43,7 @@ int	open_token(t_token *t, t_process *p)
 	}
 	*fd = open_redirect(t->type, t->word, p->link);
 	if (*fd == -1)
-		return (EXTRA_ERROR);
+		return (handle_error(NULL, t->word, EXTRA_ERROR));
 	return (EXIT_SUCCESS);
 }
 

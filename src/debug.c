@@ -117,7 +117,7 @@ int	set_next_cmd(char **s)
 	t_process	p;
 	
 	if (pipe(p.pipe_fd) == -1 || fork_process(&p))
-		return (EXIT_FAILURE);
+		return (EXTRA_ERROR);
 	if (!p.pid)
 	{
 		close(p.pipe_fd[0]);
