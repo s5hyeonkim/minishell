@@ -6,7 +6,7 @@
 /*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 16:44:42 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/19 16:51:17 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/21 12:59:27 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void	set_fd(t_shell *shell, size_t index)
 	shell->p[index].fd[1] = 1;
 }
 
-int		set_args(t_process *p, t_data d, t_token *t)
+int	set_args(t_process *p, t_data d, t_token *t)
 {
 	if (set_cmdargs(p, t->argvs) || set_cmdpath(p, d.paths, t->word))
 		return (EXTRA_ERROR);

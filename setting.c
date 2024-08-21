@@ -6,12 +6,12 @@
 /*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 07:09:55 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/19 16:51:45 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/21 13:00:05 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "minishell.h"
 
-int		set_env_paths(t_data *d)
+int	set_env_paths(t_data *d)
 {
 	char	**envp;
 
@@ -61,7 +61,8 @@ static void	set_pwd_path(t_shell *shell)
 static void	set_data(t_shell *shell, char *envp[])
 {
 	shell->data.envps = strstodeq(envp);
-	if (!shell->data.envps || set_env_paths(&shell->data) || set_cwd(&shell->data.lcwd))
+	if (!shell->data.envps || set_env_paths(&shell->data) \
+			|| set_cwd(&shell->data.lcwd))
 		exit_process(shell, NULL, EXTRA_ERROR);
 	set_depth(shell);
 	set_pwd_path(shell);
