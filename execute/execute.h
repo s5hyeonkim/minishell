@@ -24,11 +24,12 @@
 # include <dirent.h>
 # include <string.h>
 # include <curses.h>
-# include "../src/ft_signal.h"
+# include "../utils/ft_signal.h"
 # include "../src/parsing.h"
 # include "../utils/terminal.h"
 # include "deque/deque.h"
 # include "../ft_err.h"
+# include "../utils/utils.h"
 
 // getconf ARG_MAX
 # define ARG_MAX 262144
@@ -113,8 +114,9 @@ char		**get_cmdargs(char **cmds);
 
 /*execute.c*/
 int			fork_process(t_process *p);
-int			token_to_word(t_process *p, t_data d, t_token *t);
 t_builtin	find_builtin(int index);
+int			set_cmdargs(t_process *p, char **argvs);
+int			set_cmdpath(t_process *p, char **paths, char *cmd);
 
 /*free.c*/
 void		free_data(t_data d);

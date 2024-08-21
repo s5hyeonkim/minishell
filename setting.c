@@ -11,23 +11,19 @@
 /* ************************************************************************** */
 #include "minishell.h"
 
-static int	get_depth(char *str)
+int		set_env_paths(t_data *d)
 {
-	int	num;
+	char	**envp;
 
-	num = 0;
-	if (!str)
-		return (0);
-	while (*str && num < 1000)
-	{
-		if (!ft_isdigit(*str))
-			return (0);
-		num = num * 10 + *str - '0';
-		str++;
-	}
-	if (num >= 1000)
-		return (0);
-	return (num);
+	free_strs(d->paths);
+	d->paths = NULL;
+	envp = deqtostrs(d->envps->head);
+	if (envp)
+		d->paths = get_env_paths(envp);
+	free_strs(envp);
+	if (d->paths)
+		return (EXIT_SUCCESS);
+	return (EXTRA_ERROR);
 }
 
 static void	set_depth(t_shell *shell)
@@ -65,8 +61,7 @@ static void	set_pwd_path(t_shell *shell)
 static void	set_data(t_shell *shell, char *envp[])
 {
 	shell->data.envps = strstodeq(envp);
-	shell->data.paths = get_env_paths(envp);
-	if (!shell->data.paths || !shell->data.envps || set_cwd(&shell->data.lcwd))
+	if (!shell->data.envps || set_env_paths(&shell->data) || set_cwd(&shell->data.lcwd))
 		exit_process(shell, NULL, EXTRA_ERROR);
 	set_depth(shell);
 	set_pwd_path(shell);

@@ -13,10 +13,14 @@ SRCS = ./main.c \
 		./free.c \
 		./setting.c \
 		./process.c \
-		./pipeline.c \
-		./redirect.c \
+		./process_utils.c \
+		./validation.c \
+		./terminal.c \
 		$(UTILSDIR)print.c \
 		$(UTILSDIR)term.c \
+		$(UTILSDIR)utils.c \
+		$(UTILSDIR)signal.c \
+		$(UTILSDIR)signal_utils.c \
 		$(BUILTINDIR)utils.c \
 		$(BUILTINDIR)cd.c \
 		$(BUILTINDIR)cd_utils.c \
@@ -45,9 +49,6 @@ SRCS = ./main.c \
 		$(SRCDIR)resword.c \
 		$(SRCDIR)sublibft.c \
 		$(SRCDIR)utils.c \
-		$(SRCDIR)signal.c \
-		$(SRCDIR)signal_utils.c \
-		$(SRCDIR)terminal.c \
 		$(EXECDIR)heredoc.c \
 		$(EXECDIR)heredoc_signal.c \
 		$(EXECDIR)execute.c \
@@ -56,7 +57,6 @@ SRCS = ./main.c \
 		$(EXECDIR)redirect.c \
 		$(EXECDIR)redirect_utils.c \
 		$(EXECDIR)free.c \
-		$(SRCDIR)debug.c  # 제출 전 debug.c 삭제
 
 OBJS = $(SRCS:.c=.o)
 DEPS = $(SRCS:.c=.d)

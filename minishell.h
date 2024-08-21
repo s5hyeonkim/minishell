@@ -46,59 +46,41 @@ typedef struct s_shell
 	t_termios		term;
 }	t_shell;
 
-/* main.c */
-void		exit_process(t_shell *shell, char *obj, int errcode);
-// void		child_handler(int signo);
-char		**get_env_paths(char *envp[]);
-
-/* execute dir */
-void		set_cmds(t_shell *shell);
-void		get_terminal(t_shell *shell);
-void		reset_terminal(t_shell *shell);
-
-void		set_process(t_shell *shell);
-t_builtin	find_builtin(int index);
-char		*read_val_strs(char *strs[], char *key);
-/* execute */
-void		wait_process(t_shell *shell);
-void		exec_program(t_shell *shell, t_process p);
-void		set_process(t_shell *shell);
-void		close_pipe(t_shell *shell, size_t index);
-void		subprocess(t_shell *shell);
-void		inprocess(t_shell *shell);
-void		exec_cmds(t_shell *shell);
-void		clean_files(t_process *p, size_t p_size);
 /* free.c */
 void		free_token(t_token *t);
-void		free_data(t_data d);
-void		free_process(t_process *p, size_t size);
 void		free_shell(t_shell shell);
-void		clean_process(t_process *p, size_t size);
+void		clean_buffer(t_shell *shell);
+void		exit_process(t_shell *shell, char *obj, int errcode);
 void		exit_wo_error(t_shell *shell, int errcode);
 
-
-
-/* signal_utils.c  */
-void		move_cursor(void);
-
+/* execute.c */
+void		exit_subprocess(t_shell *shell, char *obj, int errcode);
+void		exec_program(t_shell *shell, t_process p);
+void		child(t_shell *shell, size_t index);
+void		parent(t_shell *shell, size_t index);
 
 /* setting.c */
 void		set_shell(t_shell *shell, char *envp[]);
-// int			set_token(t_token **t);
-// void		tokenization(t_shell *shell, t_token *t);
-void		parent(t_shell *shell, size_t index);
-void		child(t_shell *shell, size_t index);
-int			fork_process(t_process *p);
-int			find_redirect(t_process *p, t_token *t);
+int			set_env_paths(t_data *d);
+
+/* process.c */
+void		exec_cmds(t_shell *shell);
+
+/* process_utils.c */
+int			set_args(t_process *p, t_data d, t_token *t);
 int			open_pipe(t_process *p, size_t size);
 size_t		find_pipe(t_token *t);
-int			wait_heredoc(t_process p);
 void		set_fd(t_shell *shell, size_t index);
-void		dup_fd(int *fd, int std);
-int			here_doc(char *link, char *limiter);
-int			open_token(t_token *t, t_process *p);
+void		close_pipe(t_shell *shell, size_t index);
+
+/* terminal.c */
+void		get_terminal(t_shell *shell);
+void		reset_terminal(t_shell *shell);
 
 /* parsing.c */
 int			parselines(t_shell *shell, char *buffer);
+
+/*validation.c*/
+void		check_valid(t_shell *shell, int argc);
 
 #endif

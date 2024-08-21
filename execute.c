@@ -38,7 +38,6 @@ void	exec_program(t_shell *shell, t_process p)
 		exit_subprocess(shell, p.args[0], CMD_NOT_FOUND);
 }
 
-// child free
 void	child(t_shell *shell, size_t index)
 {
 	int	ret;
@@ -52,15 +51,12 @@ void	child(t_shell *shell, size_t index)
 		ret = exec_builtin(shell->p[index], &shell->data);
 		if (!ft_memcmp(shell->p[index].path, "exit", 5) && !ret)
 			exit_wo_error(shell, g_status);
-		g_status = ret;
 		exit_subprocess(shell, shell->p[index].args[0], ret);
 	}
 	else if (!shell->p[index].args[0][0])
 		exit_wo_error(shell, g_status);
 	else
-	{
 		exec_program(shell, shell->p[index]);
-	}
 }
 
 void	parent(t_shell *shell, size_t index)

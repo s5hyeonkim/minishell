@@ -1,24 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   terminal.c                                         :+:      :+:    :+:   */
+/*   validation.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
+/*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/08/20 16:36:13 by yubshin           #+#    #+#             */
-/*   Updated: 2024/08/20 16:36:21 by yubshin          ###   ########.fr       */
+/*   Created: 2024/08/21 11:44:15 by sohykim           #+#    #+#             */
+/*   Updated: 2024/08/21 11:44:21 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../minishell.h"
+#include "minishell.h"
 
-/* terminal */
-void	get_terminal(t_shell *shell)
+void	check_valid(t_shell *shell, int argc)
 {
-	tcgetattr(1, &shell->term);
-}
-
-void	reset_terminal(t_shell *shell)
-{
-	tcsetattr(1, 0, &shell->term);
+	if (argc != 1)
+		exit_process(shell, NULL, INVALID_ARGV);
 }

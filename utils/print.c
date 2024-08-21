@@ -54,6 +54,8 @@ int	print_error(int code)
 
 int	handle_error(char *exec, char *obj, int code)
 {
+	if (code == EXIT_FAILURE)
+		return (code);
 	ft_putstr_fd("minishell: ", STDERR_FILENO);
 	if (exec)
 	{

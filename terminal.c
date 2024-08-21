@@ -1,24 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   terminal.h                                         :+:      :+:    :+:   */
+/*   terminal.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/08/21 10:23:55 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/21 10:24:01 by sohykim          ###   ########.fr       */
+/*   Created: 2024/08/20 16:36:13 by yubshin           #+#    #+#             */
+/*   Updated: 2024/08/20 16:36:21 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef TERMINAL_H
-# define TERMINAL_H
-# include <sys/ioctl.h>
-# include <term.h>
-# include <termios.h>
-# include <unistd.h>
+#include "minishell.h"
 
-typedef struct termios		t_termios;
-/* terminal.c */
-void		terminal_printoff(void);
-void		terminal_printon(void);
-#endif
+/* terminal */
+void	get_terminal(t_shell *shell)
+{
+	tcgetattr(1, &shell->term);
+}
+
+void	reset_terminal(t_shell *shell)
+{
+	tcsetattr(1, 0, &shell->term);
+}

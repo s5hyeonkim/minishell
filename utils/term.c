@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   term.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/08/21 10:23:35 by sohykim           #+#    #+#             */
+/*   Updated: 2024/08/21 10:23:45 by sohykim          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "terminal.h"
 
 void	terminal_printoff(void)
@@ -7,7 +19,6 @@ void	terminal_printoff(void)
 	tcgetattr(STDOUT_FILENO, &term);
 	term.c_lflag &= ~(ECHOCTL);
 	tcsetattr(STDOUT_FILENO, TCSANOW, &term);
-	// printf("off: %lx\n", term.c_lflag);
 }
 
 void	terminal_printon(void)
@@ -17,5 +28,4 @@ void	terminal_printon(void)
 	tcgetattr(STDOUT_FILENO, &term);
 	term.c_lflag |= (ECHOCTL);
 	tcsetattr(1, 0, &term);
-	// printf("on: %lu\n", shell->term.c_lflag);
 }

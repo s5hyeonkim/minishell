@@ -20,13 +20,18 @@ int	fork_process(t_process *p)
 	return (EXIT_SUCCESS);
 }
 
-int	token_to_word(t_process *p, t_data d, t_token *t)
+int	set_cmdargs(t_process *p, char **argvs)
 {
-	if (!t || t->type != T_CMD_WORD)
-		return (EXIT_SUCCESS);
-	p->args = get_cmdargs(t->argvs);
-	p->path = get_cmdpath(d.paths, t->word);
-	if (!p->args || !p->path)
+	p->args = get_cmdargs(argvs);
+	if (!p->args)
+		return (EXTRA_ERROR);
+	return (EXIT_SUCCESS);
+}
+
+int	set_cmdpath(t_process *p, char **paths, char *cmd)
+{
+	p->path = get_cmdpath(paths, cmd);
+	if (!p->path)
 		return (EXTRA_ERROR);
 	return (EXIT_SUCCESS);
 }

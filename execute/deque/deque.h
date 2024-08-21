@@ -81,5 +81,4 @@ char		*get_key(char *str);
 int			set_map(t_map *keyval, char *str);
 int			set_keyval(t_map *keyval, char *key, char mid, char *val);
 
-
 #endif

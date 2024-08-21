@@ -34,7 +34,36 @@ void	free_shell(t_shell shell)
 
 void	exit_wo_error(t_shell *shell, int errcode)
 {
-	terminal_printon();
+	reset_terminal(shell);
 	free_shell(*shell);
 	exit(errcode);
+}
+
+/* exit */
+void	exit_process(t_shell *shell, char *obj, int errcode)
+{
+	terminal_printon();
+	if (errcode && errcode < CMD_NOT_FOUND)
+	{
+		handle_error(obj, NULL, errcode);
+		errcode = EXIT_FAILURE;
+	}
+	else if (errcode == CMD_NOT_FOUND)
+		handle_error(obj, NULL, errcode);
+	if (errcode == SIGEXIT + SIGTERM)
+		errcode = EXIT_SUCCESS;
+	clean_files(shell->p, shell->p_size);
+	reset_terminal(shell);
+	free_shell(*shell);
+	exit(errcode);
+}
+
+void	clean_buffer(t_shell *shell)
+{
+	clean_files(shell->p, shell->p_size);
+	free_token(shell->t);
+	clean_process(shell->p, shell->p_size);
+	shell->p = 0;
+	shell->p_size = 0;
+	shell->t = 0;
 }
