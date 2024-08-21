@@ -6,9 +6,10 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/11 12:51:46 by sohykim           #+#    #+#             */
-/*   Updated: 2024/07/24 20:34:55 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/21 13:14:06 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "../ft_err.h"
 
 const char	*err_to_msg(int *code)
@@ -68,4 +69,15 @@ int	handle_error(char *exec, char *obj, int code)
 		ft_putstr_fd(": ", STDERR_FILENO);
 	}
 	return (print_error(code));
+}
+
+int	handle_error_withstr(char *exec, char *str, int len, int code)
+{
+	char	*obj;
+	int		status;
+
+	obj = ft_substr(str, 0, len);
+	status = handle_error(exec, obj, code);
+	free(obj);
+	return (status);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_err.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 16:55:15 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/19 16:57:21 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/21 13:02:45 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,5 +52,6 @@ typedef enum e_err
 }	t_err;
 
 int		handle_error(char *exec, char *obj, int code);
+int		handle_error_withstr(char *exec, char *str, int len, int code);
 
 #endif

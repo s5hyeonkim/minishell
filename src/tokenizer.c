@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   token.c                                            :+:      :+:    :+:   */
+/*   tokenizer.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 21:47:20 by yubin             #+#    #+#             */
-/*   Updated: 2024/08/20 16:38:09 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/21 11:48:14 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,17 +25,12 @@ int	tokenizer(t_token **token, t_deques *envps, char **strs)
 	{	
 		if (token_pipe(token) == EXTRA_ERROR)
 			return (EXTRA_ERROR);
-		// printf("===token_pipe :complete===\n");
 		if (token_redirect(token, envps, *strs) == EXTRA_ERROR)
 			return (EXTRA_ERROR);
-		// printf("===token_redirect : complete===\n");
 		if (token_word(token, envps, *strs) == EXTRA_ERROR)
 			return (EXTRA_ERROR);
-		// printf("===token_word :complete===\n");
 		strs++;
 	}
-	/*token 출력*/
-	// debug_token(token);
 	return (EXIT_SUCCESS);
 }
 

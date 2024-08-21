@@ -6,7 +6,7 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 16:35:46 by yubshin           #+#    #+#             */
-/*   Updated: 2024/08/20 16:43:35 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/21 12:46:59 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,6 @@ int	set_signal_init(void (*handler)(int))
 	return (status);
 }
 
-//SIG_INT, SIG_QUIT에 handler_sub 적용 
 int	set_signal_sub(void (*handler)(int))
 {
 	int	status;
@@ -51,7 +50,6 @@ int	set_signal_sub(void (*handler)(int))
 
 void	handler_init(int signo)
 {
-	// printf("signal receive %d\n", status);
 	if (signo == SIGINT)
 	{
 		replace_line(TRUE);
@@ -67,7 +65,6 @@ void	handler_init(int signo)
 void	handler_sub(int signo)
 {
 	g_status = signo + SIGEXIT;
-	// printf("signal receive %d\n", status);
 	if (signo == SIGINT)
 		replace_line(FALSE);
 	if (signo == SIGQUIT)

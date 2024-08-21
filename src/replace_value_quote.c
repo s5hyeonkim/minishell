@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   replace.c                                          :+:      :+:    :+:   */
+/*   replace_value_quote.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 14:24:38 by yubshin           #+#    #+#             */
-/*   Updated: 2024/08/20 16:23:16 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/21 11:40:48 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ char	*replace_quote(char *str)
 	while (*str)
 	{
 		len = wordlen(str);
-		if (ft_isquotend(str, ft_isquote(*str)) == EXIT_SUCCESS)
+		if (ft_isquote(*str) && is_closed_quotation(str))
 			src = ft_substr(str, 1, len - 2);
 		else
 			src = ft_substr(str, 0, len);

@@ -6,7 +6,7 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 14:31:30 by yubshin           #+#    #+#             */
-/*   Updated: 2024/08/20 17:00:58 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/21 10:41:53 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,17 +17,18 @@ int		syntax_simple_cmd(t_token **dsttoken, t_token *nowtoken);
 int		syntax_cmd_redirects(t_token **dsttoken, t_token *nowtoken);
 void	syntax_io_redirect(t_token **dsttoken, t_token *nowtoken);
 
-t_token	*parser(t_token **token)
+int	parser(t_token **token)
 {
 	t_token	*nowtoken;
 	t_token	*dsttoken;
 
 	dsttoken = NULL;
 	nowtoken = *token;
-	syntax_pipeline(&dsttoken, nowtoken);
+	if (syntax_pipeline(&dsttoken, nowtoken) == EXTRA_ERROR)
+		return (EXTRA_ERROR);
 	free(*token);
 	*token = dsttoken;
-	return (dsttoken);
+	return (EXIT_SUCCESS);
 }
 
 int	syntax_pipeline(t_token **dsttoken, t_token *nowtoken)

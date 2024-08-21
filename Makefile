@@ -47,7 +47,6 @@ SRCS = ./main.c \
 		$(SRCDIR)replace_value_quote.c \
 		$(SRCDIR)replace_value_utils.c \
 		$(SRCDIR)resword.c \
-		$(SRCDIR)sublibft.c \
 		$(SRCDIR)utils.c \
 		$(EXECDIR)heredoc.c \
 		$(EXECDIR)heredoc_signal.c \

@@ -6,7 +6,7 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 16:43:13 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/20 17:11:29 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/21 13:15:12 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ void	loop(t_shell *shell)
 	char	*buffer;
 	int		code;
 
-	while(1)
+	while (1)
 	{
 		clean_buffer(shell);
 		readlines(shell, &buffer);

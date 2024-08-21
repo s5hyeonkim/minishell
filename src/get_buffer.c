@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   buffer.c                                           :+:      :+:    :+:   */
+/*   get_buffer.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 19:47:20 by yubin             #+#    #+#             */
-/*   Updated: 2024/08/20 14:22:39 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/21 13:12:09 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-int	get_pipebuffer(char *buffer, char **dstbuffer);
+int	replace_pipebuffer(char *buffer, char **dstbuffer);
 
 int	get_validbuffer(char *buffer, char **validbuffer)
 {
@@ -24,15 +24,15 @@ int	get_validbuffer(char *buffer, char **validbuffer)
 		if (handle_empty_pipe(*validbuffer) == SYNTAX_ERROR \
 		|| handle_empty_redirect(*validbuffer) == SYNTAX_ERROR)
 		{
-			free(*validbuffer);
+			g_status = SYNTAX_ERROR;
 			return (SYNTAX_ERROR);
 		}
 		else if (ft_ispipeopen(*validbuffer) == TRUE)
 		{
-			buffer = *validbuffer;
-			code = get_pipebuffer(buffer, validbuffer);
-			free(buffer);
-			if (code == EXTRA_ERROR || code == SYNTAX_ERROR)
+			code = replace_pipebuffer(buffer, validbuffer);
+			if (code == SYNTAX_ERROR)
+				g_status = SYNTAX_ERROR;
+			if (code != EXIT_SUCCESS)
 				return (code);
 		}
 		else
@@ -41,18 +41,17 @@ int	get_validbuffer(char *buffer, char **validbuffer)
 	return (EXIT_SUCCESS);
 }
 
-int	get_pipebuffer(char *buffer, char **dstbuffer)
+int	replace_pipebuffer(char *buffer, char **dstbuffer)
 {
 	char	*srcbuffer;
 
 	if (set_next_cmd(&srcbuffer))
 	{
 		*dstbuffer = NULL;
-		g_status = handle_error(NULL, NULL, SYN_TERM);
-		return (g_status);
+		return (handle_error(NULL, NULL, SYN_TERM));
 	}
 	else
-		*dstbuffer = ft_strjoin(buffer, srcbuffer);
+		*dstbuffer = strjoin_free(buffer, srcbuffer);
 	if (!*dstbuffer)
 		return (EXTRA_ERROR);
 	return (EXIT_SUCCESS);
