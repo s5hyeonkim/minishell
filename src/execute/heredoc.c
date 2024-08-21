@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 16:38:27 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/19 16:39:47 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/21 17:17:13 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,6 @@ int	heredoc_process(char *link, char *limiter)
 	return (status);
 }
 
-//
 int	here_doc(char *link, char *limiter)
 {
 	t_process	p;
@@ -84,9 +83,6 @@ int	here_doc(char *link, char *limiter)
 	return (status);
 }
 
-// 쓰는것
-// free 및 close 함수에 unlink 추가 필요
-//close_fd print_error 뒤에
 int	set_filedoc(t_process *p)
 {
 	char	*itoa;

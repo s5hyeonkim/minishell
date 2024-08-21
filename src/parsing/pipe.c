@@ -6,11 +6,11 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 19:54:15 by yubin             #+#    #+#             */
-/*   Updated: 2024/08/21 13:11:42 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/21 14:01:10 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../minishell.h"
+#include "parsing.h"
 
 int	ft_ispipeopen(char *buffer);
 int	count_pipe(char *buffer);

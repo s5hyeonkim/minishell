@@ -6,7 +6,7 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 17:08:15 by yubshin           #+#    #+#             */
-/*   Updated: 2024/08/21 11:51:54 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/21 14:18:15 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,11 @@
 # define LESS '>'
 # define GREAT '<'
 # define DOLLAR '$'
-# define SIGTERM_NULL 0
+# define SPACE ' '
 
 # include "../execute/deque/deque.h"
+
+volatile long	g_status;
 
 typedef enum e_typeno
 {

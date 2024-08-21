@@ -6,11 +6,11 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 20:34:43 by yubin             #+#    #+#             */
-/*   Updated: 2024/08/20 16:40:47 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/21 14:01:18 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../minishell.h"
+#include "parsing.h"
 
 int	ft_iskeyend(char chr);
 

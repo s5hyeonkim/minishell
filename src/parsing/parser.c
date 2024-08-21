@@ -6,11 +6,11 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 14:31:30 by yubshin           #+#    #+#             */
-/*   Updated: 2024/08/21 10:41:53 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/21 17:17:04 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../minishell.h"
+#include "parsing.h"
 
 int		syntax_pipeline(t_token **dsttoken, t_token *nowtoken);
 int		syntax_simple_cmd(t_token **dsttoken, t_token *nowtoken);
@@ -60,7 +60,6 @@ int	syntax_pipeline(t_token **dsttoken, t_token *nowtoken)
 	return (EXIT_SUCCESS);
 }
 
-//left
 int	syntax_simple_cmd(t_token **dsttoken, t_token *nowtoken)
 {
 	t_token	*newtoken;

@@ -6,11 +6,11 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 14:24:38 by yubshin           #+#    #+#             */
-/*   Updated: 2024/08/21 11:40:48 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/21 14:01:16 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../minishell.h"
+#include "parsing.h"
 
 char	*replace_value(t_deques *envps, char *str);
 char	*replace_quote(char *str);

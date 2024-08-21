@@ -6,7 +6,7 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/11 11:35:18 by yubshin           #+#    #+#             */
-/*   Updated: 2024/08/19 16:42:05 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/21 17:18:09 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,8 +87,5 @@ t_list		*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
 
 int			ft_malloc_str(char **str, long long malloc_size);
 void		ft_swap(int *a, int *b);
-
-void		free_str(char *str);
-// void	free_strs(char **strs);
 
 #endif 

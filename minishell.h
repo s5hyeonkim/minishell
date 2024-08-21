@@ -6,14 +6,13 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 07:22:42 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/14 11:22:27 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/21 17:17:50 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-//허용함수 헤더
 # include <stdio.h>
 # include <readline/readline.h>
 # include <readline/history.h>
@@ -29,11 +28,9 @@
 
 # include "libft/libft.h"
 # include "ft_err.h"
-# include "./execute/deque/deque.h"
-# include "./execute/execute.h"
-# include "./src/parsing.h"
-# define WAIT_TIMEOUT 258
-// # define PROMPT_MSG "minishell$ "
+# include "./src/execute/deque/deque.h"
+# include "./src/execute/execute.h"
+# include "./src/parsing/parsing.h"
 # define PROMPT_MSG "\033[36mminishell ❯\033[0m "
 
 typedef struct sigaction	t_sigaction;
@@ -78,7 +75,7 @@ void		get_terminal(t_shell *shell);
 void		reset_terminal(t_shell *shell);
 
 /* parsing.c */
-int			parselines(t_shell *shell, char *buffer);
+int			parselines(t_token **token, t_deques *envps, char *buffer);
 
 /*validation.c*/
 void		check_valid(t_shell *shell, int argc);

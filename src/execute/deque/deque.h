@@ -6,14 +6,14 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 19:33:19 by sohykim           #+#    #+#             */
-/*   Updated: 2024/07/29 15:49:48 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/21 13:57:30 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef DEQUE_H
 # define DEQUE_H
-# include "../../libft/libft.h"
-# include "../../ft_err.h"
+# include "../../../libft/libft.h"
+# include "../../../ft_err.h"
 
 typedef enum e_state
 {

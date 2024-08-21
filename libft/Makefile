@@ -22,7 +22,6 @@ SRCS_MB = ft_isalpha.c ft_isdigit.c ft_isalnum.c ft_isascii.c ft_isprint.c ft_is
 		get_next_line.c get_next_line_utils.c \
 		ft_malloc_str.c \
 		ft_swap.c \
-		ft_free_utils.c \
 
 OBJS_MB = ${SRCS_MB:.c=.o}
 

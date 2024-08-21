@@ -6,13 +6,12 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 19:31:56 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/14 19:19:27 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/21 17:17:10 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../execute.h"
 
-// 숫자 아닐때 에러 출력하며 그냥 exit (default = 255)
 static char	*swap_str(char *s1)
 {
 	int		end;

@@ -1,13 +1,15 @@
 CC = cc
 CFLAGS = -Wall -Wextra -Werror -g
 CPPFLAGS = -I${HOME}/.brew/opt/readline/include -Iminishell.h -Ift_err.h -I./execute/execute.h -I./src/parsing.h -I./utils/terminal.h -MMD -MP
-LDFLAGS = -L${HOME}/.brew/opt/readline/lib -Llibft -Lexecute/deque
+LDFLAGS = -L${HOME}/.brew/opt/readline/lib -Llibft -L$(DEQDIR)
 LDLIBS = -lreadline -lft -lftdeque
-BUILTINDIR = ./execute/builtin/
-EXECDIR = ./execute/
+BUILTINDIR = ./src/execute/builtin/
+EXECDIR = ./src/execute/
+PARSEDIR = ./src/parsing/
 SRCDIR = ./src/
 OBJDIR = ./obj/
 UTILSDIR = ./utils/
+DEQDIR = ./src/execute/deque
 SRCS = ./main.c \
 		./execute.c \
 		./free.c \
@@ -32,22 +34,21 @@ SRCS = ./main.c \
 		$(BUILTINDIR)pwd.c \
 		$(BUILTINDIR)unset.c \
 		$(BUILTINDIR)builtin.c \
-		$(SRCDIR)parsing.c \
-		$(SRCDIR)get_buffer.c \
-		$(SRCDIR)next_cmd.c \
-		$(SRCDIR)pipe.c \
-		$(SRCDIR)redirect.c \
-		$(SRCDIR)argv.c \
-		$(SRCDIR)wordend.c \
-		$(SRCDIR)wordlen.c \
-		$(SRCDIR)tokenizer.c \
-		$(SRCDIR)token_utils.c \
-		$(SRCDIR)token_lst.c \
-		$(SRCDIR)parser.c \
-		$(SRCDIR)replace_value_quote.c \
-		$(SRCDIR)replace_value_utils.c \
-		$(SRCDIR)resword.c \
-		$(SRCDIR)utils.c \
+		$(PARSEDIR)parsing.c \
+		$(PARSEDIR)get_buffer.c \
+		$(PARSEDIR)pipe.c \
+		$(PARSEDIR)redirect.c \
+		$(PARSEDIR)argv.c \
+		$(PARSEDIR)wordend.c \
+		$(PARSEDIR)wordlen.c \
+		$(PARSEDIR)tokenizer.c \
+		$(PARSEDIR)token_utils.c \
+		$(PARSEDIR)token_lst.c \
+		$(PARSEDIR)parser.c \
+		$(PARSEDIR)replace_value_quote.c \
+		$(PARSEDIR)replace_value_utils.c \
+		$(PARSEDIR)resword.c \
+		$(PARSEDIR)utils.c \
 		$(EXECDIR)heredoc.c \
 		$(EXECDIR)heredoc_signal.c \
 		$(EXECDIR)execute.c \
@@ -56,6 +57,7 @@ SRCS = ./main.c \
 		$(EXECDIR)redirect.c \
 		$(EXECDIR)redirect_utils.c \
 		$(EXECDIR)free.c \
+		$(EXECDIR)next_cmd.c \
 
 OBJS = $(SRCS:.c=.o)
 DEPS = $(SRCS:.c=.d)
@@ -67,7 +69,7 @@ all : $(NAME)
 
 $(NAME) : $(OBJS)
 	make -C libft
-	make -C execute/deque
+	make -C $(DEQDIR)
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) $^ -o $@
 
 
@@ -85,12 +87,12 @@ $(UTILSDIR)%.o : $(UTILSDIR)%.c
 
 clean :
 	make clean -C libft
-	make clean -C execute/deque
+	make clean -C $(DEQDIR)
 	rm -f $(OBJS) $(DEPS)
 
 fclean :
 	make fclean -C libft
-	make fclean -C execute/deque
+	make fclean -C $(DEQDIR)
 	rm -f $(OBJS) $(DEPS) $(NAME)
 
 re : fclean

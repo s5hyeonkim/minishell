@@ -3,12 +3,13 @@
 /*                                                        :::      ::::::::   */
 /*   cmdline.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 07:42:29 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/19 15:52:26 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/21 17:19:39 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "execute.h"
 
 char	*get_pathcmd(char **paths, char *cmd)
@@ -37,8 +38,6 @@ char	*get_cmdpath(char **paths, char *cmd)
 		ret = get_pathcmd(paths, cmd);
 	return (ret);
 }
-
-// argv 파싱할때 가공하는거에서 quotation 없으면 가공안하는 걸로 바꿔주기
 
 char	**get_cmdargs(char **cmds)
 {

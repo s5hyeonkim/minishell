@@ -6,11 +6,11 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 22:36:14 by yubin             #+#    #+#             */
-/*   Updated: 2024/08/21 12:57:01 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/21 14:05:06 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../minishell.h"
+#include "parsing.h"
 
 int	init_argvs(char ***argvs, char *words);
 int	count_argv(char *words);

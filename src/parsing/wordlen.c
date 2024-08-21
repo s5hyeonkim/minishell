@@ -6,11 +6,11 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 20:18:29 by yubin             #+#    #+#             */
-/*   Updated: 2024/08/20 16:37:41 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/21 14:01:34 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../minishell.h"
+#include "parsing.h"
 
 int	wordlen(char *str)
 {

@@ -6,11 +6,11 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 16:37:16 by yubshin           #+#    #+#             */
-/*   Updated: 2024/08/21 13:10:07 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/21 14:01:37 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../minishell.h"
+#include "parsing.h"
 
 char	*find_quotend(char *str);
 int		ft_iswordhead(char chr);

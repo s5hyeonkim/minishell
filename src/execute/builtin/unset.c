@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   unset.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 19:32:13 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/14 19:19:41 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/21 17:16:46 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ int	unset_wt_argv(t_process p, t_data *d)
 {
 	int		index;
 	int		status;
-	char	*key;
 
 	index = 1;
 	status = EXIT_SUCCESS;
@@ -40,13 +39,7 @@ int	unset_wt_argv(t_process p, t_data *d)
 		if (!is_valid_name(p.args[index]))
 			status = handle_error(p.args[0], p.args[index], INVALID_IDF);
 		else
-		{
-			key = get_key(p.args[index]);
-			if (!key)
-				return (handle_error(p.args[0], NULL, EXTRA_ERROR));
-			remove_targetdeq(d->envps, find_deq(d->envps, key));
-			free(key);
-		}
+			remove_targetdeq(d->envps, find_deq(d->envps, p.args[index]));
 		index++;
 	}
 	return (status);

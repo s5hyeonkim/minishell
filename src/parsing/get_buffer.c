@@ -6,19 +6,21 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 19:47:20 by yubin             #+#    #+#             */
-/*   Updated: 2024/08/21 13:12:09 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/21 17:19:10 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../minishell.h"
+#include "parsing.h"
 
-int	replace_pipebuffer(char *buffer, char **dstbuffer);
+int	replace_pipebuffer(char **dstbuffer);
 
 int	get_validbuffer(char *buffer, char **validbuffer)
 {
 	int		code;
 
 	*validbuffer = ft_strdup(buffer);
+	if (!*validbuffer)
+		return (EXTRA_ERROR);
 	while (1)
 	{
 		if (handle_empty_pipe(*validbuffer) == SYNTAX_ERROR \
@@ -29,7 +31,7 @@ int	get_validbuffer(char *buffer, char **validbuffer)
 		}
 		else if (ft_ispipeopen(*validbuffer) == TRUE)
 		{
-			code = replace_pipebuffer(buffer, validbuffer);
+			code = replace_pipebuffer(validbuffer);
 			if (code == SYNTAX_ERROR)
 				g_status = SYNTAX_ERROR;
 			if (code != EXIT_SUCCESS)
@@ -41,7 +43,7 @@ int	get_validbuffer(char *buffer, char **validbuffer)
 	return (EXIT_SUCCESS);
 }
 
-int	replace_pipebuffer(char *buffer, char **dstbuffer)
+int	replace_pipebuffer(char **dstbuffer)
 {
 	char	*srcbuffer;
 
@@ -51,7 +53,7 @@ int	replace_pipebuffer(char *buffer, char **dstbuffer)
 		return (handle_error(NULL, NULL, SYN_TERM));
 	}
 	else
-		*dstbuffer = strjoin_free(buffer, srcbuffer);
+		*dstbuffer = strjoin_free(*dstbuffer, srcbuffer);
 	if (!*dstbuffer)
 		return (EXTRA_ERROR);
 	return (EXIT_SUCCESS);

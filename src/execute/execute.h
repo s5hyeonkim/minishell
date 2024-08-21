@@ -3,12 +3,13 @@
 /*                                                        :::      ::::::::   */
 /*   execute.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 19:49:06 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/14 18:47:15 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/21 17:17:32 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #ifndef EXECUTE_H
 # define EXECUTE_H
 # include <sys/types.h>
@@ -24,18 +25,16 @@
 # include <dirent.h>
 # include <string.h>
 # include <curses.h>
-# include "../utils/ft_signal.h"
-# include "../src/parsing.h"
-# include "../utils/terminal.h"
+# include "../../utils/ft_signal.h"
+# include "../parsing/parsing.h"
+# include "../../utils/terminal.h"
 # include "deque/deque.h"
-# include "../ft_err.h"
-# include "../utils/utils.h"
+# include "../../ft_err.h"
+# include "../../utils/utils.h"
 
 // getconf ARG_MAX
 # define ARG_MAX 262144
 # define PATH_MAX 1024
-
-volatile long	g_status;
 
 typedef enum e_builtno
 {
@@ -81,7 +80,6 @@ int			set_env_pwd(t_deques *deqs, char *key, char *val);
 void		parsing_dir(char *wd, char *now, size_t len);
 int			set_cwd(char **cwd);
 
-// builtin function
 /*cd.c*/
 int			ft_cd(t_process p, t_data *d);
 /*echo.c*/
@@ -138,7 +136,7 @@ int			is_redirect(int type);
 void		dup_fd(int *fd, int std);
 void		close_fd(int *num);
 
-// redirect.c
+/*redirect.c*/
 int			open_redirect(int redirect, char *word, char *link);
 int			find_redirect(t_process *p, t_token *t);
 int			open_token(t_token *t, t_process *p);

@@ -6,11 +6,11 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 13:30:41 by yubin             #+#    #+#             */
-/*   Updated: 2024/08/21 13:06:51 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/21 14:01:32 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../minishell.h"
+#include "parsing.h"
 
 int	strchrlen(char *str, int chr)
 {

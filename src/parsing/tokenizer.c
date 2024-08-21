@@ -6,11 +6,11 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 21:47:20 by yubin             #+#    #+#             */
-/*   Updated: 2024/08/21 11:48:14 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/21 14:01:29 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../minishell.h"
+#include "parsing.h"
 
 int	token_pipe(t_token **token);
 int	token_redirect(t_token **token, t_deques *envps, char *buffer);

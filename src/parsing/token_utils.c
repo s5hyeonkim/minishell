@@ -6,11 +6,11 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 10:44:45 by yubshin           #+#    #+#             */
-/*   Updated: 2024/08/20 16:52:28 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/21 14:01:25 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../minishell.h"
+#include "parsing.h"
 
 int	set_token(t_token **t)
 {

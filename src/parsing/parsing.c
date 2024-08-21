@@ -6,28 +6,30 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 16:39:43 by yubshin           #+#    #+#             */
-/*   Updated: 2024/08/21 13:12:42 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/21 14:11:02 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../minishell.h"
+#include "parsing.h"
 
 int	lexer(t_token **token, t_deques *envps, char *buffer);
 
-int	parselines(t_shell *shell, char *buffer)
+int	parselines(t_token **token, t_deques *envps, char *buffer)
 {
 	char	*validbuffer;
 	int		code;
 
 	code = get_validbuffer(buffer, &validbuffer);
-	free(buffer);
 	if (code == EXIT_SUCCESS)
-		code = lexer(&(shell->t), shell->data.envps, validbuffer);
+		code = lexer(token, envps, validbuffer);
 	free(validbuffer);
 	if (code == EXIT_SUCCESS)
-		code = parser(&shell->t);
-	if (code == SYNTAX_ERROR)
+		code = parser(token);
+	if (code == EXTRA_ERROR)
+	{
+		g_status = handle_error(NULL, NULL, EXTRA_ERROR);
 		return (EXIT_FAILURE);
+	}
 	return (code);
 }
 

@@ -2,9 +2,9 @@ CC = cc
 CFLAGS = -Wall -Wextra -Werror
 AR = ar
 ARFLAGS = rsc
-SRC_DIR = ../../libft
+SRC_DIR = ../../../libft
 CPPFLAGS = -Ideque.h
-LDFLAGS = -L../../libft
+LDFLAGS = -L../../../libft
 LDLIBS = -lft
 SRCS = utils.c \
 	   deque.c \
@@ -21,18 +21,18 @@ NAME = libftdeque.a
 all : $(NAME)
 
 $(NAME) : $(OBJS)
-	make -C ../../libft
+	make -C ../../../libft
 	$(AR) $(ARFLAGS) $@ $^
 
 %.o : %.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $?
 
 clean:
-	make clean -C ../../libft
+	make clean -C ../../../libft
 	rm -f $(OBJS)
 
 fclean: clean
-	rm -f ../../libft/libft.a
+	rm -f ../../../libft/libft.a
 	rm -f $(NAME)
 
 re: fclean

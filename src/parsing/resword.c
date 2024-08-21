@@ -6,11 +6,11 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 14:36:17 by yubshin           #+#    #+#             */
-/*   Updated: 2024/08/21 10:12:40 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/21 14:01:20 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../minishell.h"
+#include "parsing.h"
 
 int	ft_isresword(char chr)
 {

@@ -6,7 +6,7 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 16:43:13 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/21 13:15:12 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/21 14:32:32 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,10 +44,9 @@ void	loop(t_shell *shell)
 	{
 		clean_buffer(shell);
 		readlines(shell, &buffer);
-		code = parselines(shell, buffer);
-		if (code)
-			handle_error(NULL, NULL, code);
-		else
+		code = parselines(&(shell->t), shell->data.envps, buffer);
+		free(buffer);
+		if (!code)
 			exec_cmds(shell);
 		rl_replace_line("", 0);
 	}
