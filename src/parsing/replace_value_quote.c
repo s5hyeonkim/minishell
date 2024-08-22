@@ -6,7 +6,7 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 14:24:38 by yubshin           #+#    #+#             */
-/*   Updated: 2024/08/21 14:01:16 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/22 11:56:00 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,9 @@ char	*replace_value(t_deques *envps, char *str)
 	char	*dst;
 	int		len;
 
-	headstr = str;
+	if (*str == SGL_QUOTE && is_closed_quotation(str))
+		return (str);
+	headstr = str; 
 	dst = ft_calloc(1, sizeof(char));
 	while (*str)
 	{
