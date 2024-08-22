@@ -85,7 +85,7 @@ int	export_wt_argv(t_process p, t_data *d)
 			status = handle_error(p.args[0], p.args[index], INVALID_IDF);
 		else if (set_map(&keyval, p.args[index]))
 			status = handle_error(p.args[0], NULL, EXTRA_ERROR);
-		else if (!keyval.val[0] && find_deq(d->envps, keyval.key))
+		else if (!keyval.mid && find_deq(d->envps, keyval.key))
 			free_map(&keyval);
 		else if (replace_back(d->envps, keyval.key, keyval.mid, keyval.val))
 			status = handle_error(p.args[0], NULL, EXTRA_ERROR);

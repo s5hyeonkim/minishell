@@ -15,11 +15,14 @@ static void	wait_process(t_shell *shell)
 {
 	size_t	index;
 	int		status;
+	int		ret;
 
 	index = 0;
 	while (index < shell->p_size && shell->p[index].pid)
 	{
-		waitpid(shell->p[index].pid, &status, 0);
+		ret = waitpid(shell->p[index].pid, &status, 0);
+		if (ret == -1)
+			continue ;
 		if (!WIFSIGNALED(status) && WIFEXITED(status))
 			g_status = WEXITSTATUS(status);
 		index++;
@@ -54,10 +57,12 @@ static void	inprocess(t_shell *shell)
 
 	set_rwfd(shell->p);
 	status = exec_builtin(shell->p[0], &shell->data);
-	if (!ft_memcmp(shell->p[0].args[0], "exit", 5) && !status)
+	clean_files(shell->p, shell->p_size);
+	if (!ft_memcmp(shell->p[0].args[0], "exit", 5))
 	{
-		clean_files(shell->p, shell->p_size);
-		exit_wo_error(shell, g_status);
+		ft_putstr_fd("exit\n", STDERR_FILENO);
+		if (!status)
+			exit_wo_error(shell, g_status);
 	}
 	g_status = status;
 }

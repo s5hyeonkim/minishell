@@ -14,7 +14,14 @@
 
 static int	is_no_nl(char *str)
 {
-	if (str && !ft_memcmp(str, "-n", 3))
+	int	index;
+
+	index = 2;
+	if (!str || ft_memcmp(str, "-n", 2))
+		return (FALSE);
+	while (str[index] == 'n')
+		index++;
+	if (!str[index])
 		return (TRUE);
 	return (FALSE);
 }

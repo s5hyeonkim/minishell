@@ -94,7 +94,6 @@ int	ft_exit(t_process p, t_data *d)
 
 	(void) d;
 	index = 1;
-	ft_putstr_fd("exit\n", STDERR_FILENO);
 	if (p.args[index] && !ft_memcmp(p.args[index], "--", 3))
 		index++;
 	if (p.args[index])
