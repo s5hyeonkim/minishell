@@ -6,7 +6,7 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 22:36:14 by yubin             #+#    #+#             */
-/*   Updated: 2024/08/26 13:10:16 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/26 13:46:45 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,13 +35,12 @@ int	get_words(char **words, char *str)
 	return (EXIT_SUCCESS);
 }
 
-int	get_word(t_deques *envps, char **word, char *words)
+int	get_word(char **word, char *words)
 {
 	int		len;
 
-	(void) envps;
 	words = wordlen_word(words, &len);
-	*word = substrjoin_free(*word, words, len);
+	*word = ft_substr(words, 0, len);
 	if (*word == NULL)
 		return (EXTRA_ERROR);	
 	*word = replace_quote(*word);
@@ -50,13 +49,12 @@ int	get_word(t_deques *envps, char **word, char *words)
 	return (EXIT_SUCCESS);
 }
 
-int	get_argvs(t_deques *envps, char ***argvs, char *words)
+int	get_argvs(char ***argvs, char *words)
 {
 	char	*argv;
 	int		len;
 	int		index;
 
-	(void) envps;
 	if (init_argvs(argvs, words) == EXTRA_ERROR)
 		return (EXTRA_ERROR);
 	index = 0;
