@@ -14,10 +14,20 @@
 int	set_env_paths(t_data *d)
 {
 	char	**envp;
+	char	*val;
 
 	free_strs(d->paths);
 	d->paths = NULL;
 	envp = deqtostrs(d->envps->head);
+	if (envp && !find_deq(d->envps, "PATH"))
+	{
+		val = getenv("PATH");
+		if (!val || replace_back(d->envps, "PATH", val, SET))
+		{
+			free(val);
+			return (EXTRA_ERROR);
+		}
+	}
 	if (envp)
 		d->paths = get_env_paths(envp);
 	free_strs(envp);
@@ -36,7 +46,7 @@ static void	set_depth(t_shell *shell)
 		itoa = ft_strdup("");
 	else
 		itoa = ft_itoa(depth);
-	if (!itoa || replace_back(shell->data.envps, "SHLVL", '=', itoa))
+	if (!itoa || replace_back(shell->data.envps, "SHLVL", itoa, ENV))
 	{
 		free(itoa);
 		exit_process(shell, NULL, EXTRA_ERROR);
@@ -49,8 +59,8 @@ static void	set_pwd_path(t_shell *shell)
 	char	*cwd;
 
 	cwd = ft_strdup(shell->data.lcwd);
-	if (!cwd || replace_back(shell->data.envps, "OLDPWD", 0, "") || \
-	replace_back(shell->data.envps, "PWD", '=', cwd))
+	if (!cwd || replace_back(shell->data.envps, "OLDPWD", "", EXPORT) || \
+	replace_back(shell->data.envps, "PWD", cwd, ENV))
 	{
 		free(cwd);
 		exit_process(shell, NULL, EXTRA_ERROR);

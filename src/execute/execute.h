@@ -47,17 +47,33 @@ typedef enum e_builtno
 	_EXIT
 }	t_builtno;
 
-typedef struct s_process
+typedef struct s_fd
 {
-	pid_t	pid;
+	int		in[2];
+	int		pipe[2];
+	int		redirect[2];
+}	t_fd;
+
+typedef struct s_exec
+{
 	char	*path;
 	char	**args;
+}	t_exec;
+
+typedef struct s_sys
+{
 	char	*link;
-	size_t	index;
 	int		flag;
-	int		fd[2];
-	int		pipe_fd[2];
-	int		redirect_fd[2];
+}	t_sys;
+
+typedef struct s_process
+{
+	size_t	index;
+	pid_t	pid;
+	t_exec	exec;
+	t_fd	fd;
+	t_sys	file;
+	t_token	t;
 }	t_process;
 
 typedef struct s_data
@@ -76,12 +92,16 @@ int			exec_builtin(t_process p, t_data *d);
 
 /*cd_utils.c*/
 int			check_folder(char *to_dir);
-int			set_env_pwd(t_deques *deqs, char *key, char *val);
+int	        set_env_pwd(t_deques *deqs, char **lcwd, char **lnwd);
 void		parsing_dir(char *wd, char *now, size_t len);
 int			set_cwd(char **cwd);
 
 /*cd.c*/
 int			ft_cd(t_process p, t_data *d);
+/*cd_utils.c*/
+char		*get_nextdir(char *path, char *cwd);
+int			is_valid_folder(char *wd, char *now, char *next);
+
 /*echo.c*/
 int			ft_echo(t_process p, t_data *d);
 /*env.c*/
@@ -90,6 +110,10 @@ int			ft_env(t_process p, t_data *d);
 int			ft_exit(t_process p, t_data *d);
 /*export.c*/
 int			ft_export(t_process p, t_data *d);
+
+/* export_utils.c*/
+int 		add_val(t_deques *envps, t_map *keyval, char *str);
+
 /*pwd.c*/
 int			ft_pwd(t_process p, t_data *d);
 /*unset.c*/
@@ -100,6 +124,8 @@ void		set_fd_builtin(t_process *p);
 void		ft_sort(char **strs, int (*guide)(char *, char *));
 int			is_valid_opt(char	*opt);
 void		set_rwfd(t_process *p);
+int			is_folder(char	*to_dir);
+int	        is_file(char *to_dir);
 
 /*cmdline_utils.c*/
 int			is_valid_quotation(size_t *start, int *open1, int open2);
@@ -128,7 +154,7 @@ void		handler_heredoc_wait(int signo);
 
 /*heredoc.c*/
 int			set_filedoc(t_process *p);
-int			here_doc(char *link, char *limiter);
+int			here_doc(char *link, char *limiter, t_deques *envps);
 
 /*redirect_utils.c*/
 void		set_fd_builtin(t_process *p);
@@ -140,5 +166,6 @@ void		close_fd(int *num);
 int			open_redirect(int redirect, char *word, char *link);
 int			find_redirect(t_process *p, t_token *t);
 int			open_token(t_token *t, t_process *p);
+int			set_redirect(t_process *p, t_deques *deqs);
 
 #endif

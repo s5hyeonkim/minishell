@@ -35,6 +35,8 @@ const char	*err_to_msg(int *code)
 		return (MSG_SET);
 	if (err == NOT_NUM)
 		return (MSG_NUM);
+	if (err == E_ISDIR)
+		return (strerror(EISDIR));
 	if (err == EXTRA_ERROR)
 		return (strerror(errno));
 	return ("");

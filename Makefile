@@ -31,6 +31,7 @@ SRCS = ./main.c \
 		$(BUILTINDIR)execute.c \
 		$(BUILTINDIR)exit.c \
 		$(BUILTINDIR)export.c \
+		$(BUILTINDIR)export_utils.c \
 		$(BUILTINDIR)pwd.c \
 		$(BUILTINDIR)unset.c \
 		$(BUILTINDIR)builtin.c \

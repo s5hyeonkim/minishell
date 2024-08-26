@@ -43,7 +43,8 @@ void	free_deque(t_deque *deque)
 	while (deque)
 	{
 		next = deque->next;
-		free_map(&deque->keyval);
+		free_map(deque->data);
+		free(deque->data);
 		free(deque);
 		deque = next;
 	}

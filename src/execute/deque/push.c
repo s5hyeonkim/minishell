@@ -13,11 +13,18 @@
 
 static int	set_deque(t_deque **deq, t_map keyval)
 {
+	t_map	*new;
+
 	*deq = create_deque();
-	if (*deq == NULL)
+	new = create_keyval();
+	if (*deq == NULL || !new)
+	{
+		free(new);
 		return (EXTRA_ERROR);
-	ft_memcpy(&((*deq)->keyval), &keyval, sizeof(t_map));
-	set_state(*deq);
+	}
+
+	ft_memcpy(new, &keyval, sizeof(t_map));
+	(*deq)->data = new;
 	return (EXIT_SUCCESS);
 }
 
@@ -27,7 +34,6 @@ int	push_back(t_deques *deques, t_map keyval)
 
 	if (set_deque(&new_deque, keyval))
 	{
-		free_map(&keyval);
 		free_deque(new_deque);
 		return (EXTRA_ERROR);
 	}
@@ -48,11 +54,11 @@ int	push_back(t_deques *deques, t_map keyval)
 	return (EXIT_SUCCESS);
 }
 
-int	push_keyval(t_deques *deqs, char *key, char mid, char *val)
+int	push_keyval(t_deques *deqs, char *key, char *val, t_state state)
 {
 	t_map	keyval;
 
-	if (set_keyval(&keyval, key, mid, val) || push_back(deqs, keyval))
+	if (set_keyval(&keyval, key, val, state) || push_back(deqs, keyval))
 	{
 		free_map(&keyval);
 		return (EXTRA_ERROR);
@@ -60,9 +66,9 @@ int	push_keyval(t_deques *deqs, char *key, char mid, char *val)
 	return (EXIT_SUCCESS);
 }
 
-int	replace_back(t_deques *deqs, char *key, char mid, char *val)
+int	replace_back(t_deques *deqs, char *key, char *val, t_state state)
 {
 	if (find_deq(deqs, key))
 		remove_targetdeq(deqs, find_deq(deqs, key));
-	return (push_keyval(deqs, key, mid, val));
+	return (push_keyval(deqs, key, val, state));
 }

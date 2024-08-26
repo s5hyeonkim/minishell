@@ -94,18 +94,18 @@ int	ft_exit(t_process p, t_data *d)
 
 	(void) d;
 	index = 1;
-	if (p.args[index] && !ft_memcmp(p.args[index], "--", 3))
+	if (p.exec.args[index] && !ft_memcmp(p.exec.args[index], "--", 3))
 		index++;
-	if (p.args[index])
+	if (p.exec.args[index])
 	{
-		g_status = ft_atol(p.args[index]);
-		if (!is_equal(g_status, p.args[index]))
+		g_status = ft_atol(p.exec.args[index]);
+		if (!is_equal(g_status, p.exec.args[index]))
 		{
 			g_status = 255;
-			handle_error(p.args[0], p.args[index], NOT_NUM);
+			handle_error(p.exec.args[0], p.exec.args[index], NOT_NUM);
 			return (EXIT_SUCCESS);
 		}
-		else if (p.args[index + 1])
+		else if (p.exec.args[index + 1])
 		{
 			g_status = EXIT_FAILURE;
 			write(STDERR_FILENO, "minishell: exit: too many arguments\n", 36);

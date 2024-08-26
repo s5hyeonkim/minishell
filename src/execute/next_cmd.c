@@ -52,7 +52,7 @@ int	wait_reading(t_process p, char **s)
 	ssize_t	byte;
 
 	set_signal_init(handler_pipe_wait);
-	byte = read(p.pipe_fd[0], buffer, sizeof(buffer) - 1);
+	byte = read(p.fd.pipe[0], buffer, sizeof(buffer) - 1);
 	if (byte > 0)
 	{
 		buffer[byte] = 0;
@@ -70,16 +70,16 @@ int	set_next_cmd(char **s)
 {
 	t_process	p;
 
-	if (pipe(p.pipe_fd) == -1 || fork_process(&p))
+	if (pipe(p.fd.pipe) == -1 || fork_process(&p))
 		return (EXTRA_ERROR);
 	if (!p.pid)
 	{
-		close(p.pipe_fd[0]);
-		exit(read_next_cmd(p.pipe_fd[1]));
+		close(p.fd.pipe[0]);
+		exit(read_next_cmd(p.fd.pipe[1]));
 	}
 	else
 	{
-		close(p.pipe_fd[1]);
+		close(p.fd.pipe[1]);
 		return (wait_reading(p, s));
 	}
 }

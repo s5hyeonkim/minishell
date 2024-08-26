@@ -58,7 +58,7 @@ static void	inprocess(t_shell *shell)
 	set_rwfd(shell->p);
 	status = exec_builtin(shell->p[0], &shell->data);
 	clean_files(shell->p, shell->p_size);
-	if (!ft_memcmp(shell->p[0].args[0], "exit", 5))
+	if (!ft_memcmp(shell->p[0].exec.args[0], "exit", 5))
 	{
 		ft_putstr_fd("exit\n", STDERR_FILENO);
 		if (!status)
@@ -67,45 +67,51 @@ static void	inprocess(t_shell *shell)
 	g_status = status;
 }
 
-static int	token_to_process(t_shell *shell, t_token *t, size_t *index)
+static void	token_to_process(t_shell *shell, t_token *t, size_t *index)
 {
-	int	status;
-
-	status = EXIT_SUCCESS;
 	if (t->type == T_SIMPLE_CMD)
 	{
-		if (set_args(&shell->p[*index], shell->data, t->right))
-			return (EXTRA_ERROR);
-		status = find_redirect(&shell->p[*index], t->left);
 		shell->p[*index].index = *index;
+		shell->p[*index].t = *t;
 		*index += 1;
-		return (status);
+		return ;
 	}
 	if (t->left)
-		status = token_to_process(shell, t->left, index);
-	if (!status && t->right)
-		status = token_to_process(shell, t->right, index);
-	return (status);
+		token_to_process(shell, t->left, index);
+	if (t->right)
+		token_to_process(shell, t->right, index);
+}
+
+int	set_cmd(t_shell *shell)
+{
+	size_t	index;
+
+	index = 0;
+	if (set_env_paths(&shell->data))
+		return (EXTRA_ERROR);
+	while (index < shell->p_size)
+	{
+		if (set_args(&shell->p[index], shell->data))
+			return (EXTRA_ERROR);
+		if (set_redirect(&shell->p[index], shell->data.envps))
+			return (EXTRA_ERROR);
+		index++;
+	}
+	return (EXIT_SUCCESS);
 }
 
 void	exec_cmds(t_shell *shell)
 {
 	size_t	index;
-	int		status;
 
 	index = 0;
 	shell->p_size = find_pipe(shell->t);
 	shell->p = ft_calloc(shell->p_size + 1, sizeof(t_process));
-	status = set_env_paths(&shell->data);
 	if (shell->p)
-		status = token_to_process(shell, shell->t, &index);
-	if (!shell->p || status)
-	{
-		if (status == EXTRA_ERROR)
-			handle_error(NULL, NULL, EXTRA_ERROR);
-		g_status = EXIT_FAILURE;
-	}
-	else if (shell->p_size == 1 && is_builtin(shell->p[0].path))
+		token_to_process(shell, shell->t, &index);
+	if (!shell->p || set_cmd(shell))
+		g_status = handle_error(NULL, NULL, EXTRA_ERROR);
+	else if (shell->p_size == 1 && is_builtin(shell->p[0].exec.path))
 		inprocess(shell);
 	else
 		subprocess(shell);

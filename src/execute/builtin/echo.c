@@ -32,15 +32,15 @@ int	ft_echo(t_process p, t_data *d)
 
 	(void) d;
 	index = 1;
-	if (is_no_nl(p.args[1]))
+	if (is_no_nl(p.exec.args[1]))
 		index++;
-	while (p.args[index])
+	while (p.exec.args[index])
 	{
-		ft_putstr_fd(p.args[index++], p.fd[1]);
-		if (p.args[index])
-			ft_putchar_fd(' ', p.fd[1]);
+		ft_putstr_fd(p.exec.args[index++], p.fd.in[1]);
+		if (p.exec.args[index])
+			ft_putchar_fd(' ', p.fd.in[1]);
 	}
-	if (!is_no_nl(p.args[1]))
-		ft_putchar_fd('\n', p.fd[1]);
+	if (!is_no_nl(p.exec.args[1]))
+		ft_putchar_fd('\n', p.fd.in[1]);
 	return (EXIT_SUCCESS);
 }

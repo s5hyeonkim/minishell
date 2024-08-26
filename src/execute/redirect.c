@@ -30,36 +30,23 @@ int	open_redirect(int redirect, char *word, char *link)
 
 int	open_token(t_token *t, t_process *p)
 {
-	int			*fd;
-	int			status;
-
-	fd = &p->redirect_fd[t->type % 2];
-	if (t->type == T_DGREAT)
-	{
-		p->flag = 1;
-		status = here_doc(p->link, t->word);
-		if (status)
-			return (status);
-	}
-	*fd = open_redirect(t->type, t->word, p->link);
-	if (*fd == -1)
+	p->fd.redirect[t->type % 2] = open_redirect(t->type, t->word, p->file.link);
+	if (p->fd.redirect[t->type % 2] == -1)
 		return (handle_error(NULL, t->word, EXTRA_ERROR));
 	return (EXIT_SUCCESS);
 }
 
 int	find_redirect(t_process *p, t_token *t)
 {
-	int		status;
+	int	status;
 
-	status = 0;
+	status = EXIT_SUCCESS;
 	if (!t)
-		return (EXIT_SUCCESS);
-	if (set_filedoc(p))
-		return (EXTRA_ERROR);
+		return (status);
 	if (is_redirect(t->type))
 	{
-		if (p->redirect_fd[t->type % 2] > 0)
-			close_fd(&p->redirect_fd[t->type % 2]);
+		if (p->fd.redirect[t->type % 2] > 0)
+			close_fd(&p->fd.redirect[t->type % 2]);
 		status = open_token(t, p);
 	}
 	if (!status)
@@ -67,4 +54,40 @@ int	find_redirect(t_process *p, t_token *t)
 	if (!status)
 		status = find_redirect(p, t->right);
 	return (status);
+}
+
+int	set_redirect_in(t_token *t, char *name)
+{
+	free(t->word);
+	t->word = ft_strdup(name);
+	if (!t->word)
+		return (EXTRA_ERROR);
+	t->type = T_GREAT;
+	return (EXIT_SUCCESS);
+}
+
+int	set_heredoc(t_process *p, t_token *t, t_deques *envps)
+{
+	int	status;
+
+	status = EXIT_SUCCESS;
+	if (!t)
+		return (status);
+	if (t->type == T_DGREAT)
+	{
+		if (set_filedoc(p) || set_redirect_in(t, p->file.link))
+			status = EXTRA_ERROR;
+	}
+	if (!status)
+		status = set_heredoc(p, t->left, envps);
+	if (!status)
+		status = set_heredoc(p, t->right, envps);
+	return (status);
+}
+
+int	set_redirect(t_process *p, t_deques *envps)
+{
+	if (set_heredoc(p, p->t.left, envps))
+		return (EXTRA_ERROR);
+	return (find_redirect(p, p->t.left));
 }

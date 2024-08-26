@@ -26,17 +26,13 @@ char	*get_nextdir(char *path, char *cwd)
 		ft_memcpy(wd, cwd, ft_strlen(cwd));
 	else
 		ft_strlcat(wd, "/", PATH_MAX);
-	while (next)
+	while (is_valid_folder(wd, now, next) && next)
 	{
-		if (now != next)
-			parsing_dir(wd, now, next - now);
 		if (check_folder(wd))
-			return (wd);
+			break ;
 		now = next + 1;
 		next = ft_strchr(now, '/');
 	}
-	parsing_dir(wd, now, ft_strlen(now));
-	check_folder(wd);
 	return (wd);
 }
 
@@ -86,21 +82,17 @@ int	ft_cd(t_process p, t_data *d)
 	char		*nwd;
 	int			index;
 	t_deques	*deqs;
-	int			status;
 
 	index = 1;
 	deqs = d->envps;
-	if (!is_valid_opt(p.args[1]))
-		return (handle_error(p.args[0], p.args[1], INVALID_OPT));
-	if (p.args[1] && !ft_memcmp(p.args[1], "--", 3) && p.args[2])
+	if (!is_valid_opt(p.exec.args[1]))
+		return (handle_error(p.exec.args[0], p.exec.args[1], INVALID_OPT));
+	if (p.exec.args[1] && !ft_memcmp(p.exec.args[1], "--", 3) && p.exec.args[2])
 		index++;
-	nwd = navigate_targetdir(*d, p.args[index]);
-	if (!nwd)
+	nwd = navigate_targetdir(*d, p.exec.args[index]);
+	if (!nwd || set_env_pwd(d->envps, &d->lcwd, &nwd))
 		return (EXIT_FAILURE);
-	status = set_env_pwd(deqs, "OLDPWD", d->lcwd);
-	free(d->lcwd);
-	d->lcwd = nwd;
-	if (status || set_env_pwd(deqs, "PWD", d->lcwd))
-		return (handle_error("cd", NULL, EXTRA_ERROR));
+	if (p.exec.args[index] && !ft_memcmp(p.exec.args[index], "-", 2))
+		ft_putendl_fd(d->lcwd, p.fd.in[1]);
 	return (EXIT_SUCCESS);
 }

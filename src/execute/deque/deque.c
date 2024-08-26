@@ -26,3 +26,11 @@ t_deque	*create_deque(void)
 	new_deque = ft_calloc(1, sizeof(t_deque));
 	return (new_deque);
 }
+
+t_map	*create_keyval(void)
+{
+	t_map	*new_map;
+
+	new_map = ft_calloc(1, sizeof(t_map));
+	return (new_map);
+}

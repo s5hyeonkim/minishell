@@ -44,10 +44,10 @@ void	set_fd_builtin(t_process *p)
 
 	fd_in = dup(STDIN_FILENO);
 	fd_out = dup(STDOUT_FILENO);
-	if (p->redirect_fd[0] > 0)
-		dup_fd(&p->redirect_fd[0], fd_in);
-	if (p->redirect_fd[1] > 0)
-		dup_fd(&p->redirect_fd[1], fd_out);
-	p->redirect_fd[0] = fd_in;
-	p->redirect_fd[1] = fd_out;
+	if (p->fd.redirect[0] > 0)
+		dup_fd(&p->fd.redirect[0], fd_in);
+	if (p->fd.redirect[1] > 0)
+		dup_fd(&p->fd.redirect[1], fd_out);
+	p->fd.redirect[0] = fd_in;
+	p->fd.redirect[1] = fd_out;
 }

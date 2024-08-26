@@ -39,6 +39,7 @@ typedef struct s_shell
 	t_token			*t;
 	t_process		*p;
 	size_t			p_size;
+	size_t			h_size;
 	t_data			data;
 	t_termios		term;
 }	t_shell;
@@ -64,7 +65,7 @@ int			set_env_paths(t_data *d);
 void		exec_cmds(t_shell *shell);
 
 /* process_utils.c */
-int			set_args(t_process *p, t_data d, t_token *t);
+int			set_args(t_process *p, t_data d);
 int			open_pipe(t_process *p, size_t size);
 size_t		find_pipe(t_token *t);
 void		set_fd(t_shell *shell, size_t index);
