@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   export_utils.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/08/26 17:23:02 by sohykim           #+#    #+#             */
+/*   Updated: 2024/08/26 17:23:44 by sohykim          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 #include "../execute.h"
 
 static int	is_plusval(char *str)
@@ -13,7 +24,7 @@ static int	is_plusval(char *str)
 static int	is_noreplace(t_deques *envps, t_map keyval)
 {
 	if (!keyval.mid && find_deq(envps, keyval.key))
-		return (TRUE) ;
+		return (TRUE);
 	return (FALSE);
 }
 
@@ -34,7 +45,7 @@ static int	concat_val(t_deques *envps, t_map *keyval)
 	return (EXIT_SUCCESS);
 }
 
-int add_val(t_deques *envps, t_map *keyval, char *str)
+int	add_val(t_deques *envps, t_map *keyval, char *str)
 {
 	if (is_noreplace(envps, *keyval))
 		return (EXIT_SUCCESS);

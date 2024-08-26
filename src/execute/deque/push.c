@@ -6,7 +6,7 @@
 /*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/11 16:50:52 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/14 17:56:07 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/26 17:17:30 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "deque.h"
@@ -22,7 +22,6 @@ static int	set_deque(t_deque **deq, t_map keyval)
 		free(new);
 		return (EXTRA_ERROR);
 	}
-
 	ft_memcpy(new, &keyval, sizeof(t_map));
 	(*deq)->data = new;
 	return (EXIT_SUCCESS);

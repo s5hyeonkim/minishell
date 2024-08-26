@@ -38,21 +38,21 @@ void	exec_program(t_shell *shell, t_process p)
 		exit_subprocess(shell, NULL, EXTRA_ERROR);
 	if (execve(p.exec.path, p.exec.args, envp) == -1)
 	{
+		status = errno;
 		if (!ft_strchr(p.exec.args[0], '/'))
 			exit_subprocess(shell, p.exec.args[0], CMD_NOT_FOUND);
-		status = EXTRA_ERROR;
 		pr = get_nextdir(p.exec.path, shell->data.lcwd);
-		if (pr && is_folder(pr))
-		{
-			free(pr);
-			exit_subprocess(shell, p.exec.args[0], E_ISDIR);
-		}
 		if (pr)
 		{
-			if (!access(pr, X_OK))
-				execve(pr, p.exec.args, envp);
+			if (is_folder(pr))
+				errno = E_ISDIR;
+			else if (access(pr, X_OK))
+				errno = EACCES;
+			else
+				errno = status;
 		}
-		exit_subprocess(shell, p.exec.args[0], status);
+		free(pr);
+		exit_subprocess(shell, p.exec.args[0], EXTRA_ERROR);
 	}
 }
 

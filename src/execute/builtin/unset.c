@@ -6,7 +6,7 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 19:32:13 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/21 17:16:46 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/26 17:22:54 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,10 @@ int	unset_wt_argv(t_process p, t_data *d)
 	while (p.exec.args[index])
 	{
 		if (!is_valid_name(p.exec.args[index]))
-			status = handle_error(p.exec.args[0], p.exec.args[index], INVALID_IDF);
+		{
+			handle_error(p.exec.args[0], p.exec.args[index], INVALID_IDF);
+			status = EXIT_FAILURE;
+		}
 		else
 			remove_targetdeq(d->envps, find_deq(d->envps, p.exec.args[index]));
 		index++;
@@ -47,7 +50,7 @@ int	unset_wt_argv(t_process p, t_data *d)
 
 int	ft_unset(t_process p, t_data *d)
 {
-	if (!p.exec.args[1] || (!p.exec.args[2] && !ft_memcmp(p.exec.args[1], "--", 3)))
+	if (is_noopt(p.exec))
 		return (EXIT_SUCCESS);
 	if (!is_valid_opt(p.exec.args[1]))
 	{

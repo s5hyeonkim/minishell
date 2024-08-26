@@ -6,7 +6,7 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 19:49:06 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/21 17:17:32 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/26 17:28:03 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ int			exec_builtin(t_process p, t_data *d);
 
 /*cd_utils.c*/
 int			check_folder(char *to_dir);
-int	        set_env_pwd(t_deques *deqs, char **lcwd, char **lnwd);
+int			set_env_pwd(t_deques *deqs, char **lcwd, char **lnwd);
 void		parsing_dir(char *wd, char *now, size_t len);
 int			set_cwd(char **cwd);
 
@@ -112,7 +112,7 @@ int			ft_exit(t_process p, t_data *d);
 int			ft_export(t_process p, t_data *d);
 
 /* export_utils.c*/
-int 		add_val(t_deques *envps, t_map *keyval, char *str);
+int			add_val(t_deques *envps, t_map *keyval, char *str);
 
 /*pwd.c*/
 int			ft_pwd(t_process p, t_data *d);
@@ -125,7 +125,8 @@ void		ft_sort(char **strs, int (*guide)(char *, char *));
 int			is_valid_opt(char	*opt);
 void		set_rwfd(t_process *p);
 int			is_folder(char	*to_dir);
-int	        is_file(char *to_dir);
+int			is_file(char *to_dir);
+int			is_noopt(t_exec p);
 
 /*cmdline_utils.c*/
 int			is_valid_quotation(size_t *start, int *open1, int open2);
@@ -163,9 +164,9 @@ void		dup_fd(int *fd, int std);
 void		close_fd(int *num);
 
 /*redirect.c*/
-int			open_redirect(int redirect, char *word, char *link);
 int			find_redirect(t_process *p, t_token *t);
-int			open_token(t_token *t, t_process *p);
+int			open_token(t_token t, t_process *p);
 int			set_redirect(t_process *p, t_deques *deqs);
+int			open_redirect(t_token t);
 
 #endif

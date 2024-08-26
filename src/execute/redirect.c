@@ -6,33 +6,17 @@
 /*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 16:38:20 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/19 16:39:54 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/26 17:27:27 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "execute.h"
 
-int	open_redirect(int redirect, char *word, char *link)
+int	open_token(t_token t, t_process *p)
 {
-	int	fd;
-
-	fd = 0;
-	if (redirect == T_GREAT)
-		fd = open(word, O_RDONLY);
-	else if (redirect == T_DGREAT)
-		fd = open(link, O_RDONLY);
-	else if (redirect == T_LESS)
-		fd = open(word, O_CREAT | O_WRONLY | O_TRUNC, 0666);
-	else if (redirect == T_DLESS)
-		fd = open(word, O_CREAT | O_WRONLY | O_APPEND, 0666);
-	return (fd);
-}
-
-int	open_token(t_token *t, t_process *p)
-{
-	p->fd.redirect[t->type % 2] = open_redirect(t->type, t->word, p->file.link);
-	if (p->fd.redirect[t->type % 2] == -1)
-		return (handle_error(NULL, t->word, EXTRA_ERROR));
+	p->fd.redirect[t.type % 2] = open_redirect(t);
+	if (p->fd.redirect[t.type % 2] == -1)
+		return (handle_error(NULL, t.word, EXTRA_ERROR));
 	return (EXIT_SUCCESS);
 }
 
@@ -47,7 +31,7 @@ int	find_redirect(t_process *p, t_token *t)
 	{
 		if (p->fd.redirect[t->type % 2] > 0)
 			close_fd(&p->fd.redirect[t->type % 2]);
-		status = open_token(t, p);
+		status = open_token(*t, p);
 	}
 	if (!status)
 		status = find_redirect(p, t->left);
@@ -75,8 +59,11 @@ int	set_heredoc(t_process *p, t_token *t, t_deques *envps)
 		return (status);
 	if (t->type == T_DGREAT)
 	{
-		if (set_filedoc(p) || set_redirect_in(t, p->file.link))
-			status = EXTRA_ERROR;
+		status = set_filedoc(p);
+		if (!status)
+			status = here_doc(p->file.link, t->word, envps);
+		if (!status)
+			status = set_redirect_in(t, p->file.link);
 	}
 	if (!status)
 		status = set_heredoc(p, t->left, envps);
@@ -87,7 +74,10 @@ int	set_heredoc(t_process *p, t_token *t, t_deques *envps)
 
 int	set_redirect(t_process *p, t_deques *envps)
 {
-	if (set_heredoc(p, p->t.left, envps))
-		return (EXTRA_ERROR);
-	return (find_redirect(p, p->t.left));
+	int	status;
+
+	status = set_heredoc(p, p->t.left, envps);
+	if (!status)
+		return (find_redirect(p, p->t.left));
+	return (status);
 }

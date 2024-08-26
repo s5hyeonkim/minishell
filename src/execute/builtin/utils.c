@@ -6,7 +6,7 @@
 /*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 19:11:02 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/14 19:19:47 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/26 17:25:44 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,4 +55,11 @@ int	is_file(char *to_dir)
 		return (FALSE);
 	close(fd);
 	return (TRUE);
+}
+
+int	is_noopt(t_exec p)
+{
+	if (!p.args[1] || (!p.args[2] && !ft_memcmp(p.args[1], "--", 3)))
+		return (TRUE);
+	return (FALSE);
 }

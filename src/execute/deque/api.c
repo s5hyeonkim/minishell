@@ -101,9 +101,11 @@ char	*get_val_deq(t_deques *deqs, char *key)
 	t_map	*keyval;
 
 	node = find_deq(deqs, key);
-	keyval = (t_map *)node->data;
 	if (node)
+	{
+		keyval = (t_map *)node->data;
 		val = ft_strdup(keyval->val);
+	}
 	else
 		val = ft_strdup("");
 	return (val);

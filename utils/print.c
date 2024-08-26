@@ -6,7 +6,7 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/11 12:51:46 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/21 13:14:06 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/26 17:15:53 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,6 @@ const char	*err_to_msg(int *code)
 		return (MSG_SET);
 	if (err == NOT_NUM)
 		return (MSG_NUM);
-	if (err == E_ISDIR)
-		return (strerror(EISDIR));
 	if (err == EXTRA_ERROR)
 		return (strerror(errno));
 	return ("");

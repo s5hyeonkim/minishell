@@ -6,7 +6,7 @@
 /*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 16:38:35 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/19 16:40:24 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/26 17:29:18 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,4 +50,18 @@ void	set_fd_builtin(t_process *p)
 		dup_fd(&p->fd.redirect[1], fd_out);
 	p->fd.redirect[0] = fd_in;
 	p->fd.redirect[1] = fd_out;
+}
+
+int	open_redirect(t_token t)
+{
+	int	fd;
+
+	fd = 0;
+	if (t.type == T_GREAT)
+		fd = open(t.word, O_RDONLY);
+	else if (t.type == T_LESS)
+		fd = open(t.word, O_CREAT | O_WRONLY | O_TRUNC, 0666);
+	else if (t.type == T_DLESS)
+		fd = open(t.word, O_CREAT | O_WRONLY | O_APPEND, 0666);
+	return (fd);
 }

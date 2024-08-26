@@ -39,7 +39,6 @@ typedef struct s_shell
 	t_token			*t;
 	t_process		*p;
 	size_t			p_size;
-	size_t			h_size;
 	t_data			data;
 	t_termios		term;
 }	t_shell;

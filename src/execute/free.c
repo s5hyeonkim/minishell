@@ -6,7 +6,7 @@
 /*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 16:38:12 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/19 16:39:33 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/26 17:27:37 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ void	clean_files(t_process *p, size_t p_size)
 			continue ;
 		if (p_id->file.flag)
 			unlink(p_id->file.link);
-		p_id->file.link = 0;
+		p_id->file.flag = 0;
 		index++;
 	}
 }

@@ -37,6 +37,7 @@ static void	subprocess(t_shell *shell)
 	set_signal_sub(handler_sub);
 	while (index < shell->p_size)
 	{
+		printf("path: %s\n", shell->p[index].exec.path);
 		if (open_pipe(&shell->p[index], shell->p_size) \
 				|| fork_process(&shell->p[index]))
 		{
@@ -85,6 +86,7 @@ static void	token_to_process(t_shell *shell, t_token *t, size_t *index)
 int	set_cmd(t_shell *shell)
 {
 	size_t	index;
+	int		status;
 
 	index = 0;
 	if (set_env_paths(&shell->data))
@@ -93,8 +95,9 @@ int	set_cmd(t_shell *shell)
 	{
 		if (set_args(&shell->p[index], shell->data))
 			return (EXTRA_ERROR);
-		if (set_redirect(&shell->p[index], shell->data.envps))
-			return (EXTRA_ERROR);
+		status = set_redirect(&shell->p[index], shell->data.envps);
+		if (status)
+			return (status);
 		index++;
 	}
 	return (EXIT_SUCCESS);
@@ -103,14 +106,23 @@ int	set_cmd(t_shell *shell)
 void	exec_cmds(t_shell *shell)
 {
 	size_t	index;
+	int		status;
 
 	index = 0;
 	shell->p_size = find_pipe(shell->t);
 	shell->p = ft_calloc(shell->p_size + 1, sizeof(t_process));
-	if (shell->p)
-		token_to_process(shell, shell->t, &index);
-	if (!shell->p || set_cmd(shell))
+	if (!shell->p)
+	{
 		g_status = handle_error(NULL, NULL, EXTRA_ERROR);
+		return ;
+	}
+	token_to_process(shell, shell->t, &index);
+	status = set_cmd(shell);
+	if (status)
+	{
+		if (status != SIGNALED)
+			g_status = handle_error(NULL, NULL, status);
+	}
 	else if (shell->p_size == 1 && is_builtin(shell->p[0].exec.path))
 		inprocess(shell);
 	else

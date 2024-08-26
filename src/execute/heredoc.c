@@ -44,38 +44,31 @@ int	write_files(char *file_name, char *line)
 
 int	heredoc_process(char *link, char *limiter, t_deques *deqs)
 {
-	int		status;
 	char	*buffer;
-	char	*parse;
 	char	line[ARG_MAX];
 
 	line[0] = 0;
-	status = set_signal_init(handler_heredoc);
-	parse = NULL;
+	if (set_signal_init(handler_heredoc))
+		return (EXTRA_ERROR);
 	write_files(link, line);
-	while (!status)
+	while (TRUE)
 	{
 		rl_replace_line("", 0);
 		buffer = readline("> ");
-		if(!buffer)
-			status = EXTRA_ERROR;
-		parse = replace_value(deqs, buffer);
-		free(buffer);
-		if (parse && !ft_memcmp(buffer, limiter, ft_strlen(limiter) + 1))
+		if (!buffer)
 			break ;
-		if (!parse)
-			status = EXTRA_ERROR;
-		if (parse)
-		{
-			ft_strlcat(line, buffer, ARG_MAX);
-			ft_strlcat(line, "\n", ARG_MAX);
-		}
-		free(parse);
+		buffer = replace_value(deqs, buffer);
+		if (!buffer)
+			return (EXTRA_ERROR);
+		if (!ft_memcmp(buffer, limiter, ft_strlen(limiter) + 1))
+			break ;
+		ft_strlcat(line, buffer, ARG_MAX);
+		ft_strlcat(line, "\n", ARG_MAX);
+		free(buffer);
 	}
-	if (!status)
-		status = write_files(link, line);
+	rl_replace_line("", 0);
 	free(buffer);
-	return (status);
+	return (write_files(link, line));
 }
 
 int	here_doc(char *link, char *limiter, t_deques *envps)
@@ -109,5 +102,6 @@ int	set_filedoc(t_process *p)
 		if (!p->file.link)
 			return (EXTRA_ERROR);
 	}
+	p->file.flag = 1;
 	return (EXIT_SUCCESS);
 }

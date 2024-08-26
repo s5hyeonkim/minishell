@@ -6,7 +6,7 @@
 /*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 16:15:03 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/19 18:28:10 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/26 17:27:16 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,11 +28,11 @@ int	set_env_pwd(t_deques *deqs, char **lcwd, char **lnwd)
 		status = handle_error("cd", NULL, EXTRA_ERROR);
 	free(*lcwd);
 	*lcwd = *lnwd;
-	if (!status && find_deq(deqs, "PWD") && replace_back(deqs, "PWD", *lcwd, ENV))
+	if (!status && find_deq(deqs, "PWD") && \
+			replace_back(deqs, "PWD", *lcwd, ENV))
 		status = handle_error("cd", NULL, EXTRA_ERROR);
 	return (status);
 }
-
 
 void	parsing_dir(char *wd, char *target, size_t len)
 {
