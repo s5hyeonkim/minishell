@@ -65,10 +65,9 @@ static int	init_path(t_data *d)
 	if (!find_deq(d->envps, "PATH"))
 	{
 		val = getenv("PATH");
-		if (!val || replace_back(d->envps, "PATH", val, SET))
+		if (val && replace_back(d->envps, "PATH", val, SET))
 		{
 			free(val);
-			printf("????\n");
 			return (EXTRA_ERROR);
 		}
 	}

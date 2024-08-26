@@ -46,6 +46,8 @@ void	exec_program(t_shell *shell, t_process p)
 		{
 			if (is_folder(pr))
 				errno = E_ISDIR;
+			else if (access(pr, F_OK))
+				errno = ENOENT;
 			else if (access(pr, X_OK))
 				errno = EACCES;
 			else
