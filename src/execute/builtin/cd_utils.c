@@ -6,7 +6,7 @@
 /*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 16:15:03 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/19 18:28:10 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/26 17:27:16 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,30 +14,32 @@
 
 int	check_folder(char *to_dir)
 {
-	DIR	*dir;
-
-	dir = opendir(to_dir);
-	if (!dir)
-		return (EXTRA_ERROR);
-	closedir(dir);
-	if (access(to_dir, X_OK))
+	if (!is_folder(to_dir) || access(to_dir, X_OK))
 		return (EXTRA_ERROR);
 	return (EXIT_SUCCESS);
 }
 
-int	set_env_pwd(t_deques *deqs, char *key, char *val)
+int	set_env_pwd(t_deques *deqs, char **lcwd, char **lnwd)
 {
-	if (find_deq(deqs, key) && replace_back(deqs, key, '=', val))
-		return (EXTRA_ERROR);
-	return (EXIT_SUCCESS);
+	int	status;
+
+	status = EXIT_SUCCESS;
+	if (find_deq(deqs, "OLDPWD") && replace_back(deqs, "OLDPWD", *lcwd, ENV))
+		status = handle_error("cd", NULL, EXTRA_ERROR);
+	free(*lcwd);
+	*lcwd = *lnwd;
+	if (!status && find_deq(deqs, "PWD") && \
+			replace_back(deqs, "PWD", *lcwd, ENV))
+		status = handle_error("cd", NULL, EXTRA_ERROR);
+	return (status);
 }
 
-void	parsing_dir(char *wd, char *now, size_t len)
+void	parsing_dir(char *wd, char *target, size_t len)
 {
 	char	*end;
 
 	end = strrchr(wd, '/');
-	if (len == 2 && !ft_memcmp(now, "..", len))
+	if (len == 2 && !ft_memcmp(target, "..", len))
 	{
 		if (end != wd && end)
 			end[0] = 0;
@@ -45,11 +47,11 @@ void	parsing_dir(char *wd, char *now, size_t len)
 			end[1] = 0;
 		return ;
 	}
-	if (len == 1 && !ft_memcmp(now, ".", len))
+	if (len == 1 && !ft_memcmp(target, ".", len))
 		return ;
 	if (wd[ft_strlen(wd) - 1] != '/')
 		ft_strlcat(wd, "/", ft_strlen(wd) + 2);
-	ft_strlcat(wd, now, ft_strlen(wd) + len + 1);
+	ft_strlcat(wd, target, ft_strlen(wd) + len + 1);
 }
 
 int	set_cwd(char **cwd)
@@ -58,4 +60,13 @@ int	set_cwd(char **cwd)
 	if (*cwd == NULL || !getcwd(*cwd, sizeof(char) * PATH_MAX))
 		return (EXTRA_ERROR);
 	return (EXIT_SUCCESS);
+}
+
+int	is_valid_folder(char *wd, char *now, char *next)
+{
+	if (next && now != next)
+		parsing_dir(wd, now, next - now);
+	else if (!next)
+		parsing_dir(wd, now, ft_strlen(now));
+	return (TRUE);
 }

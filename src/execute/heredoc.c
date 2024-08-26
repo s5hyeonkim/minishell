@@ -42,31 +42,36 @@ int	write_files(char *file_name, char *line)
 	return (EXIT_SUCCESS);
 }
 
-int	heredoc_process(char *link, char *limiter)
+int	heredoc_process(char *link, char *limiter, t_deques *deqs)
 {
-	int		status;
 	char	*buffer;
 	char	line[ARG_MAX];
 
 	line[0] = 0;
-	status = set_signal_init(handler_heredoc);
+	if (set_signal_init(handler_heredoc))
+		return (EXTRA_ERROR);
 	write_files(link, line);
-	rl_replace_line("", 0);
-	buffer = readline("> ");
-	while (buffer && ft_memcmp(buffer, limiter, ft_strlen(limiter) + 1))
+	while (TRUE)
 	{
+		rl_replace_line("", 0);
+		buffer = readline("> ");
+		if (!buffer)
+			break ;
+		buffer = replace_value(deqs, buffer);
+		if (!buffer)
+			return (EXTRA_ERROR);
+		if (!ft_memcmp(buffer, limiter, ft_strlen(limiter) + 1))
+			break ;
 		ft_strlcat(line, buffer, ARG_MAX);
 		ft_strlcat(line, "\n", ARG_MAX);
 		free(buffer);
-		rl_replace_line("", 0);
-		buffer = readline("> ");
 	}
-	status = write_files(link, line);
+	rl_replace_line("", 0);
 	free(buffer);
-	return (status);
+	return (write_files(link, line));
 }
 
-int	here_doc(char *link, char *limiter)
+int	here_doc(char *link, char *limiter, t_deques *envps)
 {
 	t_process	p;
 	int			status;
@@ -75,7 +80,7 @@ int	here_doc(char *link, char *limiter)
 		return (EXTRA_ERROR);
 	if (!p.pid)
 	{
-		status = heredoc_process(link, limiter);
+		status = heredoc_process(link, limiter, envps);
 		exit(status);
 	}
 	else
@@ -87,17 +92,16 @@ int	set_filedoc(t_process *p)
 {
 	char	*itoa;
 
-	if (!p->link)
+	if (!p->file.link)
 	{
 		itoa = ft_itoa(p->index);
-		if (itoa)
-			p->link = ft_strjoin("here_doc", itoa);
-		if (!itoa || !p->link)
-		{
-			free(itoa);
+		if (!itoa)
 			return (EXTRA_ERROR);
-		}
+		p->file.link = ft_strjoin("here_doc", itoa);
 		free(itoa);
+		if (!p->file.link)
+			return (EXTRA_ERROR);
 	}
+	p->file.flag = 1;
 	return (EXIT_SUCCESS);
 }

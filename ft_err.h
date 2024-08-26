@@ -43,6 +43,7 @@ typedef enum e_err
 	NOT_SET,
 	NOT_NUM,
 	EXTRA_ERROR,
+	E_ISDIR = 21,
 	CMD_NOT_FOUND = 127,
 	SIGEXIT = 128,
 	SYNTAX_ERROR = 258,

@@ -6,7 +6,7 @@
 /*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 19:32:01 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/14 19:19:32 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/26 17:26:22 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,20 +75,21 @@ int	export_wt_argv(t_process p, t_data *d)
 	int		status;
 
 	index = 1;
-	if (!ft_memcmp(p.args[1], "--", 3))
+	if (!ft_memcmp(p.exec.args[1], "--", 3))
 		index++;
 	status = EXIT_SUCCESS;
 	ft_memset(&keyval, 0, sizeof(t_map));
-	while (p.args[index])
+	while (p.exec.args[index])
 	{
-		if (!is_valid_key(p.args[index]))
-			status = handle_error(p.args[0], p.args[index], INVALID_IDF);
-		else if (set_map(&keyval, p.args[index]))
-			status = handle_error(p.args[0], NULL, EXTRA_ERROR);
-		else if (!keyval.mid && find_deq(d->envps, keyval.key))
-			free_map(&keyval);
-		else if (replace_back(d->envps, keyval.key, keyval.mid, keyval.val))
-			status = handle_error(p.args[0], NULL, EXTRA_ERROR);
+		if (!is_valid_key(p.exec.args[index]))
+		{
+			handle_error(p.exec.args[0], p.exec.args[index], INVALID_IDF);
+			status = EXIT_FAILURE;
+		}
+		else if (set_map(&keyval, p.exec.args[index]))
+			status = handle_error(p.exec.args[0], NULL, EXTRA_ERROR);
+		else if (add_val(d->envps, &keyval, p.exec.args[index]))
+			status = handle_error(p.exec.args[0], NULL, EXTRA_ERROR);
 		free_map(&keyval);
 		index++;
 	}
@@ -97,16 +98,11 @@ int	export_wt_argv(t_process p, t_data *d)
 
 int	ft_export(t_process p, t_data *d)
 {
-	int		status;
-
-	if (!p.args[1] || (!p.args[2] && !ft_memcmp(p.args[1], "--", 3)))
+	if (is_noopt(p.exec))
+		return (export_wo_argv(d, p.fd.in));
+	if (!is_valid_opt(p.exec.args[1]))
 	{
-		status = export_wo_argv(d, p.fd);
-		return (status);
-	}
-	if (!is_valid_opt(p.args[1]))
-	{
-		handle_error(p.args[0], p.args[1], INVALID_OPT);
+		handle_error(p.exec.args[0], p.exec.args[1], INVALID_OPT);
 		return (BUILTIN_ERROR);
 	}
 	return (export_wt_argv(p, d));

@@ -31,9 +31,16 @@ char	*ft_pairjoin(char *key, char mid, char *val)
 char	*get_key(char *str)
 {
 	char	*key;
+	char	*target;
 
-	if (ft_strchr(str, '='))
-		key = ft_substr(str, 0, ft_strchr(str, '=') - str);
+	target = ft_strchr(str, '=');
+	if (target)
+	{
+		if (str < target && str[target - str - 1] == '+')
+			key = ft_substr(str, 0, ft_strchr(str, '=') - str - 1);
+		else
+			key = ft_substr(str, 0, ft_strchr(str, '=') - str);
+	}
 	else
 		key = ft_strdup(str);
 	return (key);
@@ -53,8 +60,12 @@ char	*get_value(char *str)
 int	set_map(t_map *keyval, char *str)
 {
 	ft_memset(keyval, 0, sizeof(keyval));
+	keyval->state = EXPORT;
 	if (ft_strchr(str, '='))
+	{
 		keyval->mid = '=';
+		keyval->state = ENV;
+	}
 	keyval->key = get_key(str);
 	keyval->val = get_value(str);
 	if (!keyval->key || !keyval->val)
@@ -65,7 +76,7 @@ int	set_map(t_map *keyval, char *str)
 	return (EXIT_SUCCESS);
 }
 
-int	set_keyval(t_map *keyval, char *key, char mid, char *val)
+int	set_keyval(t_map *keyval, char *key, char *val, t_state state)
 {
 	ft_memset(keyval, 0, sizeof(keyval));
 	keyval->key = ft_strdup(key);
@@ -76,6 +87,7 @@ int	set_keyval(t_map *keyval, char *key, char mid, char *val)
 		free_map(keyval);
 		return (EXTRA_ERROR);
 	}
-	keyval->mid = mid;
+	if (state == ENV)
+		keyval->mid = '=';
 	return (EXIT_SUCCESS);
 }

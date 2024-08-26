@@ -19,7 +19,8 @@ typedef enum e_state
 {
 	NO = 0,
 	EXPORT = 1,
-	ENV = 2
+	ENV = 2,
+	SET = 3
 }	t_state;
 
 typedef struct s_map
@@ -27,12 +28,12 @@ typedef struct s_map
 	char	*key;
 	char	mid;
 	char	*val;
+	t_state	state;
 }	t_map;
 
 typedef struct s_deque
 {
-	t_map			keyval;
-	t_state			state;
+	void			*data;
 	struct s_deque	*prev;
 	struct s_deque	*next;
 }	t_deque;
@@ -46,11 +47,12 @@ typedef struct s_deques
 /*deque.c*/
 t_deques	*create_deques(void);
 t_deque		*create_deque(void);
+t_map		*create_keyval(void);
 
 /*push.c*/
 int			push_back(t_deques *deques, t_map keyval);
-int			replace_back(t_deques *deqs, char *key, char mid, char *val);
-int			push_keyval(t_deques *deqs, char *key, char mid, char *val);
+int			replace_back(t_deques *deqs, char *key, char *val, t_state state);
+int			push_keyval(t_deques *deqs, char *key, char *val, t_state state);
 
 /*free.c*/
 void		free_deque(t_deque *deque);
@@ -73,12 +75,11 @@ char		*get_val_deq(t_deques *deqs, char *key);
 /*utils.c*/
 t_deque		*find_deq(t_deques *deq, char *key);
 int			is_valid_key(char *s);
-void		set_state(t_deque *deq);
 
 /*map.c*/
 char		*ft_pairjoin(char *key, char mid, char *val);
 char		*get_key(char *str);
 int			set_map(t_map *keyval, char *str);
-int			set_keyval(t_map *keyval, char *key, char mid, char *val);
+int			set_keyval(t_map *keyval, char *key, char *val, t_state state);
 
 #endif

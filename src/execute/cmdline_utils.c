@@ -67,14 +67,14 @@ int	set_parsing_deques(t_deques *deqs, char *cmd)
 	ft_memset(fb, 0, sizeof(size_t) * 2);
 	str = NULL;
 	if (!ft_strchr(cmd, '\'') && !ft_strchr(cmd, '\"'))
-		return (push_keyval(deqs, cmd, 0, ""));
+		return (push_keyval(deqs, cmd, "", NO));
 	while (fb[0] < len)
 	{
 		parsing_cmd(cmd, &fb[0], &fb[1]);
 		if (fb[0] >= len)
 			break ;
 		str = ft_substr(cmd, fb[0], fb[1] - fb[0]);
-		if (!str || push_keyval(deqs, str, 0, ""))
+		if (!str || push_keyval(deqs, str, "", NO))
 		{
 			free(str);
 			return (EXTRA_ERROR);

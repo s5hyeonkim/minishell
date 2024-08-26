@@ -32,6 +32,7 @@ size_t	ft_deqlen(t_deque *head)
 char	**deqtostrs(t_deque *dq)
 {
 	char	**ret;
+	t_map	*keyval;
 	size_t	id;
 	size_t	size;
 
@@ -42,13 +43,16 @@ char	**deqtostrs(t_deque *dq)
 		return (NULL);
 	while (id < size)
 	{
-		ret[id] = ft_pairjoin(dq->keyval.key, dq->keyval.mid, dq->keyval.val);
+		keyval = (t_map *)(dq->data);
+		dq = dq->next;
+		if (keyval->state == SET || keyval->state == NO)
+			continue ;
+		ret[id] = ft_pairjoin(keyval->key, keyval->mid, keyval->val);
 		if (!ret[id++])
 		{
 			free_strs(ret);
 			return (NULL);
 		}
-		dq = dq->next;
 	}
 	return (ret);
 }
@@ -73,35 +77,35 @@ t_deques	*strstodeq(char **strs)
 		}
 		index++;
 	}
-	if (!index && (set_map(&keyval, "") || push_back(new, keyval)))
-	{
-		free_map(&keyval);
-		free_deques(&new);
-		return (NULL);
-	}
 	return (new);
 }
 
 char	*read_val_deq(t_deques *deqs, char *key)
 {
-	char	*val;
 	t_deque	*node;
+	t_map	*keyval;
 
-	val = NULL;
 	node = find_deq(deqs, key);
 	if (node)
-		val = node->keyval.val;
-	return (val);
+	{
+		keyval = (t_map *)node->data;
+		return (keyval->val);
+	}
+	return (NULL);
 }
 
 char	*get_val_deq(t_deques *deqs, char *key)
 {
 	char	*val;
 	t_deque	*node;
+	t_map	*keyval;
 
 	node = find_deq(deqs, key);
 	if (node)
-		val = ft_strdup(node->keyval.val);
+	{
+		keyval = (t_map *)node->data;
+		val = ft_strdup(keyval->val);
+	}
 	else
 		val = ft_strdup("");
 	return (val);

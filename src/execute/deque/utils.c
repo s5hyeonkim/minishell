@@ -6,25 +6,20 @@
 /*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/11 16:50:52 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/14 18:43:20 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/26 17:16:33 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "deque.h"
 
-void	set_state(t_deque *deq)
-{
-	deq->state = EXPORT;
-	if (deq->keyval.mid == '=')
-		deq->state = ENV;
-}
-
 int	is_valid_key(char *s)
 {
-	if (ft_isdigit(*s) || *s == '=')
+	if (!ft_isalpha(*s) && *s != '_')
 		return (FALSE);
 	while (*s)
 	{
 		if (*s == '=')
+			break ;
+		if (!ft_memcmp(s, "+=", 2))
 			break ;
 		if (!ft_isdigit(*s) && !ft_isalpha(*s) && *s != '_')
 			return (FALSE);
@@ -36,12 +31,14 @@ int	is_valid_key(char *s)
 t_deque	*find_deq(t_deques *deq, char *key)
 {
 	t_deque	*node;
+	t_map	*keyval;
 
 	node = deq->tail;
 	while (node)
 	{
 		node = node->next;
-		if (!ft_memcmp(node->keyval.key, key, ft_strlen(key) + 1))
+		keyval = node->data;
+		if (!ft_memcmp(keyval->key, key, ft_strlen(key) + 1))
 			return (node);
 		if (node == deq->tail)
 			break ;

@@ -36,7 +36,7 @@ static void	set_depth(t_shell *shell)
 		itoa = ft_strdup("");
 	else
 		itoa = ft_itoa(depth);
-	if (!itoa || replace_back(shell->data.envps, "SHLVL", '=', itoa))
+	if (!itoa || replace_back(shell->data.envps, "SHLVL", itoa, ENV))
 	{
 		free(itoa);
 		exit_process(shell, NULL, EXTRA_ERROR);
@@ -49,8 +49,8 @@ static void	set_pwd_path(t_shell *shell)
 	char	*cwd;
 
 	cwd = ft_strdup(shell->data.lcwd);
-	if (!cwd || replace_back(shell->data.envps, "OLDPWD", 0, "") || \
-	replace_back(shell->data.envps, "PWD", '=', cwd))
+	if (!cwd || replace_back(shell->data.envps, "OLDPWD", "", EXPORT) || \
+	replace_back(shell->data.envps, "PWD", cwd, ENV))
 	{
 		free(cwd);
 		exit_process(shell, NULL, EXTRA_ERROR);
@@ -58,10 +58,27 @@ static void	set_pwd_path(t_shell *shell)
 	free(cwd);
 }
 
+static int	init_path(t_data *d)
+{
+	char	*val;
+
+	if (!find_deq(d->envps, "PATH"))
+	{
+		val = getenv("PATH");
+		if (!val || replace_back(d->envps, "PATH", val, SET))
+		{
+			free(val);
+			printf("????\n");
+			return (EXTRA_ERROR);
+		}
+	}
+	return (EXIT_SUCCESS);
+}
+
 static void	set_data(t_shell *shell, char *envp[])
 {
 	shell->data.envps = strstodeq(envp);
-	if (!shell->data.envps || set_env_paths(&shell->data) \
+	if (!shell->data.envps || init_path(&shell->data) || set_env_paths(&shell->data) \
 			|| set_cwd(&shell->data.lcwd))
 		exit_process(shell, NULL, EXTRA_ERROR);
 	set_depth(shell);

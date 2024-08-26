@@ -6,7 +6,7 @@
 /*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 16:38:12 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/19 16:39:33 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/26 17:27:37 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,9 +28,9 @@ void	free_process(t_process *p, size_t size)
 		return ;
 	while (index < size)
 	{
-		free_strs(p[index].args);
-		free(p[index].path);
-		free(p[index].link);
+		free_strs(p[index].exec.args);
+		free(p[index].exec.path);
+		free(p[index].file.link);
 		index++;
 	}
 	free(p);
@@ -49,10 +49,10 @@ void	clean_process(t_process *p, size_t p_size)
 		p_id = &p[index];
 		if (!p_id && ++index)
 			continue ;
-		close_fd(&p_id->redirect_fd[0]);
-		close_fd(&p_id->redirect_fd[1]);
-		close_fd(&p_id->pipe_fd[0]);
-		close_fd(&p_id->pipe_fd[1]);
+		close_fd(&p_id->fd.redirect[0]);
+		close_fd(&p_id->fd.redirect[1]);
+		close_fd(&p_id->fd.pipe[0]);
+		close_fd(&p_id->fd.pipe[1]);
 		index++;
 	}
 	free_process(p, p_size);
@@ -71,9 +71,9 @@ void	clean_files(t_process *p, size_t p_size)
 		p_id = &p[index];
 		if (!p_id && ++index)
 			continue ;
-		if (p_id->flag)
-			unlink(p->link);
-		p_id->flag = 0;
+		if (p_id->file.flag)
+			unlink(p_id->file.link);
+		p_id->file.flag = 0;
 		index++;
 	}
 }

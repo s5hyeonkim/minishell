@@ -23,8 +23,8 @@ static int	is_valid_option(char *opt)
 
 int	ft_pwd(t_process p, t_data *d)
 {
-	if (!is_valid_option(p.args[1]))
-		return (handle_error(p.args[0], p.args[1], INVALID_OPT));
-	ft_putendl_fd(d->lcwd, p.fd[1]);
+	if (!is_valid_option(p.exec.args[1]))
+		return (handle_error(p.exec.args[0], p.exec.args[1], INVALID_OPT));
+	ft_putendl_fd(d->lcwd, p.fd.in[1]);
 	return (EXIT_SUCCESS);
 }
