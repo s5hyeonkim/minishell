@@ -6,7 +6,7 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 22:36:14 by yubin             #+#    #+#             */
-/*   Updated: 2024/08/26 13:46:45 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/26 14:31:04 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ int	get_word(char **word, char *words)
 	words = wordlen_word(words, &len);
 	*word = ft_substr(words, 0, len);
 	if (*word == NULL)
-		return (EXTRA_ERROR);	
+		return (EXTRA_ERROR);
 	*word = replace_quote(*word);
 	if (*word == NULL)
 		return (EXTRA_ERROR);
