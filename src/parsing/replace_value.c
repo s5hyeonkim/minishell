@@ -6,13 +6,13 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/23 14:25:03 by yubshin           #+#    #+#             */
-/*   Updated: 2024/08/26 13:15:27 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/26 14:27:52 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parsing.h"
 
-static char	*get_value_oneword(t_deques *envps, char *word);
+static char	*get_value_oneword(t_deques *envps, char *word, char *dst);
 static char	*get_nodollar_value(char *word, int *len);
 static char	*get_dollar_value(t_deques *envps, char *word, int *len);
 
@@ -21,7 +21,6 @@ char	*replace_value(t_deques *envps, char *str)
 	char	*headstr;
 	char	*word;
 	char	*dst;
-	char	*value;
 	int		len;
 
 	headstr = str;
@@ -31,11 +30,13 @@ char	*replace_value(t_deques *envps, char *str)
 		len = wordlen(str);
 		word = ft_substr(str, 0, len);
 		if (word)
-			value = get_value_oneword(envps, word);
-		if (value)
-			dst = strjoin_free(dst, value);
-		if (!word || !value)
+			dst = get_value_oneword(envps, word, dst);
+		if (!word)
+		{
+			free(dst);
+			dst = NULL;
 			break ;
+		}
 		free(word);
 		str += len;
 	}
@@ -43,14 +44,18 @@ char	*replace_value(t_deques *envps, char *str)
 	return (dst);
 }
 
-static char	*get_value_oneword(t_deques *envps, char *word)
+static char	*get_value_oneword(t_deques *envps, char *word, char *dst)
 {
-	char	*dst;
 	char	*value;
 	int		len;
 
 	len = 0;
-	dst = NULL;
+	if (*find_notspace(word) == SGL_QUOTE \
+		&& is_closed_quotation(find_notspace(word)))
+	{
+		dst = strjoin_free(dst, ft_strdup(word));
+		return (dst);
+	}
 	while (*word)
 	{
 		value = get_nodollar_value(word, &len);
@@ -77,9 +82,7 @@ static char	*get_nodollar_value(char *word, int *len)
 		dst = ft_strdup(" ");
 		*len = find_notspace(word) - word;
 	}
-	else if ((*find_notspace(word) == SGL_QUOTE \
-		&& is_closed_quotation(find_notspace(word))) \
-		|| !ft_strchr(word, DOLLAR))
+	else if (!ft_strchr(word, DOLLAR))
 	{
 		dst = ft_strdup(word);
 		*len = ft_strlen(word);

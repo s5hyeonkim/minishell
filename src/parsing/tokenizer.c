@@ -6,7 +6,7 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 21:47:20 by yubin             #+#    #+#             */
-/*   Updated: 2024/08/26 13:20:28 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/26 13:47:07 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,10 +86,10 @@ static int	token_word(t_token **token, t_deques *envps, char *str)
 	if (words)
 	{
 		headwords = words;
-		if (get_word(envps, &word, words) == EXTRA_ERROR)
+		if (get_word(&word, words) == EXTRA_ERROR)
 			return (EXTRA_ERROR);
 		if (word)
-			if (get_argvs(envps, &argvs, words) == EXTRA_ERROR)
+			if (get_argvs(&argvs, words) == EXTRA_ERROR)
 				return (EXTRA_ERROR);
 		free(headwords);
 		if (add_tokenright(token, T_CMD_WORD, word, argvs) == EXIT_SUCCESS)

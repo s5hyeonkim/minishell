@@ -6,7 +6,7 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 17:08:15 by yubshin           #+#    #+#             */
-/*   Updated: 2024/08/26 13:14:07 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/26 13:46:39 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,8 +68,8 @@ int		handle_empty_redirect(char *buffer);
 
 /* argv.c */
 int		get_words(char **words, char *str);
-int		get_word(t_deques *envps, char **word, char *words);
-int		get_argvs(t_deques *envps, char ***argvs, char *words);
+int		get_word(char **word, char *words);
+int		get_argvs(char ***argvs, char *words);
 
 /* wordend.c */
 char	*find_wordend(char *str);
