@@ -6,15 +6,15 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 21:47:20 by yubin             #+#    #+#             */
-/*   Updated: 2024/08/21 14:01:29 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/26 13:20:28 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parsing.h"
 
-int	token_pipe(t_token **token);
-int	token_redirect(t_token **token, t_deques *envps, char *buffer);
-int	token_word(t_token **token, t_deques *envps, char *str);
+static int	token_pipe(t_token **token);
+static int	token_redirect(t_token **token, t_deques *envps, char *buffer);
+static int	token_word(t_token **token, t_deques *envps, char *str);
 
 int	tokenizer(t_token **token, t_deques *envps, char **strs)
 {
@@ -34,14 +34,14 @@ int	tokenizer(t_token **token, t_deques *envps, char **strs)
 	return (EXIT_SUCCESS);
 }
 
-int	token_pipe(t_token **token)
+static int	token_pipe(t_token **token)
 {
 	if (add_tokenright(token, T_PIPE, NULL, NULL) == EXTRA_ERROR)
 		return (EXTRA_ERROR);
 	return (EXIT_SUCCESS);
 }
 
-int	token_redirect(t_token **token, t_deques *envps, char *buffer)
+static int	token_redirect(t_token **token, t_deques *envps, char *buffer)
 {
 	char	*filename;
 	int		typeno;
@@ -61,6 +61,8 @@ int	token_redirect(t_token **token, t_deques *envps, char *buffer)
 		if (filename == NULL)
 			return (EXTRA_ERROR);
 		filename = replace_word(envps, filename);
+		if (!filename)
+			return (EXTRA_ERROR);
 		if (add_tokenright(token, typeno, filename, NULL) == EXTRA_ERROR)
 			return (EXTRA_ERROR);
 		buffer += len;
@@ -68,7 +70,7 @@ int	token_redirect(t_token **token, t_deques *envps, char *buffer)
 	return (EXIT_SUCCESS);
 }
 
-int	token_word(t_token **token, t_deques *envps, char *str)
+static int	token_word(t_token **token, t_deques *envps, char *str)
 {
 	char	*words;
 	char	*word;
@@ -80,16 +82,18 @@ int	token_word(t_token **token, t_deques *envps, char *str)
 	argvs = NULL;
 	if (get_words(&words, str) == EXTRA_ERROR)
 		return (EXTRA_ERROR);
+	words = replace_value(envps, words);
 	if (words)
 	{
 		headwords = words;
 		if (get_word(envps, &word, words) == EXTRA_ERROR)
 			return (EXTRA_ERROR);
-		if (get_argvs(envps, &argvs, words) == EXTRA_ERROR)
-			return (EXTRA_ERROR);
+		if (word)
+			if (get_argvs(envps, &argvs, words) == EXTRA_ERROR)
+				return (EXTRA_ERROR);
 		free(headwords);
+		if (add_tokenright(token, T_CMD_WORD, word, argvs) == EXIT_SUCCESS)
+			return (EXIT_SUCCESS);
 	}
-	if (add_tokenright(token, T_CMD_WORD, word, argvs) == EXTRA_ERROR)
-		return (EXTRA_ERROR);
-	return (EXIT_SUCCESS);
+	return (EXTRA_ERROR);
 }

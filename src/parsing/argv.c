@@ -6,14 +6,14 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 22:36:14 by yubin             #+#    #+#             */
-/*   Updated: 2024/08/21 14:05:06 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/26 13:10:16 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parsing.h"
 
-int	init_argvs(char ***argvs, char *words);
-int	count_argv(char *words);
+static int	init_argvs(char ***argvs, char *words);
+static int	count_argv(char *words);
 
 int	get_words(char **words, char *str)
 {
@@ -39,11 +39,12 @@ int	get_word(t_deques *envps, char **word, char *words)
 {
 	int		len;
 
+	(void) envps;
 	words = wordlen_word(words, &len);
 	*word = substrjoin_free(*word, words, len);
 	if (*word == NULL)
-		return (EXTRA_ERROR);
-	*word = replace_word(envps, *word);
+		return (EXTRA_ERROR);	
+	*word = replace_quote(*word);
 	if (*word == NULL)
 		return (EXTRA_ERROR);
 	return (EXIT_SUCCESS);
@@ -55,6 +56,7 @@ int	get_argvs(t_deques *envps, char ***argvs, char *words)
 	int		len;
 	int		index;
 
+	(void) envps;
 	if (init_argvs(argvs, words) == EXTRA_ERROR)
 		return (EXTRA_ERROR);
 	index = 0;
@@ -64,7 +66,7 @@ int	get_argvs(t_deques *envps, char ***argvs, char *words)
 		words = wordlen_word(words, &len);
 		argv = ft_substr(words, 0, len);
 		if (argv)
-			argv = replace_word(envps, argv);
+			argv = replace_quote(argv);
 		if (!argv)
 			return (EXTRA_ERROR);
 		if (*argv)
@@ -78,7 +80,7 @@ int	get_argvs(t_deques *envps, char ***argvs, char *words)
 	return (EXIT_SUCCESS);
 }
 
-int	init_argvs(char ***argvs, char *words)
+static int	init_argvs(char ***argvs, char *words)
 {
 	int	argvnums;
 
@@ -92,7 +94,7 @@ int	init_argvs(char ***argvs, char *words)
 	return (EXIT_SUCCESS);
 }
 
-int	count_argv(char *words)
+static int	count_argv(char *words)
 {
 	char	*word;
 	int		len;

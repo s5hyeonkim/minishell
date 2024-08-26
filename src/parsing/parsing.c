@@ -6,13 +6,13 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 16:39:43 by yubshin           #+#    #+#             */
-/*   Updated: 2024/08/21 14:11:02 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/26 13:11:30 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parsing.h"
 
-int	lexer(t_token **token, t_deques *envps, char *buffer);
+static int	lexer(t_token **token, t_deques *envps, char *buffer);
 
 int	parselines(t_token **token, t_deques *envps, char *buffer)
 {
@@ -33,7 +33,7 @@ int	parselines(t_token **token, t_deques *envps, char *buffer)
 	return (code);
 }
 
-int	lexer(t_token **token, t_deques *envps, char *buffer)
+static int	lexer(t_token **token, t_deques *envps, char *buffer)
 {
 	char	**buffers;
 

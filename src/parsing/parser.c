@@ -6,16 +6,16 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 14:31:30 by yubshin           #+#    #+#             */
-/*   Updated: 2024/08/21 17:17:04 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/26 13:11:20 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parsing.h"
 
-int		syntax_pipeline(t_token **dsttoken, t_token *nowtoken);
-int		syntax_simple_cmd(t_token **dsttoken, t_token *nowtoken);
-int		syntax_cmd_redirects(t_token **dsttoken, t_token *nowtoken);
-void	syntax_io_redirect(t_token **dsttoken, t_token *nowtoken);
+static int	syntax_pipeline(t_token **dsttoken, t_token *nowtoken);
+static int	syntax_simple_cmd(t_token **dsttoken, t_token *nowtoken);
+static int	syntax_cmd_redirects(t_token **dsttoken, t_token *nowtoken);
+static void	syntax_io_redirect(t_token **dsttoken, t_token *nowtoken);
 
 int	parser(t_token **token)
 {
@@ -31,7 +31,7 @@ int	parser(t_token **token)
 	return (EXIT_SUCCESS);
 }
 
-int	syntax_pipeline(t_token **dsttoken, t_token *nowtoken)
+static int	syntax_pipeline(t_token **dsttoken, t_token *nowtoken)
 {
 	t_token	*nexttoken;
 	t_token	*lasttoken;
@@ -60,7 +60,7 @@ int	syntax_pipeline(t_token **dsttoken, t_token *nowtoken)
 	return (EXIT_SUCCESS);
 }
 
-int	syntax_simple_cmd(t_token **dsttoken, t_token *nowtoken)
+static int	syntax_simple_cmd(t_token **dsttoken, t_token *nowtoken)
 {
 	t_token	*newtoken;
 	t_token	*nexttoken;
@@ -84,7 +84,7 @@ int	syntax_simple_cmd(t_token **dsttoken, t_token *nowtoken)
 	return (EXIT_SUCCESS);
 }	
 
-int	syntax_cmd_redirects(t_token **dsttoken, t_token *nowtoken)
+static int	syntax_cmd_redirects(t_token **dsttoken, t_token *nowtoken)
 {
 	t_token	*newtoken;
 	t_token	*lasttoken;
@@ -106,7 +106,7 @@ int	syntax_cmd_redirects(t_token **dsttoken, t_token *nowtoken)
 	return (EXIT_SUCCESS);
 }
 
-void	syntax_io_redirect(t_token **dsttoken, t_token *nowtoken)
+static void	syntax_io_redirect(t_token **dsttoken, t_token *nowtoken)
 {
 	if (nowtoken && nowtoken->type >= T_DLESS && nowtoken->type <= T_GREAT)
 	{	

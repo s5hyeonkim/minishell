@@ -6,7 +6,7 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 17:08:15 by yubshin           #+#    #+#             */
-/*   Updated: 2024/08/21 14:18:15 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/26 13:14:07 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,14 +97,19 @@ void	tlst_addleft(t_token **t, t_token *newtoken);
 /* parser.c */
 int		parser(t_token **token);
 
-/* replace.c */
+/* replace_word.c */
 char	*replace_word(t_deques *envps, char *str);
 
+/* replace_value.c */
+char	*replace_value(t_deques *envps, char *str);
+
 /* replace_value_utils */
-char	*get_novalue(char *str, int *len);
 char	*get_dollar(char *str, int *len);
-char	*get_status(char *str, int *len);
+char	*get_status(int *len);
 char	*get_env(t_deques *envps, char *keyhead, int *len);
+
+/* replace_quote.c */
+char	*replace_quote(char *str);
 
 /* resword.c */
 int		ft_isresword(char chr);
@@ -126,5 +131,7 @@ int		handle_error_withstr(char *exec, char *str, int len, int code);
 void	debug_buffers(char **buffers);
 void	debug_token(t_token *token);
 void	debug_tree(t_token *dsttoken, int leftright, int i);
+
+char	*replace_quote(char *str);
 
 #endif

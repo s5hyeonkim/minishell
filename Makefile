@@ -45,7 +45,9 @@ SRCS = ./main.c \
 		$(PARSEDIR)token_utils.c \
 		$(PARSEDIR)token_lst.c \
 		$(PARSEDIR)parser.c \
-		$(PARSEDIR)replace_value_quote.c \
+		$(PARSEDIR)replace_word.c \
+		$(PARSEDIR)replace_quote.c \
+		$(PARSEDIR)replace_value.c \
 		$(PARSEDIR)replace_value_utils.c \
 		$(PARSEDIR)resword.c \
 		$(PARSEDIR)utils.c \

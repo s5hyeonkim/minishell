@@ -6,14 +6,14 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 16:37:16 by yubshin           #+#    #+#             */
-/*   Updated: 2024/08/21 14:01:37 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/26 13:16:46 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parsing.h"
 
-char	*find_quotend(char *str);
-int		ft_iswordhead(char chr);
+static char	*find_quotend(char *str);
+static int		ft_iswordhead(char chr);
 
 char	*find_wordend(char *str)
 {
@@ -26,7 +26,7 @@ char	*find_wordend(char *str)
 	return (str);
 }
 
-char	*find_quotend(char *str)
+static char	*find_quotend(char *str)
 {
 	int		sgl_open;
 	int		dbl_open;

@@ -6,78 +6,61 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 20:34:43 by yubin             #+#    #+#             */
-/*   Updated: 2024/08/22 11:57:07 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/26 13:16:07 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parsing.h"
 
-int	ft_iskeyend(char chr);
-
-char	*get_novalue(char *str, int *len)
-{
-	char	*novalue;
-
-	novalue = NULL;
-	*len = strchrlen(str, DOLLAR);
-	if (*len)
-		novalue = ft_substr(str, 0, *len);
-	return (novalue);
-}
+static int	ft_iskeyend(char chr);
 
 char	*get_dollar(char *str, int *len)
 {
-	char	*res;
+	char	*dollar;
 
-	res = NULL;
-	if (*(str + 1) == DOLLAR || ft_isspace(*(str + 1)) || !*(str + 1))
-	{
-		res = ft_substr(str, 0, 1);
-		*len = 1;
-	}
-	return (res);
+	dollar = ft_substr(str, 0, 1);
+	*len = 1;
+	if (!dollar)
+		return (NULL);
+	return (dollar);
 }
 
-char	*get_status(char *str, int *len)
+char	*get_status(int *len)
 {
-	char	*envp;
+	char	*status;
 
-	envp = NULL;
-	str++;
-	if (*str == '?')
-	{
-		envp = ft_itoa(g_status);
-		if (!envp)
-			return (NULL);
-	}
+	status = ft_itoa(g_status);
 	*len = 2;
-	return (envp);
+	if (!status)
+		return (NULL);
+	return (status);
 }
 
-char	*get_env(t_deques *envps, char *keyhead, int *len)
+char	*get_env(t_deques *envps, char *word, int *len)
 {
 	char	*now;
 	char	*envp;
 	char	*key;
 
-	envp = NULL;
 	*len = 0;
-	now = keyhead;
+	now = word;
 	while (*now && ft_iskeyend(*now) == FALSE)
 	{
 		now++;
 		(*len)++;
 	}
-	key = ft_substr(keyhead, 0, *len);
+	key = ft_substr(word, 0, *len);
+	*len = ft_strlen(key) + 1;
 	if (!key)
 		return (NULL);
 	envp = get_val_deq(envps, key);
-	*len = ft_strlen(key) + 1;
 	free(key);
+	if (!envp)
+		return (NULL);
 	return (envp);
 }
 
-int	ft_iskeyend(char chr)
+static int	ft_iskeyend(char chr)
 {
 	if (chr == DOLLAR || chr == SPACE || chr == '/' \
 	|| chr == SGL_QUOTE || chr == DBL_QUOTE)

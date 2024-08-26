@@ -6,13 +6,13 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 19:47:20 by yubin             #+#    #+#             */
-/*   Updated: 2024/08/21 17:19:10 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/26 13:10:34 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parsing.h"
 
-int	replace_pipebuffer(char **dstbuffer);
+static int	replace_pipebuffer(char **dstbuffer);
 
 int	get_validbuffer(char *buffer, char **validbuffer)
 {
@@ -43,7 +43,7 @@ int	get_validbuffer(char *buffer, char **validbuffer)
 	return (EXIT_SUCCESS);
 }
 
-int	replace_pipebuffer(char **dstbuffer)
+static int	replace_pipebuffer(char **dstbuffer)
 {
 	char	*srcbuffer;
 

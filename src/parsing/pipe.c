@@ -6,14 +6,13 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 19:54:15 by yubin             #+#    #+#             */
-/*   Updated: 2024/08/21 14:01:10 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/26 13:19:40 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parsing.h"
 
-int	ft_ispipeopen(char *buffer);
-int	count_pipe(char *buffer);
+static int	count_pipe(char *buffer);
 
 int	handle_empty_pipe(char *buffer)
 {
@@ -91,7 +90,7 @@ char	**split_pipe(char *buffer)
 	return (strs);
 }
 
-int	count_pipe(char *buffer)
+static int	count_pipe(char *buffer)
 {
 	int	pipenum;
 	int	len;

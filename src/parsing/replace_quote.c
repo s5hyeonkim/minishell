@@ -1,59 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   replace_value_quote.c                              :+:      :+:    :+:   */
+/*   replace_quote.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 14:24:38 by yubshin           #+#    #+#             */
-/*   Updated: 2024/08/22 11:56:00 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/26 13:14:29 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parsing.h"
-
-char	*replace_value(t_deques *envps, char *str);
-char	*replace_quote(char *str);
-
-char	*replace_word(t_deques *envps, char *str)
-{
-	str = replace_value(envps, str);
-	if (!str)
-		return (NULL);
-	str = replace_quote(str);
-	if (!str)
-		return (NULL);
-	return (str);
-}
-
-char	*replace_value(t_deques *envps, char *str)
-{
-	char	*headstr;
-	char	*envp;
-	char	*dst;
-	int		len;
-
-	if (*str == SGL_QUOTE && is_closed_quotation(str))
-		return (str);
-	headstr = str; 
-	dst = ft_calloc(1, sizeof(char));
-	while (*str)
-	{
-		envp = NULL;
-		envp = get_novalue(str, &len);
-		if (!envp && *str == DOLLAR)
-			envp = get_dollar(str, &len);
-		if (!envp && *str == DOLLAR)
-			envp = get_status(str, &len);
-		if (!envp && *str == DOLLAR)
-			envp = get_env(envps, str + 1, &len);
-		if (envp)
-			dst = strjoin_free(dst, envp);
-		str += len;
-	}
-	free(headstr);
-	return (dst);
-}
 
 char	*replace_quote(char *str)
 {
