@@ -37,7 +37,6 @@ static void	subprocess(t_shell *shell)
 	set_signal_sub(handler_sub);
 	while (index < shell->p_size)
 	{
-		printf("path: %s\n", shell->p[index].exec.path);
 		if (open_pipe(&shell->p[index], shell->p_size) \
 				|| fork_process(&shell->p[index]))
 		{
