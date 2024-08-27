@@ -71,13 +71,14 @@ char		*read_val_deq(t_deques *deq, char *key);
 char		**deqtostrs(t_deque *deq);
 t_deques	*strstodeq(char **strs);
 char		*get_val_deq(t_deques *deqs, char *key);
+size_t		ft_deqlen(t_deque *head);
 
 /*utils.c*/
 t_deque		*find_deq(t_deques *deq, char *key);
 int			is_valid_key(char *s);
 
 /*map.c*/
-char		*ft_pairjoin(char *key, char mid, char *val);
+char		*ft_pairjoin(t_map *keyval);
 char		*get_key(char *str);
 int			set_map(t_map *keyval, char *str);
 int			set_keyval(t_map *keyval, char *key, char *val, t_state state);

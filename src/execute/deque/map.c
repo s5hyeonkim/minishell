@@ -11,21 +11,23 @@
 /* ************************************************************************** */
 #include "deque.h"
 
-char	*ft_pairjoin(char *key, char mid, char *val)
+char	*ft_pairjoin(t_map *keyval)
 {
-	char	*temp;
-	char	*ret;
-	char	m[2];	
+	size_t	len;
+	char	*str;
 
-	ret = NULL;
-	m[0] = mid;
-	m[1] = 0;
-	temp = ft_strjoin(key, m);
-	if (!temp)
+	len = ft_strlen(keyval->key);
+	if (keyval->mid)
+		len++;
+	len += ft_strlen(keyval->val);
+	str = ft_calloc(len + 1, sizeof(char));
+	if (!str)
 		return (NULL);
-	ret = ft_strjoin(temp, val);
-	free(temp);
-	return (ret);
+	ft_strlcat(str, keyval->key, len + 1);
+	if (keyval->mid)
+		ft_strlcat(str, "=", len + 1);
+	ft_strlcat(str, keyval->val, len + 1);
+	return (str);
 }
 
 char	*get_key(char *str)
@@ -78,7 +80,8 @@ int	set_map(t_map *keyval, char *str)
 
 int	set_keyval(t_map *keyval, char *key, char *val, t_state state)
 {
-	ft_memset(keyval, 0, sizeof(keyval));
+	ft_memset(keyval, 0, sizeof(t_map));
+	keyval->mid = 0;
 	keyval->key = ft_strdup(key);
 	if (keyval->key)
 		keyval->val = ft_strdup(val);

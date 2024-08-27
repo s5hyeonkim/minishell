@@ -20,7 +20,7 @@ char	*get_pathcmd(char **paths, char *cmd)
 	index = 0;
 	while (paths[index])
 	{
-		ret = ft_pairjoin(paths[index++], '/', cmd);
+		ret = ft_triplejoin(paths[index++], "/", cmd);
 		if (!ret || !access(ret, X_OK))
 			return (ret);
 		free(ret);
@@ -36,6 +36,43 @@ char	*get_cmdpath(char **paths, char *cmd)
 		ret = ft_strdup(cmd);
 	else
 		ret = get_pathcmd(paths, cmd);
+	return (ret);
+}
+
+void	print_deq(t_deques *deqs)
+{
+	t_deque *node;
+	node = deqs->head;
+	while (node)
+	{
+		node = node->next;
+		if (node == deqs->head)
+			break ;
+	}
+}
+
+static char	**deqstostrs(t_deque *deq)
+{
+	char	**ret;
+	size_t	size;
+	size_t	id;
+
+	size = ft_deqlen(deq);
+	ret = ft_calloc(size + 1, sizeof(char *));
+	if (!ret)
+		return (NULL);
+	id = 0;
+	while (id < size)
+	{
+		ret[id] = ft_pairjoin(deq->data);
+		if (!ret[id])
+		{
+			free_strs(ret);
+			return (NULL);
+		}
+		id++;
+		deq = deq->next;
+	}
 	return (ret);
 }
 
@@ -58,7 +95,7 @@ char	**get_cmdargs(char **cmds)
 		}
 		index++;
 	}
-	strs = deqtostrs(deqs->head);
+	strs = deqstostrs(deqs->head);
 	free_deques(&deqs);
 	return (strs);
 }

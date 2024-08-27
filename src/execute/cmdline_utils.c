@@ -34,27 +34,25 @@ int	check_quotation_flag(int *flag, int flag2)
 
 void	parsing_cmd(char *cmd, size_t *start, size_t *end)
 {
-	size_t		size;
 	int			flag;
 	int			flag1;
 
-	size = *start;
 	flag = 0;
 	flag1 = 0;
-	while (cmd[size] == ' ')
-		size++;
-	*start = size;
-	while (cmd[size])
+	while (cmd[*start] == ' ')
+		(*start)++;
+	*end = *start;
+	while (cmd[*end])
 	{
-		if (cmd[size] == '\'' && check_quotation_flag(&flag, flag1))
-			size++;
-		if (cmd[size] == '\"' && check_quotation_flag(&flag1, flag))
-			size++;
-		if (!flag1 && !flag && cmd[size] == ' ')
+		if (cmd[*end] == '\'' && check_quotation_flag(&flag, flag1))
+			(*end)++;
+		else if (cmd[*end] == '\"' && check_quotation_flag(&flag1, flag))
+			(*end)++;
+		else if (!flag1 && !flag && cmd[*end] == ' ')
 			break ;
-		size++;
+		else
+			(*end)++;
 	}
-	*end = size;
 }
 
 int	set_parsing_deques(t_deques *deqs, char *cmd)
@@ -83,4 +81,21 @@ int	set_parsing_deques(t_deques *deqs, char *cmd)
 		fb[0] = ++fb[1];
 	}
 	return (EXIT_SUCCESS);
+}
+
+char	*ft_triplejoin(char *s1, char *s2, char *s3)
+{
+	size_t	len;
+	char	*ret;
+
+	len = ft_strlen(s1);
+	len += ft_strlen(s2);
+	len += ft_strlen(s3);
+	ret = ft_calloc(len + 1, sizeof(char));
+	if (!ret)
+		return (NULL);
+	ft_strlcat(ret, s1, len + 1);
+	ft_strlcat(ret, s2, len + 1);
+	ft_strlcat(ret, s3, len + 1);
+	return (ret);
 }

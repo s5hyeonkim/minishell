@@ -62,6 +62,8 @@ int	push_keyval(t_deques *deqs, char *key, char *val, t_state state)
 		free_map(&keyval);
 		return (EXTRA_ERROR);
 	}
+	t_map *a;
+	a = deqs->tail->data;
 	return (EXIT_SUCCESS);
 }
 

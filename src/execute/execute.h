@@ -131,6 +131,7 @@ int			is_noopt(t_exec p);
 /*cmdline_utils.c*/
 int			is_valid_quotation(size_t *start, int *open1, int open2);
 int			set_parsing_deques(t_deques *deqs, char *cmd);
+char		*ft_triplejoin(char *s1, char *s2, char *s3);
 
 /*cmdline.c*/
 char		*get_pathcmd(char **paths, char *cmd);

@@ -32,27 +32,27 @@ size_t	ft_deqlen(t_deque *head)
 char	**deqtostrs(t_deque *dq)
 {
 	char	**ret;
-	t_map	*keyval;
 	size_t	id;
-	size_t	size;
+	size_t	len;
 
-	id = 0;
-	size = ft_deqlen(dq);
-	ret = ft_calloc(size + 1, sizeof(char *));
+	len = ft_deqlen(dq);
+	ret = ft_calloc(len + 1, sizeof(char *));
 	if (!ret)
 		return (NULL);
-	while (id < size)
+	id = 0;
+	while (id < len)
 	{
-		keyval = (t_map *)(dq->data);
-		dq = dq->next;
-		if (keyval->state == SET || keyval->state == NO)
-			continue ;
-		ret[id] = ft_pairjoin(keyval->key, keyval->mid, keyval->val);
-		if (!ret[id++])
+		if (((t_map *)dq->data)->state == ENV || ((t_map *)dq->data)->state == EXPORT)
 		{
-			free_strs(ret);
-			return (NULL);
+			ret[id] = ft_pairjoin(dq->data);
+			if (!ret[id])
+			{
+				free_strs(ret);
+				return (NULL);
+			}
 		}
+		id++;
+		dq = dq->next;
 	}
 	return (ret);
 }
