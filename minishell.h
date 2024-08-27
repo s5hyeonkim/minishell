@@ -59,6 +59,7 @@ void		parent(t_shell *shell, size_t index);
 /* setting.c */
 void		set_shell(t_shell *shell, char *envp[]);
 int			set_env_paths(t_data *d);
+void		set_data(t_shell *shell, char *envp[]);
 
 /* process.c */
 void		exec_cmds(t_shell *shell);

@@ -59,7 +59,7 @@ int	export_wo_argv(t_data *d, int fd[2])
 {
 	char	**envs;
 
-	envs = deqtostrs(d->envps->head);
+	envs = deqtostrs(d->envps->head, EXPORT);
 	if (!envs)
 		return (handle_error("export", NULL, EXTRA_ERROR));
 	ft_sort(envs, ft_keycmp);

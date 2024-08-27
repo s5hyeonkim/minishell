@@ -13,6 +13,13 @@
 #include "minishell.h"
 
 /* main */
+
+void	set_shell(t_shell *shell, char *envp[])
+{
+	ft_memset(shell, 0, sizeof(t_shell));
+	set_data(shell, envp);
+}
+
 void	init(t_shell *shell, int argc, char *envp[])
 {
 	set_shell(shell, envp);

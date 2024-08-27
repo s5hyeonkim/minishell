@@ -6,7 +6,7 @@
 /*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 18:41:44 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/14 18:42:56 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/27 11:26:50 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ size_t	ft_deqlen(t_deque *head)
 	return (size);
 }
 
-char	**deqtostrs(t_deque *dq)
+char	**deqtostrs(t_deque *dq, t_state state)
 {
 	char	**ret;
 	size_t	id;
@@ -42,7 +42,7 @@ char	**deqtostrs(t_deque *dq)
 	id = 0;
 	while (id < len)
 	{
-		if (((t_map *)dq->data)->state == ENV || ((t_map *)dq->data)->state == EXPORT)
+		if (((t_map *)dq->data)->state >= state)
 		{
 			ret[id] = ft_pairjoin(dq->data);
 			if (!ret[id])

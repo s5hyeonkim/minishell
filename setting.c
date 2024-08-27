@@ -17,7 +17,7 @@ int	set_env_paths(t_data *d)
 
 	free_strs(d->paths);
 	d->paths = NULL;
-	envp = deqtostrs(d->envps->head);
+	envp = deqtostrs(d->envps->head, ENV);
 	if (envp)
 		d->paths = get_env_paths(envp);
 	free_strs(envp);
@@ -74,18 +74,12 @@ static int	init_path(t_data *d)
 	return (EXIT_SUCCESS);
 }
 
-static void	set_data(t_shell *shell, char *envp[])
+void	set_data(t_shell *shell, char *envp[])
 {
 	shell->data.envps = strstodeq(envp);
-	if (!shell->data.envps || init_path(&shell->data) || set_env_paths(&shell->data) \
-			|| set_cwd(&shell->data.lcwd))
+	if (!shell->data.envps || init_path(&shell->data) \
+	|| set_env_paths(&shell->data) || set_cwd(&shell->data.lcwd))
 		exit_process(shell, NULL, EXTRA_ERROR);
 	set_depth(shell);
 	set_pwd_path(shell);
-}
-
-void	set_shell(t_shell *shell, char *envp[])
-{
-	ft_memset(shell, 0, sizeof(t_shell));
-	set_data(shell, envp);
 }

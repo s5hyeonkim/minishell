@@ -18,9 +18,9 @@
 typedef enum e_state
 {
 	NO = 0,
-	EXPORT = 1,
-	ENV = 2,
-	SET = 3
+	SET = 1,
+	EXPORT = 2,
+	ENV = 3,
 }	t_state;
 
 typedef struct s_map
@@ -68,7 +68,7 @@ t_deque		*pop_target(t_deques *deqs, t_deque *target);
 
 /*api.c*/
 char		*read_val_deq(t_deques *deq, char *key);
-char		**deqtostrs(t_deque *deq);
+char		**deqtostrs(t_deque *deq, t_state state);
 t_deques	*strstodeq(char **strs);
 char		*get_val_deq(t_deques *deqs, char *key);
 size_t		ft_deqlen(t_deque *head);

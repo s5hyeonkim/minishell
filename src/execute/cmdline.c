@@ -6,7 +6,7 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 07:42:29 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/21 17:19:39 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/27 11:27:15 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,43 +39,6 @@ char	*get_cmdpath(char **paths, char *cmd)
 	return (ret);
 }
 
-void	print_deq(t_deques *deqs)
-{
-	t_deque *node;
-	node = deqs->head;
-	while (node)
-	{
-		node = node->next;
-		if (node == deqs->head)
-			break ;
-	}
-}
-
-static char	**deqstostrs(t_deque *deq)
-{
-	char	**ret;
-	size_t	size;
-	size_t	id;
-
-	size = ft_deqlen(deq);
-	ret = ft_calloc(size + 1, sizeof(char *));
-	if (!ret)
-		return (NULL);
-	id = 0;
-	while (id < size)
-	{
-		ret[id] = ft_pairjoin(deq->data);
-		if (!ret[id])
-		{
-			free_strs(ret);
-			return (NULL);
-		}
-		id++;
-		deq = deq->next;
-	}
-	return (ret);
-}
-
 char	**get_cmdargs(char **cmds)
 {
 	t_deques	*deqs;
@@ -95,7 +58,7 @@ char	**get_cmdargs(char **cmds)
 		}
 		index++;
 	}
-	strs = deqstostrs(deqs->head);
+	strs = deqtostrs(deqs->head, NO);
 	free_deques(&deqs);
 	return (strs);
 }

@@ -26,7 +26,7 @@ int	ft_env(t_process p, t_data *d)
 
 	if (!is_envopt(p.exec.args[1]))
 		return (handle_error(p.exec.args[0], p.exec.args[1], INVALID_OPT));
-	envs = deqtostrs(d->envps->head);
+	envs = deqtostrs(d->envps->head, ENV);
 	if (!envs)
 		return (handle_error(p.exec.args[0], NULL, EXTRA_ERROR));
 	index = 0;

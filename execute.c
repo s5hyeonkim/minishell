@@ -27,33 +27,39 @@ void	exit_subprocess(t_shell *shell, char *obj, int errcode)
 	exit(errcode);
 }
 
-void	exec_program(t_shell *shell, t_process p)
+static void	parsing_route(t_shell *shell, t_process p)
 {
-	char	**envp;
 	char	*pr;
 	int		status;
 
-	envp = deqtostrs(shell->data.envps->head);
+	status = errno;
+	pr = get_nextdir(p.exec.path, shell->data.lcwd);
+	if (pr)
+	{
+		if (is_folder(pr))
+			errno = E_ISDIR;
+		else if (access(pr, F_OK))
+			errno = ENOENT;
+		else if (access(pr, X_OK))
+			errno = EACCES;
+		else
+			errno = status;
+	}
+	free(pr);
+}
+
+void	exec_program(t_shell *shell, t_process p)
+{
+	char	**envp;
+
+	envp = deqtostrs(shell->data.envps->head, ENV);
 	if (!envp)
 		exit_subprocess(shell, NULL, EXTRA_ERROR);
 	if (execve(p.exec.path, p.exec.args, envp) == -1)
 	{
-		status = errno;
 		if (!ft_strchr(p.exec.args[0], '/'))
 			exit_subprocess(shell, p.exec.args[0], CMD_NOT_FOUND);
-		pr = get_nextdir(p.exec.path, shell->data.lcwd);
-		if (pr)
-		{
-			if (is_folder(pr))
-				errno = E_ISDIR;
-			else if (access(pr, F_OK))
-				errno = ENOENT;
-			else if (access(pr, X_OK))
-				errno = EACCES;
-			else
-				errno = status;
-		}
-		free(pr);
+		parsing_route(shell, p);
 		exit_subprocess(shell, p.exec.args[0], EXTRA_ERROR);
 	}
 }

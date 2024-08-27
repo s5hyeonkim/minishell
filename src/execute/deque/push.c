@@ -6,7 +6,7 @@
 /*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/11 16:50:52 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/26 17:17:30 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/27 11:26:28 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "deque.h"
@@ -62,8 +62,6 @@ int	push_keyval(t_deques *deqs, char *key, char *val, t_state state)
 		free_map(&keyval);
 		return (EXTRA_ERROR);
 	}
-	t_map *a;
-	a = deqs->tail->data;
 	return (EXIT_SUCCESS);
 }
 
