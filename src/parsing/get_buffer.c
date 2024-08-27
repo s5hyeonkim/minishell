@@ -6,7 +6,7 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 19:47:20 by yubin             #+#    #+#             */
-/*   Updated: 2024/08/26 13:10:34 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/27 11:32:34 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,8 @@ static int	replace_pipebuffer(char **dstbuffer)
 
 	if (set_next_cmd(&srcbuffer))
 	{
+		free(*dstbuffer);
+		free(srcbuffer);
 		*dstbuffer = NULL;
 		return (handle_error(NULL, NULL, SYN_TERM));
 	}

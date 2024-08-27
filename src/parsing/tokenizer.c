@@ -6,7 +6,7 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 21:47:20 by yubin             #+#    #+#             */
-/*   Updated: 2024/08/26 13:47:07 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/27 10:35:31 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,9 +58,8 @@ static int	token_redirect(t_token **token, t_deques *envps, char *buffer)
 		if (*buffer == '\0')
 			return (EXIT_SUCCESS);
 		filename = ft_substr(buffer, 0, len);
-		if (filename == NULL)
-			return (EXTRA_ERROR);
-		filename = replace_word(envps, filename);
+		if (filename)
+			filename = replace_word(envps, filename);
 		if (!filename)
 			return (EXTRA_ERROR);
 		if (add_tokenright(token, typeno, filename, NULL) == EXTRA_ERROR)

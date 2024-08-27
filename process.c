@@ -3,12 +3,13 @@
 /*                                                        :::      ::::::::   */
 /*   process.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sohykim <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 07:02:29 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/19 18:27:46 by sohykim          ###   ########.fr       */
+/*   Updated: 2024/08/27 11:39:57 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "minishell.h"
 
 static void	wait_process(t_shell *shell)
@@ -23,6 +24,7 @@ static void	wait_process(t_shell *shell)
 		ret = waitpid(shell->p[index].pid, &status, 0);
 		if (ret == -1)
 			continue ;
+		handler_child(status);
 		if (!WIFSIGNALED(status) && WIFEXITED(status))
 			g_status = WEXITSTATUS(status);
 		index++;
@@ -80,26 +82,6 @@ static void	token_to_process(t_shell *shell, t_token *t, size_t *index)
 		token_to_process(shell, t->left, index);
 	if (t->right)
 		token_to_process(shell, t->right, index);
-}
-
-int	set_cmd(t_shell *shell)
-{
-	size_t	index;
-	int		status;
-
-	index = 0;
-	if (set_env_paths(&shell->data))
-		return (EXTRA_ERROR);
-	while (index < shell->p_size)
-	{
-		if (set_args(&shell->p[index], shell->data))
-			return (EXTRA_ERROR);
-		status = set_redirect(&shell->p[index], shell->data.envps);
-		if (status)
-			return (status);
-		index++;
-	}
-	return (EXIT_SUCCESS);
 }
 
 void	exec_cmds(t_shell *shell)

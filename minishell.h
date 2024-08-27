@@ -6,7 +6,7 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 07:22:42 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/21 17:17:50 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/27 11:41:11 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,9 @@ int			open_pipe(t_process *p, size_t size);
 size_t		find_pipe(t_token *t);
 void		set_fd(t_shell *shell, size_t index);
 void		close_pipe(t_shell *shell, size_t index);
+
+/* set_cmd.c */
+int			set_cmd(t_shell *shell);
 
 /* terminal.c */
 void		get_terminal(t_shell *shell);

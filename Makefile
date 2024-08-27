@@ -1,21 +1,36 @@
+NAME = minishell
+
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -g
-CPPFLAGS = -I${HOME}/.brew/opt/readline/include -Iminishell.h -Ift_err.h -I./execute/execute.h -I./src/parsing.h -I./utils/terminal.h -MMD -MP
-LDFLAGS = -L${HOME}/.brew/opt/readline/lib -Llibft -L$(DEQDIR)
+CFLAGS = -Wall -Wextra -Werror
+CPPFLAGS = ${READLINE_INC} ${MINISHELL_INC} ${DEPFLAGS}
+LDFLAGS = ${READLINE_LIB_DIR} ${MINISHELL_LIB_DIR}
 LDLIBS = -lreadline -lft -lftdeque
+DEPFLAGS = -MMD -MP
+
+READLINE_INC = -I${HOME}/.brew/opt/readline/include
+READLINE_LIB_DIR = -L${HOME}/.brew/opt/readline/lib
+MINISHELL_INC = -Iminishell.h \
+				-Ift_err.h \
+				-I./src/execute/execute.h \
+				-I./src/parsing/parsing.h \
+				-I./utils/terminal.h \
+				-I./utils/ft_signal.h 
+MINISHELL_LIB_DIR = -Llibft \
+					-L${DEQDIR}
+
 BUILTINDIR = ./src/execute/builtin/
+DEQDIR = ./src/execute/deque
 EXECDIR = ./src/execute/
 PARSEDIR = ./src/parsing/
-SRCDIR = ./src/
-OBJDIR = ./obj/
 UTILSDIR = ./utils/
-DEQDIR = ./src/execute/deque
+
 SRCS = ./main.c \
 		./execute.c \
 		./free.c \
 		./setting.c \
 		./process.c \
 		./process_utils.c \
+		./set_cmd.c \
 		./validation.c \
 		./terminal.c \
 		$(UTILSDIR)print.c \
@@ -64,7 +79,6 @@ SRCS = ./main.c \
 
 OBJS = $(SRCS:.c=.o)
 DEPS = $(SRCS:.c=.d)
-NAME = minishell
 
 all : $(NAME)
 
@@ -74,7 +88,6 @@ $(NAME) : $(OBJS)
 	make -C libft
 	make -C $(DEQDIR)
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) $^ -o $@
-
 
 $(EXECDIR)%.o : $(EXECDIR)%.c
 	$(CC) $(CFLAGS) -c -o $@ $<

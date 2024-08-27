@@ -1,29 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_signal.h                                        :+:      :+:    :+:   */
+/*   set_cmd.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/08/21 13:41:54 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/27 10:23:29 by yubshin          ###   ########.fr       */
+/*   Created: 2024/08/27 11:39:03 by yubshin           #+#    #+#             */
+/*   Updated: 2024/08/27 11:39:59 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FT_SIGNAL_H
-# define FT_SIGNAL_H
-# include <signal.h>
-# include <sys/signal.h>
+#include "minishell.h"
 
-/* signal.c */
-int		set_signal(void (*handler)(int), int signo);
-int		set_signal_init(void (*handler)(int));
-int		set_signal_sub(void (*handler)(int));
+int	set_cmd(t_shell *shell)
+{
+	size_t	index;
+	int		status;
 
-/* signal_utils.c */
-void	handler_init(int signo);
-void	handler_sub(int signo);
-void	handler_child(int status);
-void	replace_line(int redisplayon);
-
-#endif
+	index = 0;
+	if (set_env_paths(&shell->data))
+		return (EXTRA_ERROR);
+	while (index < shell->p_size)
+	{
+		if (set_args(&shell->p[index], shell->data))
+			return (EXTRA_ERROR);
+		status = set_redirect(&shell->p[index], shell->data.envps);
+		if (status)
+			return (status);
+		index++;
+	}
+	return (EXIT_SUCCESS);
+}

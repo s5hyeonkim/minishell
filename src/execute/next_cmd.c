@@ -6,7 +6,7 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 16:25:15 by yubshin           #+#    #+#             */
-/*   Updated: 2024/08/21 14:14:02 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/27 11:03:37 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,10 +54,7 @@ int	wait_reading(t_process p, char **s)
 	set_signal_init(handler_pipe_wait);
 	byte = read(p.fd.pipe[0], buffer, sizeof(buffer) - 1);
 	if (byte > 0)
-	{
 		buffer[byte] = 0;
-		printf("%s\n", buffer);
-	}
 	waitpid(p.pid, &status, 0);
 	*s = ft_strdup(buffer);
 	set_signal_init(handler_sub);
