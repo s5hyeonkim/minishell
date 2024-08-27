@@ -6,7 +6,7 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 17:08:15 by yubshin           #+#    #+#             */
-/*   Updated: 2024/08/26 13:46:39 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/27 12:22:20 by yubshin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 # define PIPE '|'
 # define SGL_QUOTE '\''
 # define DBL_QUOTE '\"'
+# define T_SGL_QUOTE 1
+# define T_DBL_QUOTE 2
 # define LESS '>'
 # define GREAT '<'
 # define DOLLAR '$'
@@ -35,9 +37,7 @@ typedef enum e_typeno
 	T_DLESS,
 	T_DGREAT,
 	T_LESS,
-	T_GREAT,
-	T_DOUBLE_QUOTES,
-	T_SINGLE_QUOTES
+	T_GREAT
 }	t_typeno;
 
 typedef struct s_token
