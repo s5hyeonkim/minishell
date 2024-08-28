@@ -12,18 +12,23 @@
 
 #include "deque.h"
 
-size_t	ft_deqlen(t_deque *head)
+size_t	ft_deqlen(t_deque *head, t_state state)
 {
 	t_deque	*deq;
 	size_t	size;
+	t_map	*keyval;
 
 	if (!head)
 		return (0);
-	size = 1;
 	deq = head;
-	while (deq != head->prev)
+	size = 0;
+	while (TRUE)
 	{
-		size++;
+		keyval = deq->data;
+		if (keyval->state >= state)
+			size++;
+		if (deq == head->prev)
+			break ;
 		deq = deq->next;
 	}
 	return (size);
@@ -35,7 +40,7 @@ char	**deqtostrs(t_deque *dq, t_state state)
 	size_t	id;
 	size_t	len;
 
-	len = ft_deqlen(dq);
+	len = ft_deqlen(dq, state);
 	ret = ft_calloc(len + 1, sizeof(char *));
 	if (!ret)
 		return (NULL);
@@ -45,13 +50,12 @@ char	**deqtostrs(t_deque *dq, t_state state)
 		if (((t_map *)dq->data)->state >= state)
 		{
 			ret[id] = ft_pairjoin(dq->data);
-			if (!ret[id])
+			if (!ret[id++])
 			{
 				free_strs(ret);
 				return (NULL);
 			}
 		}
-		id++;
 		dq = dq->next;
 	}
 	return (ret);

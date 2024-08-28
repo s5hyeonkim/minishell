@@ -78,7 +78,7 @@ SRCS = ./main.c \
 		$(EXECDIR)next_cmd.c \
 
 OBJS = $(SRCS:.c=.o)
-DEPS = $(SRCS:.c=.d)
+DEPS = $(SRCS:.c=.d) 
 
 all : $(NAME)
 

@@ -23,7 +23,7 @@ static int	is_plusval(char *str)
 
 static int	is_noreplace(t_deques *envps, t_map keyval)
 {
-	if (!keyval.mid && find_deq(envps, keyval.key))
+	if (keyval.state != ENV && find_deq(envps, keyval.key))
 		return (TRUE);
 	return (FALSE);
 }
@@ -51,7 +51,7 @@ int	add_val(t_deques *envps, t_map *keyval, char *str)
 		return (EXIT_SUCCESS);
 	if (is_plusval(str) && concat_val(envps, keyval))
 		return (EXTRA_ERROR);
-	if (replace_back(envps, keyval->key, keyval->val, ENV))
-		return (EXTRA_ERROR);
-	return (EXIT_SUCCESS);
+	if (keyval->mid)
+		return (replace_back(envps, keyval->key, keyval->val, ENV));
+	return (replace_back(envps, keyval->key, keyval->val, EXPORT));
 }

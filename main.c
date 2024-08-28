@@ -6,7 +6,7 @@
 /*   By: yubshin <yubshin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 16:43:13 by sohykim           #+#    #+#             */
-/*   Updated: 2024/08/27 11:42:38 by yubshin          ###   ########.fr       */
+/*   Updated: 2024/08/28 11:38:05 by sohykim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,8 @@ void	readlines(t_shell *shell, char **buffer)
 		exit_wo_error(shell, g_status);
 	}
 	rl_replace_line("", 0);
-	add_history(*buffer);
+	if (**buffer)
+		add_history(*buffer);
 }
 
 void	loop(t_shell *shell)

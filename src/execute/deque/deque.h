@@ -71,7 +71,7 @@ char		*read_val_deq(t_deques *deq, char *key);
 char		**deqtostrs(t_deque *deq, t_state state);
 t_deques	*strstodeq(char **strs);
 char		*get_val_deq(t_deques *deqs, char *key);
-size_t		ft_deqlen(t_deque *head);
+size_t		ft_deqlen(t_deque *head, t_state state);
 
 /*utils.c*/
 t_deque		*find_deq(t_deques *deq, char *key);

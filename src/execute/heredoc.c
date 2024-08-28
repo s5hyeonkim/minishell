@@ -16,10 +16,13 @@ int	wait_heredoc(t_process p)
 {
 	int	status;
 	int	s;
+	int	ret;
 
 	g_status = 0;
 	s = set_signal_init(handler_heredoc_wait);
-	waitpid(p.pid, &status, 0);
+	ret = -1;
+	while (ret == -1)
+		ret = waitpid(p.pid, &status, 0);
 	if (!s)
 		s = set_signal_init(handler_init);
 	if (!s && g_status)

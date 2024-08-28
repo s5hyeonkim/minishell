@@ -61,7 +61,7 @@ char	*get_value(char *str)
 
 int	set_map(t_map *keyval, char *str)
 {
-	ft_memset(keyval, 0, sizeof(keyval));
+	ft_memset(keyval, 0, sizeof(t_map));
 	keyval->state = EXPORT;
 	if (ft_strchr(str, '='))
 	{
@@ -83,6 +83,7 @@ int	set_keyval(t_map *keyval, char *key, char *val, t_state state)
 	ft_memset(keyval, 0, sizeof(t_map));
 	keyval->mid = 0;
 	keyval->key = ft_strdup(key);
+	keyval->state = state;
 	if (keyval->key)
 		keyval->val = ft_strdup(val);
 	if (!keyval->key || !keyval->val)

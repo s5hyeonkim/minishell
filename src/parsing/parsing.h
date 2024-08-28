@@ -127,11 +127,4 @@ char	*strchr_end(char *str, int chr);
 char	*find_notspace(char *str);
 int		handle_error_withstr(char *exec, char *str, int len, int code);
 
-/* debug.c */
-void	debug_buffers(char **buffers);
-void	debug_token(t_token *token);
-void	debug_tree(t_token *dsttoken, int leftright, int i);
-
-char	*replace_quote(char *str);
-
 #endif

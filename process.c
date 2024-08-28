@@ -16,17 +16,23 @@ static void	wait_process(t_shell *shell)
 {
 	size_t	index;
 	int		status;
+	int		flag;
 	int		ret;
 
 	index = 0;
+	flag = 0;
 	while (index < shell->p_size && shell->p[index].pid)
 	{
 		ret = waitpid(shell->p[index].pid, &status, 0);
 		if (ret == -1)
 			continue ;
-		handler_child(status);
 		if (!WIFSIGNALED(status) && WIFEXITED(status))
 			g_status = WEXITSTATUS(status);
+		if (WIFSIGNALED(status) && !flag)
+		{
+			flag = 1;
+			handler_child(status);
+		}
 		index++;
 	}
 }
